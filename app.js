@@ -36,10 +36,18 @@ io.on('connection', function(socket){
 
     console.log('a user connected');
 
-    socket.on('register session', function(roomID) {
+    socket.on('register room', function(roomID) {
         console.log('join room', roomID);
+
+        var sockets = getSocketsOfRoom(roomID);
+        if (sockets.length > 1) {
+            return socket.emit('room registered', { isSuccessful: false, error: 'There are too many users in this room!' });
+        }
+
         socket.roomID = roomID;
         socket.join(roomID);
+        socket.emit('room registered', { isSuccessful: true });
+
         roomJoined = true;
     });
 
@@ -59,6 +67,18 @@ io.on('connection', function(socket){
         }
     });
 });
+
+function getSocketsOfRoom(roomID, namespace) {
+    var ns = io.of(namespace || '/');
+
+    if (!roomID || !ns) {
+        return [];
+    }
+
+    return _.filter(ns.connected, function(socket) {
+        return _.contains(socket.rooms, roomID);
+    });
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
