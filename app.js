@@ -4,6 +4,7 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var _ = require('lodash');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -31,14 +32,31 @@ app.use('/', routes);
 app.use('/users', users);
 
 io.on('connection', function(socket){
+    var roomJoined = false;
+
     console.log('a user connected');
 
-    socket.on('chat message', function(msg){
-        io.emit('chat message', msg);
+    socket.on('register session', function(roomID) {
+        console.log('join room', roomID);
+        socket.roomID = roomID;
+        socket.join(roomID);
+        roomJoined = true;
+    });
+
+    socket.on('chat message', function(message){
+        if (!socket.roomID) {
+            return;
+        }
+
+        io.to(socket.roomID).emit('chat message', message);
     });
 
     socket.on('disconnect', function(){
         console.log('user disconnected');
+
+        if (roomJoined) {
+            socket.leave(socket.roomID);
+        }
     });
 });
 
