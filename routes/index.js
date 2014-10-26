@@ -7,7 +7,7 @@ router.get('/', function(req, res) {
 });
 
 router.get('/io-test', function(req, res) {
-  res.render('io-test');
+  res.render('io-test', { containerCss: 'io-test' });
 });
 
 module.exports = router;
