@@ -9,7 +9,7 @@ var GameBoard = React.createClass({
   handleCellClick: function (coords) {
     var ship = this.findShip(x, y);
     if(ship) {
-      setState({ships: React.addons.update(this.state.ships, )})
+      //setState({ships: React.addons.update(this.state.ships, )})
     }
   },
 
