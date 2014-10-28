@@ -3,6 +3,26 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+
 a {
   color: #00B7FF;
+}
+.gameboard {
+  display: inline-block;
+  padding-right: 3em;
+  .gameboard-table {
+    width: 600px;
+    height: 600px;
+    div.cell {
+      box-sizing: border-box;
+      width: 40px;
+      height: 40px;
+      float: left;
+      border: solid red 1px;
+
+      &.red {
+        background: red;
+      }
+    }
+  }
 }
