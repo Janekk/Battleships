@@ -30,3 +30,4 @@ node_modules
 .idea
 
 public/stylesheets/style.css
+public/scripts/bundle.js
