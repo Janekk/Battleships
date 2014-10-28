@@ -13,15 +13,14 @@
     "serve-favicon": "~2.1.3",
     "debug": "~2.0.0",
     "jade": "~1.6.0",
-    "react": "~0.11.2",
+    "react": "~0.12.0",
     "browserify": "~6.0.3",
-    "express-react-views": "~0.5.1",
     "lodash": "~2.4.1",
     "socket.io": "^1.1.0"
   },
   "devDependencies": {
     "browserify": "~6.0.3",
-    "reactify": "~0.14.0",
+    "reactify": "andreypopp/reactify",
     "node-jsx": "~0.11.0",
     "vinyl-source-stream": "~1.0.0",
     "gulp-watch": "~1.1.0"

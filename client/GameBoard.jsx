@@ -33,7 +33,7 @@ var GameBoard = React.createClass({
           y: y,
           onCellClick: this.handleCellClick.bind(this, {x: x, y: y})
         }
-        divs.push((Cell(cellProps)));
+        divs.push((React.createElement(Cell, cellProps)));
       }.bind(this));
     }.bind(this));
 

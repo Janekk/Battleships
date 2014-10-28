@@ -9,8 +9,8 @@ var GamePanel = React.createClass({
     var oppBoardProps = _.extend( this.props.oppBoard, dragMethods);
     return (
       <div className="panel">
-        {GameBoard(myBoardProps)}
-        {GameBoard(oppBoardProps)}
+        {React.createElement(GameBoard, myBoardProps)}
+        {React.createElement(GameBoard, oppBoardProps)}
       </div>
     );
   }

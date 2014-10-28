@@ -29,7 +29,8 @@ var activator = {
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      React.renderComponent(GamePanel(gameData), document.getElementById('gameboard'));
+      var GamePanelFactory = React.createFactory(GamePanel);
+      React.render(GamePanelFactory(gameData), document.getElementById('gameboard'));
     });
   }
 }
