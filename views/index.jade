@@ -1,6 +1,10 @@
 extends layout
-
+block header
+  script(src='https://code.jquery.com/jquery-2.1.1.min.js')
+  script(src='https://cdn.socket.io/socket.io-1.1.0.js')
 block content
   h1= title
   p Welcome to #{title}
   div.gameboard#gameboard
+block footer
+  script(src="/scripts/bundle.js")

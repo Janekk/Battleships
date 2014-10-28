@@ -3,11 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index', { title: 'Börd Casino' });
-});
-
-router.get('/io-test', function(req, res) {
-  res.render('io-test', { containerCss: 'io-test' });
+  res.render('index', { title: 'Börd Casino', containerCss: 'boerd-casino' });
 });
 
 module.exports = router;
