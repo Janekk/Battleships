@@ -3,6 +3,7 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body
+    block header
+  body(class=containerCss)
     block content
     script(src="/scripts/bundle.js")

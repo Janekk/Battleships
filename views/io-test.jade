@@ -1,0 +1,16 @@
+extends layout
+block header
+    script(src='https://code.jquery.com/jquery-2.1.1.min.js')
+    script(src='https://cdn.socket.io/socket.io-1.1.0.js')
+    script(src='/scripts/io-test.js')
+block content
+    h1 socket.io test
+    p.room-id
+        input#room-id(type='text', name='roomID')
+        button#register-room register room
+    p.chart-message
+        input#message(type='text', name='message', disabled='true')
+        button#send-message(disabled='true') send
+    p.messages
+        h2 messages
+        ul#messages
