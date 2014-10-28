@@ -1,5 +1,6 @@
 module.exports = function(http) {
     var io = require('socket.io')(http);
+    var _ = require('lodash');
 
     io.on('connection', function(socket){
         var roomJoined = false;
