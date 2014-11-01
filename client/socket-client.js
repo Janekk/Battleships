@@ -39,9 +39,13 @@ module.exports = function() {
 
     socket.on('game started', function(result) {
         toastr.info('game started');
+
+        //TODO show gameboard and user can position ships
     });
 
     socket.on('player left', function() {
         toastr.warning('player has left :-(');
+
+        //TODO cancel game
     });
 };
