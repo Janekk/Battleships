@@ -5,7 +5,7 @@ var source = require('vinyl-source-stream');
 var paths = {
   src: {
     client: {
-      scripts : 'client/**/*.js',
+      scripts: './client/*',
       app: './client/main.js'
     },
     server: {
@@ -23,12 +23,14 @@ var paths = {
   }
 };
 
+
 gulp.task('browserify', function () {
   return gulpClientBundle();
 });
 
 var gulpClientBundle = function () {
-  var b = browserify(paths.src.client.app,
+  var plumber = require('gulp-plumber');
+  return browserify(paths.src.client.app,
     {
       extensions: ['.jsx', '.js']
     })
@@ -36,16 +38,13 @@ var gulpClientBundle = function () {
     .transform('reactify') //don't generate intermediate js files
     .bundle()
     .pipe(source(paths.dest.client.bundle))
+    .pipe(plumber())
     .pipe(gulp.dest(paths.dest.client.scripts));
 }
 
-// Rerun the task when a file changes
-var watch = require('gulp-watch');
-gulp.task('watch', function() {
-
-  watch({glob: [paths.src.client.scripts, paths.src.jsx, paths.dest.bundlesFilter]}, function () {
-    return gulpClientBundle();
-  });
+//var watch = require('gulp-watch');
+gulp.task('watch', function () {
+  gulp.watch([paths.src.client.scripts], ['browserify']);
 });
 
 //// Rerun the task when a file changes
@@ -57,27 +56,22 @@ gulp.task('watch', function() {
 //  });
 //});
 
-////"watch" for server
-//var nodemon = require('gulp-nodemon');
-//gulp.task('watchserver', function () {
-//    nodemon({
-//      script: 'app.js',
-//      ext: 'js,jsx,json',
-//      ignore: ['client', 'public', 'gulpfile.js'],
-//      watch: [
-//        'app.js', 'routing.js', 'passport.js',
-//        'config/*',
-//        'components/*',
-//        'views/*',
-//        'routes'
-//      ],
-//      env: {
-//        "NODE_ENV": "development"
-//      }
-//    })
-//      //.on('change', ['lint'])
-//      .on('restart', function () {
-//        console.log('restarted!');
-//      });
-//  }
-//);
+//"watch" for server
+var nodemon = require('gulp-nodemon');
+gulp.task('watchserver', function () {
+    nodemon({
+      script: 'app.js',
+      ext: 'js jsx json',
+      ignore: ['client/*', 'public/*', 'gulpfile.js'],
+      watch: [
+        'app.js',
+        'views',
+        'routes'
+      ]
+    })
+      //.on('change', ['lint'])
+      .on('restart', function () {
+        console.log('restarted!');
+      });
+  }
+);
