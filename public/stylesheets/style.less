@@ -14,15 +14,20 @@ a {
     .gameboard-table {
       width: 600px;
       height: 600px;
-      div.cell {
-        box-sizing: border-box;
-        width: 40px;
-        height: 40px;
-        float: left;
-        border: solid red 1px;
+      rect.cell {
+        fill:blue;
+        stroke:black;
+        stroke-width:2;
+        opacity:0.5;
 
-        &.red {
-          background: red;
+        &.ship {
+          fill: red;
+        }
+
+        &.selected {
+          stroke: red;
+          fill: red;
+          opacity: 0.1;
         }
       }
     }
