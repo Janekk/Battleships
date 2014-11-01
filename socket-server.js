@@ -18,28 +18,41 @@ module.exports = function(http) {
             socket.roomID = roomID;
             socket.join(roomID);
 
-            var result = { isSuccessful: true };
+            if (sockets.length == 0) { // no opponent at the moment
+                socket.emit('room joined', {
+                    isSuccessful: true,
+                    message: 'waiting for other player...'
+                });
+            }
+            else { // has opponent
+                var opponent = _.find(sockets, function(s) {
+                    return s.id !== socket.id;
+                });
 
-            if (sockets.length == 0) {
-                result.message = 'waiting for other player...'
+                // announce opponenta
+                socket.opponent = opponent;
+                opponent.opponent = socket;
+
+                socket.emit('room joined', {
+                    isSuccessful: true
+                });
+
+                socket.opponent.emit('opponent joined');
+
+                setTimeout(function() {
+                    io.sockets.in(socket.roomID).emit('game started', {});
+                }, 5000);
             }
 
-            socket.emit('room joined', result);
             roomJoined = true;
         });
 
-        /*
-        socket.on('chat message', function(message){
-            if (!socket.roomID) {
-                return;
-            }
-
-            io.to(socket.roomID).emit('chat message', message);
-        });
-        */
-
         socket.on('disconnect', function(){
             console.log('user disconnected');
+
+            if (socket.opponent) { // has opponent
+                socket.opponent.emit('player left');
+            }
 
             if (roomJoined) {
                 socket.leave(socket.roomID);

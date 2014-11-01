@@ -16,9 +16,13 @@ module.exports = function() {
 
     socket.on('room joined', function(result) {
         if (result.isSuccessful) {
+            var message = 'room joined';
+
             if (result.message) {
-                toastr.info(result.message);
+                message += '<br/>' + result.message;
             }
+
+            toastr.info(message);
         }
         else { // error
             toastr.error(result.error);
@@ -27,5 +31,17 @@ module.exports = function() {
             $('#room-id').prop('disabled', false);
             $('#join-button').prop('disabled', false);
         }
+    });
+
+    socket.on('opponent joined', function() {
+        toastr.info('player joined');
+    });
+
+    socket.on('game started', function(result) {
+        toastr.info('game started');
+    });
+
+    socket.on('player left', function() {
+        toastr.warning('player has left :-(');
     });
 };
