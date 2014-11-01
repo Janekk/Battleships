@@ -29,7 +29,7 @@ module.exports = function(http) {
                     return s.id !== socket.id;
                 });
 
-                // announce opponenta
+                // announce opponent
                 socket.opponent = opponent;
                 opponent.opponent = socket;
 
@@ -52,6 +52,7 @@ module.exports = function(http) {
 
             if (socket.opponent) { // has opponent
                 socket.opponent.emit('player left');
+                socket.opponent.opponent = undefined;
             }
 
             if (roomJoined) {
