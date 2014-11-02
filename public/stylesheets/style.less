@@ -11,25 +11,49 @@ a {
   .gameboard {
     display: inline-block;
     padding-right: 3em;
-    .gameboard-table {
-      width: 600px;
-      height: 600px;
-      rect.cell {
-        fill:blue;
-        stroke:black;
-        stroke-width:2;
-        opacity:0.5;
+    width: 100%;
 
-        &.ship {
-          fill: red;
-        }
-
-        &.selected {
-          stroke: red;
-          fill: red;
-          opacity: 0.1;
-        }
+    .board {
+      float: left;
+      .gameboard-table {
+        width: 600px;
+        height: 600px;
       }
+    }
+  }
+
+  .ships-panel {
+    float: right;
+  }
+
+  rect.cell {
+    fill: blue;
+    stroke: black;
+    stroke-width: 2;
+    opacity: 0.5;
+  }
+
+  g.ship {
+    fill: orange;
+    stroke: black;
+    stroke-width: 2;
+    opacity: 0.5;
+
+    &.selected {
+      stroke: black;
+      fill: red;
+      opacity: 0.2;
+    }
+  }
+
+  g.config {
+    fill: blue;
+    stroke: black;
+    stroke-width: 2;
+    opacity: 0.5;
+
+    &.selected {
+      fill: orange;
     }
   }
 }
