@@ -43,7 +43,7 @@ var gulpClientBundle = function () {
 }
 
 //var watch = require('gulp-watch');
-gulp.task('watch', function () {
+gulp.task('watch-browserify', function () {
   gulp.watch([paths.src.client.scripts], ['browserify']);
 });
 
@@ -58,7 +58,7 @@ gulp.task('watch', function () {
 
 //"watch" for server
 var nodemon = require('gulp-nodemon');
-gulp.task('watchserver', function () {
+gulp.task('watch-server', function () {
     nodemon({
       script: 'app.js',
       ext: 'js jsx json',
