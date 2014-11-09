@@ -1,49 +1,49 @@
 var React = require('react/addons');
+var Reflux = require('reflux');
 var _ = require('lodash');
+var Actions = require('./actions');
 
 var cellSize = 40;
 
+var GameBoardStore = require('./stores/GameBoardStore');
+var ClipboardStore = require('./stores/ClipboardStore');
+
 var GameBoardSvg = React.createClass({
+  mixins: [Reflux.ListenerMixin],
+
   getInitialState: function () {
     return {
-      selection: undefined
+      ships : [],
+      selected: null
     };
   },
 
-  handleBoardShipClick: function (ship) {
-    if (ship) {
-      var ship = _.find(this.props.ships, function (s) {
-        return s == ship;
-      });
-      if (ship) {
-        this.setState({selection: ship});
-      }
+  componentDidMount: function() {
+    this.listenTo(GameBoardStore, this.gameBoardChanged);
+    this.listenTo(ClipboardStore, this.clipboardChanged)
+  },
+
+  gameBoardChanged: function(gameboard) {
+    this.setState(gameboard);
+  },
+
+  clipboardChanged: function(clipboard) {
+    if(clipboard.type == 'board' && clipboard.action == 'select') {
+      this.setState({selected: clipboard.item});
+    }
+    else if(clipboard.type == 'config' && clipboard.action == 'select') {
+      this.setState({selected: null});
     }
   },
 
-  onDragOver: function (ev) {
-    ev.preventDefault();
+  handleShipClick: function (ship, event) {
+    event.stopPropagation();
+    Actions.setup.selectShip(ship);
   },
 
-  onDrop: function (ev) {
-    ev.preventDefault();
-    var confShip = JSON.parse(ev.dataTransfer.getData("text"));
-
-    var cells = this.getDroppedShip(this.getCell(ev), confShip);
-    var ship = {
-      name: 'red',
-      cells: cells
-    }
-
-    this.props.handleShipDrop(ship);
-  },
-
-  getDroppedShip: function (cell, ship) {
-    var result = [];
-    for (var i = 0; i < ship.size; i++) {
-      result.push({x: cell.x + i, y: cell.y});
-    }
-    return result;
+  handleCellClick: function(ev) {
+    var cell = this.getCell(ev);
+    Actions.setup.selectCell(cell);
   },
 
   getCell: function(event) {
@@ -51,10 +51,6 @@ var GameBoardSvg = React.createClass({
       x: Math.floor((event.pageX - event.currentTarget.offsetLeft) / cellSize),
       y: Math.floor((event.pageY - event.currentTarget.offsetTop) / cellSize)
     };
-  },
-
-  handleClick: function(ev) {
-    this.props.handleClick(this.getCell(ev), this.getDroppedShip);
   },
 
   render: function () {
@@ -71,15 +67,16 @@ var GameBoardSvg = React.createClass({
     }.bind(this));
 
     var ships = []
-    this.props.ships.forEach(function (ship, index) {
-      ships.push(<Ship key={index} ship={ship} selected={this.selection==ship} onShipClick={this.handleBoardShipClick.bind(this, ship)}/>)
+    this.state.ships.forEach(function (ship, index) {
+      ships.push(<Ship key={index} ship={ship} selected={this.state.selected == ship} onShipClick={this.handleShipClick.bind(this, ship)}/>)
     }.bind(this));
 
     return (
       <div>
         <p>{"Table name: " + this.props.name}</p>
-        <div className="gameboard-table" onDragOver={this.onDragOver} onDrop={this.onDrop} onClick={this.handleClick}>
+        <div className="gameboard-table" onClick={this.handleCellClick}>
           <svg width="600" height="600">
+
             {cells}
             {ships}
           </svg>

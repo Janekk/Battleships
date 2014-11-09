@@ -1,37 +1,64 @@
 var React = require('react');
 var _ = require('lodash');
+var Reflux = require('reflux');
+var Actions = require('./actions');
+var ClipBoardStore = require('./stores/ClipboardStore');
+var ConfigStore = require('./stores/ConfigStore');
 
 var cellSize = 40;
 
 var ShipsPanel = React.createClass({
+  mixins: [Reflux.ListenerMixin],
+
+  componentDidMount: function() {
+    this.listenTo(ConfigStore, this.receivedConfig);
+    this.listenTo(ClipBoardStore, this.clipboardItemChanged);
+  },
+
+  receivedConfig : function(config) {
+    this.setState({
+      items: config.items,
+      selected: null
+    })
+  },
+
+  clipboardItemChanged : function(clipboard) {
+    if(clipboard.action == 'select' && clipboard.type == 'config') {
+      this.setState(React.addons.update(this.state, {
+          selected: {$set: clipboard.item}}
+      ));
+    }
+    else {
+      this.setState(React.addons.update(this.state, {
+          selected: {$set: null}}
+      ));
+    }
+  },
 
   getInitialState: function () {
     return {
-      selected: undefined
+      selected: null
     };
   },
 
-  onDragOver: function (ev) {
-    ev.preventDefault();
-  },
-
-  handleShipModelClick: function (ship) {
-    this.props.handleClick(ship);
-    this.setState(React.addons.update(this.state, {
-      selected: {$set: ship.size}
-    }));
+  handleItemClick: function (item) {
+    if(item.count > 0) {
+      Actions.setup.selectConfigItem(item);
+    }
   },
 
   render: function () {
-    var config = _.sortBy(this.props.availableShips, function(cfg){return cfg.size;});
+    var config = _.sortBy(this.state.items, function(cfg){return cfg.size;});
+    var selectedSize = this.state.selected ? this.state.selected.size : null;
+
     var components = [];
     config.forEach(function(cfg) {
-      var handleClick = this.handleShipModelClick.bind(this, {size: parseInt(cfg.size)});
-      components.push(<ConfigurationShip size={cfg.size} key={cfg.size} selected={cfg.size==this.state.selected} count={cfg.count} onClick={handleClick}/>);
+      var handleClick = this.handleItemClick.bind(this, cfg);
+      components.push(<ConfigurationShip size={cfg.size} key={cfg.size} selected={cfg.size == selectedSize} count={cfg.count} onClick={handleClick}/>);
     }.bind(this));
 
     return (
-      <div className="ships-panel" onDragOver={this.onDragOver}>
+      <div className="ships-panel">
         {components}
       </div>
     );
@@ -57,7 +84,7 @@ var ConfigurationShip = React.createClass({
     });
 
     return (
-      <div className="ship configuration-ship" draggable="true" onDragStart={this.onDragStart} onClick={this.props.onClick}>
+      <div className="ship configuration-ship" onClick={this.props.onClick}>
         <svg {...props}>
           <g className={classes}>
             <rect {...props} className=''/>
