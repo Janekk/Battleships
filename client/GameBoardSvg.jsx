@@ -19,15 +19,15 @@ var GameBoardSvg = React.createClass({
   },
 
   componentDidMount: function() {
-    this.listenTo(GameBoardStore, this.gameBoardChanged);
-    this.listenTo(ClipboardStore, this.clipboardChanged)
+    this.listenTo(GameBoardStore, this.loadGameBoard);
+    this.listenTo(ClipboardStore, this.setSelection)
   },
 
-  gameBoardChanged: function(gameboard) {
+  loadGameBoard: function(gameboard) {
     this.setState(gameboard);
   },
 
-  clipboardChanged: function(clipboard) {
+  setSelection: function(clipboard) {
     if(clipboard.type == 'board' && clipboard.action == 'select') {
       this.setState({selected: clipboard.item});
     }

@@ -6,11 +6,11 @@ var ClipboardStore = Reflux.createStore({
   init: function () {
     this.clipboard = null;
     this.listenTo(Actions.setup.selectConfigItem, this.selectConfigItem);
-    this.listenTo(Actions.setup.selectCell, this.selectCell);
+    this.listenTo(Actions.setup.selectCell, this.tryDrop);
     this.listenTo(Actions.setup.selectShip, this.selectShip);
   },
 
-  selectCell: function (cell, ships) {
+  tryDrop: function (cell, ships) {
     this.drop(cell, ships, this.clipboard);
   },
 

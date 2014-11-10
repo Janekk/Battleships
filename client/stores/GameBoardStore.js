@@ -9,17 +9,16 @@ var GameBoardStore = Reflux.createStore({
       ships: [],
       selected: null
     };
-    this.listenTo(ClipboardStore, this.clipboardChanged);
-    this.listenTo(Actions.init.ships, this.setShips);
+    this.listenTo(ClipboardStore, this.dropShip);
+    this.listenTo(Actions.init.ships, this.loadData);
   },
 
-  //TODO: make it private
-  setShips: function(data) {
+  loadData: function(data) {
     this.board.ships = data.ships;
     this.trigger(this.board);
   },
 
-  clipboardChanged: function(clipboard) {
+  dropShip: function(clipboard) {
     if(clipboard.action == 'drop') {
       if(clipboard.type == 'config') {
         this.board.ships.push({cells: clipboard.item});

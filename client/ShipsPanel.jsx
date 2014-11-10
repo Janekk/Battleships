@@ -11,11 +11,11 @@ var ShipsPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   componentDidMount: function() {
-    this.listenTo(ConfigStore, this.receivedConfig);
+    this.listenTo(ConfigStore, this.loadData);
     this.listenTo(ClipBoardStore, this.clipboardItemChanged);
   },
 
-  receivedConfig : function(config) {
+  loadData : function(config) {
     this.setState({
       items: config.items,
       selected: null

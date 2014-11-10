@@ -8,16 +8,16 @@ var ConfigurationStore = Reflux.createStore({
   init: function() {
     this.config = null;
 
-    this.listenTo(Actions.init.config, this.setConfig);
-    this.listenTo(ClipBoardStore, this.clipboardItemChanged);
+    this.listenTo(Actions.init.config, this.loadData);
+    this.listenTo(ClipBoardStore, this.updateConfig);
   },
 
-  setConfig: function(config) {
+  loadData: function(config) {
     this.config = config;
     this.trigger(this.config);
   },
 
-  clipboardItemChanged : function(clipboard) {
+  updateConfig : function(clipboard) {
     if(clipboard.action == 'drop' && clipboard.type == 'config') {
       var ship = _.find(this.config.items, function (item) {
         return (item.size == clipboard.item.length);
