@@ -3,11 +3,9 @@ module.exports = function(http) {
     var _ = require('lodash');
 
     io.on('connection', function(socket) {
-        console.log('a user connected');
         socket.gameService = new GameService(socket);
 
         socket.on('join room', function(roomID) {
-            console.log('join room', roomID);
             socket.gameService.joinRoom(roomID);
         });
 
@@ -16,16 +14,7 @@ module.exports = function(http) {
         });
 
         socket.on('disconnect', function(){
-            console.log('user disconnected');
-
-            if (socket.opponent) { // has opponent
-                socket.opponent.emit('player left');
-                socket.opponent.opponent = undefined;
-            }
-
-            if (socket.gameService.roomID) {
-                socket.leave(socket.roomID);
-            }
+            socket.gameService.disconnect();
         });
     });
 
@@ -111,6 +100,19 @@ module.exports = function(http) {
 
             gameServiceContext.currentSocket.emit('ships placed', { isSuccessful: true });
             gameServiceContext.opponentSocket.emit('message', 'player is ready');
+        };
+
+        this.disconnect = function() {
+            if (gameServiceContext.opponentSocket) { // has opponent
+                // remove from opponent
+                gameServiceContext.opponentSocket.gameService.opponentSocket = undefined;
+                gameServiceContext.opponentSocket.emit('player left');
+            }
+
+            if (gameServiceContext.roomID) {
+                // leave room
+                gameServiceContext.currentSocket.leave(gameServiceContext.roomID);
+            }
         }
     }
 
