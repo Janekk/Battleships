@@ -31,87 +31,136 @@ module.exports = function(http) {
     }
 
     function GameService(socket) {
-        var gameServiceContext = this;
-
-        this.currentSocket = socket;
-        this.opponentSocket = undefined;
-
+        this.socket = socket;
+        this.opponentGameService = undefined;
         this.roomID = undefined;
         this.ships = [];
         this.isReady = false;
 
+        var thisGameService = this;
+
+        this.sendToMe = function(name, data) {
+            thisGameService.socket.emit(name, data);
+        };
+
+        this.sendToOpponent = function(name, data) {
+            if (!thisGameService.opponentGameService) { // no opponent
+                return;
+            }
+
+            thisGameService.opponentGameService.socket.emit(name, data);
+        };
+
+        this.sendToRoom = function(name, data, isSenderIncluded) {
+            isSenderIncluded = isSenderIncluded || false;
+
+            if (!thisGameService.roomID) { // no room joined
+                console.log('can\'t send to room because socket isn\'t in a room');
+                return;
+            }
+
+            if (isSenderIncluded) {
+                io.sockets.in(thisGameService.roomID).emit(name, data);
+            }
+            else {
+                socket.broadcast.to(thisGameService.roomID).emit(name, data);
+            }
+        };
+
         this.joinRoom = function(roomID) {
             var roomSockets = getSocketsOfRoom(roomID);
             if (roomSockets.length >= 2) {
-                return gameServiceContext.currentSocket.emit('room joined', { isSuccessful: false, error: 'There are too many users in this room!' });
+                return thisGameService.socket.emit('room joined', { isSuccessful: false, error: 'There are too many users in this room!' });
             }
 
-            gameServiceContext.roomID = roomID;
-            gameServiceContext.currentSocket.join(roomID);
+            thisGameService.roomID = roomID;
+            thisGameService.socket.join(roomID);
 
-            if (roomSockets.length == 0) { // no opponent at the moment
-                gameServiceContext.currentSocket.emit('room joined', {
+            if (roomSockets.length == 0) { // no opponent
+                thisGameService.sendToMe('room joined', {
                     isSuccessful: true,
                     message: 'waiting for player...'
                 });
             }
             else { // has opponent
                 var opponentSocket = _.find(roomSockets, function(s) {
-                    return s.id !== gameServiceContext.currentSocket.id;
+                    return s.id !== thisGameService.socket.id;
                 });
 
-                gameServiceContext.connectSockets(opponentSocket);
+                thisGameService.connectWithOpponent(opponentSocket);
+                thisGameService.sendToMe('room joined', { isSuccessful: true });
+                thisGameService.sendToOpponent('player joined');
 
                 setTimeout(function() {
-                    io.sockets.in(gameServiceContext.roomID).emit('game started', {});
+                    thisGameService.sendToRoom('game started', { isSuccessful: true }, true);
                 }, 5000);
             }
         };
 
-        this.connectSockets = function(opponentSocket) {
-            gameServiceContext.opponentSocket = opponentSocket;
-            opponentSocket.gameService.opponentSocket = gameServiceContext.currentSocket;
+        this.connectWithOpponent = function(opponentSocket) {
+            if (!opponentSocket) {
+                return;
+            }
 
-            gameServiceContext.currentSocket.emit('room joined', { isSuccessful: true });
-            gameServiceContext.opponentSocket.emit('player joined');
+            if (thisGameService.opponentGameService) { // opponent already connected
+                return;
+            }
+
+            thisGameService.opponentGameService = opponentSocket.gameService;
+            thisGameService.opponentGameService.connectWithOpponent(thisGameService.socket)
+        };
+
+        this.disconnectOpponent = function() {
+            if (!thisGameService.opponentGameService) { // no opponent connected
+                return;
+            }
+
+            // remove opponent
+            thisGameService.opponentGameService = undefined;
         };
 
         this.placeShips = function(shipsData) {
-            if(!gameServiceContext.opponentSocket) { // no opponent
-                gameServiceContext.currentSocket.emit('ships placed', { isSuccessful: false, error: 'you need a player!' });
+            if(!thisGameService.opponentGameService) { // no opponent
+                thisGameService.sendToMe('ships placed', { isSuccessful: false, error: 'you need a player!' });
                 return;
             }
 
-            if (gameServiceContext.isReady) {
-                gameServiceContext.currentSocket.emit('ships placed', { isSuccessful: false, error: 'you\'ve already placed your ships!' });
+            if (thisGameService.isReady) {
+                thisGameService.sendToMe('ships placed', { isSuccessful: false, error: 'you\'ve already placed your ships!' });
                 return;
             }
 
+            // transform ships
             _.forEach(shipsData, function(shipData) {
                 var positions = [];
                 _.forEach(shipData, function(positionData) {
                     positions.push(new Position(positionData.x, positionData.y));
                 });
 
-                gameServiceContext.ships.push(new Ship(positions));
+                thisGameService.ships.push(new Ship(positions));
             });
 
-            gameServiceContext.isReady = true;
+            thisGameService.isReady = true;
+            thisGameService.sendToMe('ships placed', { isSuccessful: true });
 
-            gameServiceContext.currentSocket.emit('ships placed', { isSuccessful: true });
-            gameServiceContext.opponentSocket.emit('message', 'player is ready');
+            if (thisGameService.opponentGameService.isReady) {
+                // TODO select player to shoot into the water...
+            }
+            else { // opponent isn't ready
+                thisGameService.sendToOpponent('message', 'player is ready');
+            }
         };
 
         this.disconnect = function() {
-            if (gameServiceContext.opponentSocket) { // has opponent
-                // remove from opponent
-                gameServiceContext.opponentSocket.gameService.opponentSocket = undefined;
-                gameServiceContext.opponentSocket.emit('player left');
+            if (thisGameService.opponentGameService) { // has opponent
+                thisGameService.sendToOpponent('player left');
+                thisGameService.opponentGameService.disconnectOpponent();
+                thisGameService.disconnectOpponent();
             }
 
-            if (gameServiceContext.roomID) {
+            if (thisGameService.roomID) {
                 // leave room
-                gameServiceContext.currentSocket.leave(gameServiceContext.roomID);
+                thisGameService.socket.leave(thisGameService.roomID);
             }
         }
     }

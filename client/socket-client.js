@@ -43,9 +43,14 @@ module.exports = function() {
     });
 
     socket.on('game started', function(result) {
-        toastr.info('game started');
+        if (result.isSuccessful === true) {
+            toastr.info('game started');
 
-        //TODO show gameboard and user can position ships
+            //TODO show gameboard and user can position ships
+        }
+        else {
+            toastr.error(result.error);
+        }
     });
 
     socket.on('ships placed', function(result) {
