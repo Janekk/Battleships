@@ -30,6 +30,10 @@ module.exports = function(http) {
         });
     }
 
+    function getRandomNumber(min, max) {
+        return Math.floor((Math.random() * max) + min);
+    }
+
     function GameService(socket) {
         this.socket = socket;
         this.opponentGameService = undefined;
@@ -38,6 +42,19 @@ module.exports = function(http) {
         this.isReady = false;
 
         var thisGameService = this;
+
+        this.getRandomGameService = function() {
+            if (!thisGameService.opponentGameService) { // no opponent
+                return;
+            }
+
+            // throw dice
+            var diceNumber = getRandomNumber(1, 6);
+
+            return (diceNumber < 4)
+                ? thisGameService
+                : thisGameService.opponentGameService;
+        };
 
         this.sendToMe = function(name, data) {
             thisGameService.socket.emit(name, data);
@@ -51,36 +68,42 @@ module.exports = function(http) {
             thisGameService.opponentGameService.socket.emit(name, data);
         };
 
-        this.sendToRoom = function(name, data, isSenderIncluded) {
-            isSenderIncluded = isSenderIncluded || false;
+        this.sendToRoom = function(name, data, skipSender) {
+            skipSender = skipSender || false;
 
             if (!thisGameService.roomID) { // no room joined
-                console.log('can\'t send to room because socket isn\'t in a room');
                 return;
             }
 
-            if (isSenderIncluded) {
-                io.sockets.in(thisGameService.roomID).emit(name, data);
-            }
-            else {
+            if (skipSender) { // send to room (without sender)
                 socket.broadcast.to(thisGameService.roomID).emit(name, data);
+            }
+            else { // send to room (including sender)
+                io.sockets.in(thisGameService.roomID).emit(name, data);
             }
         };
 
         this.joinRoom = function(roomID) {
+            if (!roomID) { // no roomID
+                return;
+            }
+
+            if (thisGameService.roomID) { // already in a room
+                this.sendToMe('room joined', { isSuccessful: false, error: 'You are already in a room' });
+                return;
+            }
+
             var roomSockets = getSocketsOfRoom(roomID);
             if (roomSockets.length >= 2) {
-                return thisGameService.socket.emit('room joined', { isSuccessful: false, error: 'There are too many users in this room!' });
+                thisGameService.sendToMe('room joined', { isSuccessful: false, error: 'There are too many users in this room!' });
+                return;
             }
 
             thisGameService.roomID = roomID;
             thisGameService.socket.join(roomID);
 
             if (roomSockets.length == 0) { // no opponent
-                thisGameService.sendToMe('room joined', {
-                    isSuccessful: true,
-                    message: 'waiting for player...'
-                });
+                thisGameService.sendToMe('room joined', { isSuccessful: true, message: 'waiting for player...' });
             }
             else { // has opponent
                 var opponentSocket = _.find(roomSockets, function(s) {
@@ -89,10 +112,12 @@ module.exports = function(http) {
 
                 thisGameService.connectWithOpponent(opponentSocket);
                 thisGameService.sendToMe('room joined', { isSuccessful: true });
-                thisGameService.sendToOpponent('player joined');
+                thisGameService.sendToOpponent('message', 'player joined');
 
                 setTimeout(function() {
-                    thisGameService.sendToRoom('game started', { isSuccessful: true }, true);
+                    thisGameService.isReady = true;
+                    thisGameService.opponentGameService.isReady = true;
+                    thisGameService.sendToRoom('game started', { isSuccessful: true });
                 }, 5000);
             }
         };
@@ -125,7 +150,12 @@ module.exports = function(http) {
                 return;
             }
 
-            if (thisGameService.isReady) {
+            if (!thisGameService.isReady) { // no ready
+                thisGameService.sendToMe('ships placed', { isSuccessful: false, error: 'game isn\'t ready' });
+                return;
+            }
+
+            if (thisGameService.ships.length > 0) { // has ships
                 thisGameService.sendToMe('ships placed', { isSuccessful: false, error: 'you\'ve already placed your ships!' });
                 return;
             }
@@ -140,15 +170,20 @@ module.exports = function(http) {
                 thisGameService.ships.push(new Ship(positions));
             });
 
-            thisGameService.isReady = true;
-            thisGameService.sendToMe('ships placed', { isSuccessful: true });
+            if (thisGameService.opponentGameService.ships.length > 0) { // opponent has placed his ships
+                thisGameService.sendToMe('ships placed', { isSuccessful: true, message: 'ships are placed' });
 
-            if (thisGameService.opponentGameService.isReady) {
-                // TODO select player to shoot into the water...
+                setTimeout(function() {
+                    var randomGameService = thisGameService.getRandomGameService();
+
+                    randomGameService.sendToMe('message', 'You begin');
+                }, 5000);
             }
             else { // opponent isn't ready
-                thisGameService.sendToOpponent('message', 'player is ready');
+                thisGameService.sendToMe('ships placed', { isSuccessful: true, message: 'ships are placed<br/>Waiting for player...' });
             }
+
+            thisGameService.sendToOpponent('message', 'player has placed his ships');
         };
 
         this.disconnect = function() {
