@@ -2,8 +2,7 @@ var React = require('react/addons');
 var Reflux = require('reflux');
 var _ = require('lodash');
 var Actions = require('./actions');
-
-var cellSize = 40;
+var ShipPopup = require('./ShipPopup');
 
 var GameBoardStore = require('./stores/GameBoardStore');
 var ClipboardStore = require('./stores/ClipboardStore');
@@ -20,7 +19,7 @@ var GameBoardSvg = React.createClass({
 
   componentDidMount: function() {
     this.listenTo(GameBoardStore, this.loadGameBoard);
-    this.listenTo(ClipboardStore, this.setSelection)
+    this.listenTo(ClipboardStore, this.setSelection);
   },
 
   loadGameBoard: function(gameboard) {
@@ -41,16 +40,9 @@ var GameBoardSvg = React.createClass({
     Actions.setup.selectShip(ship);
   },
 
-  handleCellClick: function(ev) {
-    var cell = this.getCell(ev);
-    Actions.setup.selectCell(cell);
-  },
-
-  getCell: function(event) {
-    return {
-      x: Math.floor((event.pageX - event.currentTarget.offsetLeft) / cellSize),
-      y: Math.floor((event.pageY - event.currentTarget.offsetTop) / cellSize)
-    };
+  handleCellClick: function(cellProps) {
+    var cell = {x: cellProps.x, y: cellProps.y};
+    Actions.setup.selectCell(cell, this.state.ships);
   },
 
   render: function () {
@@ -62,7 +54,7 @@ var GameBoardSvg = React.createClass({
           x: x,
           y: y
         }
-        cells.push(<Cell {...cellProps}/>);
+        cells.push(<Cell {...cellProps} onCellClick={this.handleCellClick.bind(this, cellProps)}/>);
       }.bind(this));
     }.bind(this));
 
@@ -74,9 +66,9 @@ var GameBoardSvg = React.createClass({
     return (
       <div>
         <p>{"Table name: " + this.props.name}</p>
-        <div className="gameboard-table" onClick={this.handleCellClick}>
-          <svg width="600" height="600">
-
+        <div className="gameboard-table">
+          {this.state.selected ? <ShipPopup /> : null}
+          <svg width="100%" height="100%" viewBox={"0 0 " + this.props.xsize*10 + " " + + this.props.ysize*10}>
             {cells}
             {ships}
           </svg>
@@ -96,14 +88,14 @@ var Cell = React.createClass({
     var rectProps = {
       className: 'cell',
       key: this.props.x + '.' + this.props.y + '',
-      width: cellSize,
-      height: cellSize,
-      x: this.props.x * cellSize,
-      y: this.props.y * cellSize
+      width: 10,
+      height: 10,
+      x: this.props.x * 10,
+      y: this.props.y * 10
     }
 
     return (
-      <rect {...rectProps} />)
+      <rect onClick={this.props.onCellClick} {...rectProps} />)
   }
 });
 
@@ -112,11 +104,11 @@ var Ship = React.createClass({
     var cells = [];
     this.props.ship.cells.forEach(function (cell) {
       var rectProps = {
-        width: cellSize,
-        height: cellSize,
-        x: cell.x * cellSize,
-        y: cell.y * cellSize,
-        key: cell.x + '.' + cell.y + '',
+        width: 10,
+        height: 10,
+        x: cell.x * 10,
+        y: cell.y * 10,
+        key: cell.x + '.' + cell.y + ''
       }
       cells.push(<rect {...rectProps}/>);
     });

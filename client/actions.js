@@ -9,9 +9,10 @@ var actions = {
     getConfig: Reflux.createAction(),
     selectConfigItem: Reflux.createAction(),
     selectShip: Reflux.createAction(),
-    selectCell: Reflux.createAction()
+    selectCell: Reflux.createAction(),
+    pivotShip: Reflux.createAction()
     },
   game: null
-}
+};
 
 module.exports = actions;
