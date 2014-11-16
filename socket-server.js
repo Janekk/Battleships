@@ -117,7 +117,7 @@ module.exports = function(http) {
 
                 thisGameService.connectWithOpponent(opponentSocket);
                 thisGameService.sendToMe('room joined', { isSuccessful: true });
-                thisGameService.sendToOpponent('message', 'player joined');
+                thisGameService.sendToOpponent('info-message', 'player joined');
 
                 setTimeout(function() {
                     thisGameService.isReady = true;
@@ -183,14 +183,14 @@ module.exports = function(http) {
                     var randomGameService = thisGameService.getRandomGameService();
 
                     randomGameService.isPlaying = true;
-                    randomGameService.sendToMe('message', 'You begin');
+                    randomGameService.sendToMe('info-message', 'You begin');
                 }, 5000);
             }
             else { // opponent isn't ready
                 thisGameService.sendToMe('ships placed', { isSuccessful: true, message: 'ships are placed<br/>Waiting for player...' });
             }
 
-            thisGameService.sendToOpponent('message', 'player has placed his ships');
+            thisGameService.sendToOpponent('info-message', 'player has placed his ships');
         };
 
         this.shoot = function(position) {

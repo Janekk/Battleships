@@ -69,7 +69,7 @@ module.exports = function() {
         //TODO cancel game
     });
 
-    socket.on('message', function(message) {
+    socket.on('info-message', function(message) {
         toastr.info(message);
     });
 
