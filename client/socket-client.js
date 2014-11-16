@@ -5,6 +5,7 @@ module.exports = function() {
         var $roomID = $('#room-id');
         var $joinButton = $('#join-button');
         var $placeShipsButton = $('#place-ships-button');
+        var $shootButton = $('#shoot-button');
 
         $joinButton.on('click', function() {
             // disable buttons
@@ -17,44 +18,49 @@ module.exports = function() {
         $placeShipsButton.on('click', function() {
             socket.emit('place ships', [[{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0}], [{ x: 1, y: 2 }, { x: 2, y: 2 }]]);
         });
+
+        $shootButton.on('click', function() {
+            socket.emit('shoot', { x: 0, y: 0 });
+        });
     });
 
     socket.on('room joined', function(result) {
-        if (result.isSuccessful) {
-            var message = 'room joined';
-
-            if (result.message) {
-                message += '<br/>' + result.message;
-            }
-
-            toastr.info(message);
-        }
-        else { // error
+        if (!result.isSuccessful) { // error
             toastr.error(result.error);
 
             // activate buttons
             $('#room-id').prop('disabled', false);
             $('#join-button').prop('disabled', false);
-        }
-    });
 
-    socket.on('player joined', function() {
-        toastr.info('player joined');
+            return;
+        }
+
+        var message = 'room joined';
+
+        if (result.message) {
+            message += '<br/>' + result.message;
+        }
+
+        toastr.info(message);
     });
 
     socket.on('game started', function(result) {
-        toastr.info('game started');
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
 
+        toastr.info('game started');
         //TODO show gameboard and user can position ships
     });
 
     socket.on('ships placed', function(result) {
-        if (result.isSuccessful === true) {
-            toastr.info('ships are placed<br/>Waiting for player...');
-        }
-        else {
+        if (!result.isSuccessful) { // error
             toastr.error(result.error);
+            return;
         }
+
+        toastr.info(result.message);
     });
 
     socket.on('player left', function() {
@@ -63,11 +69,11 @@ module.exports = function() {
         //TODO cancel game
     });
 
-    socket.on('message', function(message) {
+    socket.on('info-message', function(message) {
         toastr.info(message);
     });
 
-    socket.on('error', function(message) {
+    socket.on('error-message', function(message) {
         toastr.error(message);
     });
 };
