@@ -16,7 +16,10 @@ module.exports = function() {
         });
 
         $placeShipsButton.on('click', function() {
-            socket.emit('place ships', [[{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0}], [{ x: 1, y: 2 }, { x: 2, y: 2 }]]);
+            socket.emit('place ships', [
+                [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0}],
+                [{ x: 1, y: 2 }, { x: 2, y: 2 }]
+            ]);
         });
 
         $shootButton.on('click', function() {
