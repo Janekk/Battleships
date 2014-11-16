@@ -1,3 +1,6 @@
+@import "bootstrap.css";
+@import "bootstrap-theme.css";
+
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -16,8 +19,7 @@ a {
     .board {
       float: left;
       .gameboard-table {
-        width: 600px;
-        height: 600px;
+
       }
     }
   }
@@ -29,14 +31,14 @@ a {
   rect.cell {
     fill: blue;
     stroke: black;
-    stroke-width: 2;
+    stroke-width: 0.5;
     opacity: 0.5;
   }
 
   g.ship {
     fill: orange;
     stroke: black;
-    stroke-width: 2;
+    stroke-width: 0.5;
     opacity: 0.5;
 
     &.selected {
@@ -47,13 +49,50 @@ a {
   }
 
   g.config {
-    fill: blue;
+    fill: pink;
     stroke: black;
-    stroke-width: 2;
-    opacity: 0.5;
+    stroke-width: 1;
+    font-size: 20px;
+
+    text {
+      fill: black;
+    }
 
     &.selected {
       fill: orange;
     }
+    &.inactive {
+      fill: #F8F8FF;
+    }
+  }
+
+  div.ship-popup {
+    border-radius: 20px;
+    border: 2px solid lightskyblue;
+    background: white;
+
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    width: 200px;
+    height: 80px;
+    padding: 16px;
+    z-index:1002;
+  }
+
+  @keyframes blink {
+    0% { stroke: red; }
+    100% { stroke: white; }
+  }
+  @-webkit-keyframes blink {
+    0% { stroke: red; }
+    100% { stroke: white; }
+  }
+  .blink {
+    -webkit-animation: blink 0.5s linear infinite;
+    -moz-animation: blink 0.5s linear infinite;
+    -ms-animation: blink 0.5s linear infinite;
+    -o-animation: blink 0.5s linear infinite;
+    animation: blink 0.5s linear infinite;
   }
 }
