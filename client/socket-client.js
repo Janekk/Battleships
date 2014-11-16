@@ -63,15 +63,25 @@ module.exports = function() {
         toastr.info(result.message);
     });
 
-    socket.on('activate player', function(message) {
-        if (message) {
-            toastr.info(message);
+    socket.on('activate player', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        if (result.message) {
+            toastr.info(result.message);
         }
 
         // TODO it's your turn. Let's player shoot.
     });
 
-    socket.on('player switched', function() {
+    socket.on('player switched', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
         // TODO disable player. Opponent is playing...
     });
 
@@ -87,17 +97,22 @@ module.exports = function() {
         // result.position { x: 0, y: 0 }
     });
 
-    socket.on('player left', function() {
+    socket.on('player left', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
         toastr.warning('player has left :-(');
 
         //TODO cancel game
     });
 
-    socket.on('info-message', function(message) {
-        toastr.info(message);
+    socket.on('info-message', function(result) {
+        toastr.info(result.message);
     });
 
-    socket.on('error-message', function(message) {
-        toastr.error(message);
+    socket.on('error-message', function(result) {
+        toastr.error(result.message);
     });
 };
