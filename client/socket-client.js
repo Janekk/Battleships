@@ -5,6 +5,7 @@ module.exports = function() {
         var $roomID = $('#room-id');
         var $joinButton = $('#join-button');
         var $placeShipsButton = $('#place-ships-button');
+        var $shootButton = $('#shoot-button');
 
         $joinButton.on('click', function() {
             // disable buttons
@@ -16,6 +17,10 @@ module.exports = function() {
 
         $placeShipsButton.on('click', function() {
             socket.emit('place ships', [[{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0}], [{ x: 1, y: 2 }, { x: 2, y: 2 }]]);
+        });
+
+        $shootButton.on('click', function() {
+            socket.emit('shoot', { x: 0, y: 0 });
         });
     });
 
@@ -68,7 +73,7 @@ module.exports = function() {
         toastr.info(message);
     });
 
-    socket.on('error', function(message) {
+    socket.on('error-message', function(message) {
         toastr.error(message);
     });
 };

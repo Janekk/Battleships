@@ -13,6 +13,10 @@ module.exports = function(http) {
             socket.gameService.placeShips(shipsData);
         });
 
+        socket.on('shoot', function(position) {
+            socket.gameService.shoot(position);
+        });
+
         socket.on('disconnect', function(){
             socket.gameService.disconnect();
         });
@@ -40,6 +44,7 @@ module.exports = function(http) {
         this.roomID = undefined;
         this.ships = [];
         this.isReady = false;
+        this.isPlaying = false;
 
         var thisGameService = this;
 
@@ -142,6 +147,7 @@ module.exports = function(http) {
 
             // remove opponent
             thisGameService.opponentGameService = undefined;
+            thisGameService.isReady = false;
         };
 
         this.placeShips = function(shipsData) {
@@ -176,6 +182,7 @@ module.exports = function(http) {
                 setTimeout(function() {
                     var randomGameService = thisGameService.getRandomGameService();
 
+                    randomGameService.isPlaying = true;
                     randomGameService.sendToMe('message', 'You begin');
                 }, 5000);
             }
@@ -184,6 +191,15 @@ module.exports = function(http) {
             }
 
             thisGameService.sendToOpponent('message', 'player has placed his ships');
+        };
+
+        this.shoot = function(position) {
+            if (!thisGameService.isPlaying) {
+                thisGameService.sendToMe('error-message', 'Is not you turn!')
+                return;
+            }
+
+
         };
 
         this.disconnect = function() {

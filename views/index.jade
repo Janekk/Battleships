@@ -11,7 +11,10 @@ block content
     input(type='text', name='room-id', id='room-id', placeholder='room ID')
     button(type='button', id='join-button') join
   .ship-area
-    button(type='button', id='place-ships-button') place ships
+    p
+      button(type='button', id='place-ships-button') place ships
+    p
+      button(type='button', id='shoot-button') shoot
   div.gameboard#gameboard
 block footer
   script(src="/scripts/bundle.js")
