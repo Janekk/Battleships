@@ -253,19 +253,67 @@ function GameService(socket) {
         var result = thisGameService.checkForHit(position);
         thisGameService.sendToRoom('has shot', result);
 
-        thisGameService.switchPlayer();
+        if (thisGameService.intactShipsCount <= 0) { // all ships are damaged
+            // game over
+            setTimeout(function() {
+                thisGameService.sendToMe('game over', { hasWon: false });
+                thisGameService.sendToOpponent('game over', { hasWon: true });
+            }, 2500);
+        }
+        else {
+            thisGameService.switchPlayer();
+        }
     };
 
     /**
-     * Return TRUE if the position has already been shot.
+     * Returns TRUE if the position has already been shot.
      */
-    this.hasShotOnThisPosition = function(position) {
-        var result = _.find(thisGameService.shoots, position);
+    this.hasShotOnThisPosition = function(shootPosition) {
+        var result = _.find(thisGameService.shoots, shootPosition);
         return (result !== undefined);
     };
 
-    this.checkForHit = function(position) {
+    /**
+     * Checks a shoot hit a ship.
+     * @param shootPosition
+     */
+    this.checkForHit = function(shootPosition) {
+        for (var s = 0; s < thisGameService.ships.length; s++) {
+            var ship = thisGameService.ships[s];
+            if (ship.healthCount > 0) { // ship is intact
+                for (var p = 0; p < ship.positions; p++) {
+                    var shipPosition = ship.positions[p];
+                    if (shipPosition.isDamaged) {
+                        continue;
+                    }
 
+                    if ((shipPosition.x === shootPosition.x) && (shipPosition.y === shootPosition.y)) { // hit ship
+                        shipPosition.isDamaged = true;
+                        ship.healthCount--;
+
+                        var shipWasDestroyed = false;
+
+                        if (ship.healthCount <= 0) { // ship was destroyed
+                            shipWasDestroyed = true;
+                            thisGameService.intactShipsCount--;
+                        }
+
+                        return {
+                            shipWasHit: true,
+                            shipWasDestroyed: shipWasDestroyed,
+                            position: { x: shipPosition.x, y: shipPosition.y }
+                        };
+                    }
+                }
+            }
+        }
+
+        // no hit on a ship
+        return {
+            shipWasHit: false,
+            shipWasDestroyed: false,
+            position: { x: shootPosition.x, y: shootPosition.y }
+        };
     };
 
     this.switchPlayer = function() {
