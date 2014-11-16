@@ -16,7 +16,10 @@ module.exports = function() {
         });
 
         $placeShipsButton.on('click', function() {
-            socket.emit('place ships', [[{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0}], [{ x: 1, y: 2 }, { x: 2, y: 2 }]]);
+            socket.emit('place ships', [
+                [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0}],
+                [{ x: 1, y: 2 }, { x: 2, y: 2 }]
+            ]);
         });
 
         $shootButton.on('click', function() {
@@ -63,17 +66,61 @@ module.exports = function() {
         toastr.info(result.message);
     });
 
-    socket.on('player left', function() {
+    socket.on('activate player', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        if (result.message) {
+            toastr.info(result.message);
+        }
+
+        // TODO it's your turn. Let's player shoot.
+    });
+
+    socket.on('player switched', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        // TODO disable player. Opponent is playing...
+    });
+
+    socket.on('has shot', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        // TODO show result on gameboard
+        // result.shipWasHit (boolean)
+        // result.shipWasDestroyed (boolean)
+        // result.position { x: 0, y: 0 }
+    });
+
+    socket.on('game over', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        //result.hasWon (boolean)
+    });
+
+    socket.on('player left', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
         toastr.warning('player has left :-(');
 
         //TODO cancel game
     });
 
-    socket.on('info-message', function(message) {
-        toastr.info(message);
-    });
-
-    socket.on('error-message', function(message) {
-        toastr.error(message);
+    socket.on('info-message', function(result) {
+        toastr.info(result.message);
     });
 };
