@@ -63,6 +63,30 @@ module.exports = function() {
         toastr.info(result.message);
     });
 
+    socket.on('activate player', function(message) {
+        if (message) {
+            toastr.info(message);
+        }
+
+        // TODO it's your turn. Let's player shoot.
+    });
+
+    socket.on('player switched', function() {
+        // TODO disable player. Opponent is playing...
+    });
+
+    socket.on('has shot', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        // TODO show result on gameboard
+        // result.shipWasHit (boolean)
+        // result.shipWasDestroyed (boolean)
+        // result.position { x: 0, y: 0 }
+    });
+
     socket.on('player left', function() {
         toastr.warning('player has left :-(');
 
