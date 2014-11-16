@@ -6,6 +6,7 @@ var ClipBoardStore = require('./stores/ClipboardStore');
 var ConfigStore = require('./stores/ConfigStore');
 
 var cellSize = 40;
+var borderRadius = 5;
 
 var ShipsPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
@@ -58,7 +59,7 @@ var ShipsPanel = React.createClass({
     }.bind(this));
 
     return (
-      <div className="ships-panel">
+      <div>
         {components}
       </div>
     );
@@ -80,14 +81,16 @@ var ConfigurationShip = React.createClass({
     var cx = React.addons.classSet;
     var classes = cx({
       'config': true,
-      'selected': this.props.selected
+      'blink': true,
+      'selected': this.props.selected,
+      'inactive': (this.props.count == 0)
     });
 
     return (
       <div className="ship configuration-ship" onClick={this.props.onClick}>
         <svg {...props}>
           <g className={classes}>
-            <rect {...props} className=''/>
+            <rect {...props} />
             <text x="0" y="1em" >{"x" + this.props.count}</text>
           </g>
         </svg>

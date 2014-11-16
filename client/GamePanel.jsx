@@ -1,7 +1,7 @@
 var React = require('react');
 var GameBoardSvg = require('./GameBoardSvg.jsx');
 var ShipsPanel = require('./ShipsPanel.jsx');
-var Actions = require('./actions');
+var gameParams = require('./helpers/gameParams');
 
 var _ = require('lodash');
 
@@ -9,15 +9,15 @@ var GamePanel = React.createClass({
 
   render: function () {
     return (
-      <div className="panel">
-        <div className="board">
-          <GameBoardSvg name='Rene' xsize={15} ysize={15} />
+      <div className="panel pure-g">
+        <div className="board pure-u-4-5">
+          <GameBoardSvg name='Rene' xsize={gameParams.tableSize} ysize={gameParams.tableSize} />
         </div>
-      <ShipsPanel />
+        <div className="ships-panel pure-u-1-5">
+          <ShipsPanel />
+        </div>
       </div>
     );
   }
 });
-
-
 module.exports = GamePanel;
