@@ -97,6 +97,15 @@ module.exports = function() {
         // result.position { x: 0, y: 0 }
     });
 
+    socket.on('game over', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        //result.hasWon (boolean)
+    });
+
     socket.on('player left', function(result) {
         if (!result.isSuccessful) { // error
             toastr.error(result.error);
@@ -110,9 +119,5 @@ module.exports = function() {
 
     socket.on('info-message', function(result) {
         toastr.info(result.message);
-    });
-
-    socket.on('error-message', function(result) {
-        toastr.error(result.message);
     });
 };

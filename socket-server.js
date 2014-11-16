@@ -244,7 +244,8 @@ module.exports = function(http) {
                     var randomGameService = thisGameService.getRandomGameService();
 
                     randomGameService.isPlaying = true;
-                    randomGameService.sendToMe('activate player', 'You begin');
+                    randomGameService.sendToMe('activate player', 'you begin');
+                    randomGameService.sendToOpponent('info-message', 'player begins');
                 }, 2500);
             }
             else { // opponent isn't ready
@@ -283,7 +284,7 @@ module.exports = function(http) {
             thisGameService.shoots.push(position);
 
             var result = thisGameService.checkForHit(position);
-            thisGameService.sendToMe('has shot', result);
+            thisGameService.sendToRoom('has shot', result);
 
             thisGameService.switchPlayer();
         };
