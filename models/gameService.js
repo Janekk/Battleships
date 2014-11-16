@@ -7,10 +7,11 @@ function GameService(socket) {
     this.socket = socket;
     this.opponentGameService = undefined;
     this.roomID = undefined;
-    this.isReady = false;   // if TRUE booth players are connected
-    this.ships = [];        // contains the ships for the player
-    this.isPlaying = false; // if TRUE the player can shoot
-    this.shoots = [];       // contains positions to which the player has shot
+    this.isReady = false;               // if TRUE booth players are connected
+    this.ships = [];                    // contains the ships for the player
+    this.intactShipsCount = undefined;  // number of intact ships; on "0" current player lose
+    this.isPlaying = false;             // if TRUE the player can shoot
+    this.shoots = [];                   // contains positions to which the player has shot
 
     var thisGameService = this;
 
@@ -201,6 +202,7 @@ function GameService(socket) {
 
             thisGameService.ships.push(new Ship(positions));
         });
+        thisGameService.intactShipsCount = shipsData.length;
 
         if (thisGameService.opponentGameService.ships.length > 0) { // opponent has placed his ships
             thisGameService.sendToMe('ships placed', 'ships are placed');
