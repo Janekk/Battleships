@@ -7,6 +7,11 @@ block header
 block content
   h1= title
   p Welcome to #{title}
+  .username
+    input(type='text', name='username', id='username', placeholder='username')
+    button(type='button', id='set-username-button') set username
+  h2 lobby
+    ul#lobby
   .room-area
     input(type='text', name='room-id', id='room-id', placeholder='room ID')
     button(type='button', id='join-button') join

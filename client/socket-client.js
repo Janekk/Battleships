@@ -3,9 +3,11 @@ module.exports = function() {
 
     $(document).ready(function() {
         var $roomID = $('#room-id');
+        var $username = $('#username');
         var $joinButton = $('#join-button');
         var $placeShipsButton = $('#place-ships-button');
         var $shootButton = $('#shoot-button');
+        var $setUsernameButton = $('#set-username-button');
 
         $joinButton.on('click', function() {
             // disable buttons
@@ -25,6 +27,15 @@ module.exports = function() {
         $shootButton.on('click', function() {
             socket.emit('shoot', { x: 0, y: 0 });
         });
+
+        $setUsernameButton.on('click', function() {
+            socket.emit('enter lobby', $username.val());
+        });
+    });
+
+    socket.on('user enters lobby', function(data) {
+        var $lobby = $('#lobby');
+        $lobby.append('<li data-id="' + data.id + '">' + data.username + '</li>');
     });
 
     socket.on('room joined', function(result) {

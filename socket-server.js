@@ -3,7 +3,24 @@ module.exports = function(http) {
     var GameService = require('./models/gameService');
 
     io.on('connection', function(socket) {
-        socket.gameService = new GameService(socket);
+        //socket.gameService = new GameService(socket);
+
+        socket.on('enter lobby', function(username) {
+            if (socket.username === undefined) { // user isn't in lobby
+                socket.username = username;
+
+                // enter lobby
+                socket.join('lobby');
+                socket.broadcast.to('lobby').emit('user enters lobby', { id: socket.id, username: username });
+            }
+        });
+
+        socket.on('change username', function(username) {
+            if (socket.username !== undefined) {
+                socket.username = username;
+                socket.broadcast.to('lobby').emit('username changed', { id: socket.id, username: username });
+            }
+        });
 
         socket.on('join room', function(roomID) {
             socket.gameService.joinRoom(roomID);
@@ -18,7 +35,16 @@ module.exports = function(http) {
         });
 
         socket.on('disconnect', function(){
-            socket.gameService.disconnect();
+            if (socket.username !== undefined) {
+                // leave lobby
+                socket.leave('lobby');
+
+                socket.broadcast.to('lobby').emit('user left lobby', { id: socket.id, username: username });
+            }
+
+            if (socket.gameService) {
+                socket.gameService.disconnect();
+            }
         });
     });
 
