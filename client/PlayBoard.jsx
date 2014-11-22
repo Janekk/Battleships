@@ -1,12 +1,11 @@
-var React = require('react/addons');
-var Reflux = require('reflux');
-var _ = require('lodash');
-var Actions = require('./actions');
-var Cell = require('./Board/Cell');
-var Ship = require('./Board/Ship');
-
-var BoardStore = require('./stores/BoardStore');
-var GameStore = require('./stores/GameStore');
+var React = require('react/addons')
+  , Reflux = require('reflux')
+  , _ = require('lodash')
+  , Actions = require('./actions')
+  , Cell = require('./Board/Cell')
+  , Ship = require('./Board/Ship')
+  , BoardStore = require('./stores/BoardStore')
+  , GameStore = require('./stores/GameStore');
 
 var GameBoard = React.createClass({
   mixins: [Reflux.ListenerMixin],

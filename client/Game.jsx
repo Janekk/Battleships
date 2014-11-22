@@ -1,25 +1,23 @@
-var React = require('react');
-var Reflux = require('reflux');
-var SetupBoard = require('./SetupBoard');
-var PlayBoard = require('./PlayBoard');
-var SetupShipsPanel = require('./SetupShipsPanel');
-var gameParams = require('./helpers/gameParams');
-
-var StateStore = require('./stores/GameStore');
-var Actions = require('./actions');
-
-var _ = require('lodash');
+var React = require('react')
+  , Reflux = require('reflux')
+  , SetupBoard = require('./SetupBoard')
+  , PlayBoard = require('./PlayBoard')
+  , SetupShipsPanel = require('./SetupShipsPanel')
+  , GameStore = require('./stores/GameStore')
+  , Actions = require('./actions')
+  , _ = require('lodash');
 
 var GamePanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   componentDidMount: function () {
-    this.listenTo(StateStore, this.switchGameState);
+    this.listenTo(GameStore, this.switchGameState);
   },
 
   switchGameState: function (state) {
-    if(state.phase != 'game-my-turn' && state.phase != 'game-opponents-turn')
-    this.setState(state);
+    if(state.phase != 'game-my-turn' && state.phase != 'game-opponents-turn') {
+      this.setState(state);
+    }
   },
 
   signIn: function () {
@@ -49,7 +47,7 @@ var GamePanel = React.createClass({
           panel = (
             <div className="panel pure-g">
               <div className="board pure-u-4-5">
-                <SetupBoard name={this.state.roomId} xsize={gameParams.tableSize} ysize={gameParams.tableSize} />
+                <SetupBoard name={this.state.roomId} xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
               </div>
               <div className="ships-panel pure-u-1-5">
                 <SetupShipsPanel />
@@ -63,10 +61,10 @@ var GamePanel = React.createClass({
           panel = (
             <div className="panel pure-g">
               <div className="board pure-u-1-2">
-                <PlayBoard xsize={gameParams.tableSize} ysize={gameParams.tableSize} />
+                <PlayBoard xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
               </div>
               <div className="board pure-u-1-2">
-                <PlayBoard myBoard xsize={gameParams.tableSize} ysize={gameParams.tableSize} />
+                <PlayBoard myBoard xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
               </div>
             </div>);
           break;
@@ -78,8 +76,8 @@ var GamePanel = React.createClass({
             </div>
           );
           break;
-      };
-    };
+      }
+    }
 
     return (
       <div>

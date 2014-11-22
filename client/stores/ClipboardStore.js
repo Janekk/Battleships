@@ -1,15 +1,21 @@
-var Reflux = require('Reflux');
-var Actions = require('../actions');
-var _ = require('lodash');
-var gameParams = require('../helpers/gameParams');
+var Reflux = require('Reflux')
+  , Actions = require('../actions')
+  , _ = require('lodash')
+  , BoardUtils = require('../Board/BoardUtils');
 
 var ClipboardStore = Reflux.createStore({
   init: function () {
     this.clipboard = null;
+    this.utils = new BoardUtils();
+    this.listenTo(Actions.init.setConfig, this.setConfig);
     this.listenTo(Actions.setup.selectConfigItem, this.selectConfigItem);
     this.listenTo(Actions.setup.selectCell, this.tryDrop);
     this.listenTo(Actions.setup.selectShip, this.selectShip);
     this.listenTo(Actions.setup.pivotShip, this.tryPivot);
+  },
+
+  setConfig: function(config) {
+    this.utils.boardSize = config.boardSize;
   },
 
   tryPivot: function () {
@@ -19,7 +25,7 @@ var ClipboardStore = Reflux.createStore({
 
       var isHorizontal = ship.cells[0].y == ship.cells[1].y;
 
-      var topLeft = getTopLeftShipCell(ship.cells);
+      var topLeft = this.utils.getTopLeftShipCell(ship.cells);
       var pivoted = [topLeft];
       _.times(ship.cells.length - 1, function (i) {
         var cell;
@@ -30,14 +36,14 @@ var ClipboardStore = Reflux.createStore({
           cell = {x: topLeft.x + i + 1, y: topLeft.y};
         }
 
-        if(isCellValid(cell)) {
+        if(this.utils.isCellValid(cell)) {
           pivoted.push(cell);
         }
         else {
           pivoted = null;
           return;
         }
-      });
+      }.bind(this));
 
       //TODO: JK: check can be dropped on pivot!
       //canBeDropped(pivoted, this.clipboard.id, )
@@ -69,9 +75,9 @@ var ClipboardStore = Reflux.createStore({
   drop: function (cell, ships, clipboard) {
     if (clipboard && clipboard.action == 'select') {
       if (clipboard.type == 'config') {
-        var cells = getDropCellsForConfigItem(cell, clipboard.item);
+        var cells = this.utils.getDropCellsForConfigItem(cell, clipboard.item);
 
-        if (canBeDropped(cells, null, ships)) {
+        if (this.utils.canBeDropped(cells, null, ships)) {
           this.clipboard = {
             action: 'drop',
             type: clipboard.type,
@@ -81,13 +87,13 @@ var ClipboardStore = Reflux.createStore({
         }
       }
       else if (clipboard.type == 'board') {
-        var cells = getDroppedCellsForShip(cell, clipboard.item);
-        if (canBeDropped(cells, clipboard.item.id, ships)) {
+        var cells = this.utils.getDroppedCellsForShip(cell, clipboard.item);
+        if (this.utils.canBeDropped(cells, clipboard.item.id, ships)) {
           this.clipboard = {
             action: 'drop',
             type: clipboard.type,
             item: {ship: {id: clipboard.item.id, cells: cells}, old: clipboard.item}
-          }
+          };
           this.trigger(this.clipboard);
         }
       }
@@ -108,79 +114,6 @@ var ClipboardStore = Reflux.createStore({
     };
     this.trigger(this.clipboard);
   }
-})
-
-function getDropCellsForConfigItem(cell, ship) {
-  var result = [];
-  for (var i = 0; i < ship.size; i++) {
-    result.push({x: cell.x + i, y: cell.y});
-  }
-  return result;
-};
-
-function getDroppedCellsForShip(cell, ship) {
-  var topLeft = getTopLeftShipCell(ship.cells);
-  var deltaX = cell.x - topLeft.x;
-  var deltaY = cell.y - topLeft.y;
-
-  var cells = ship.cells.map(function (cell) {
-    return {
-      x: cell.x + deltaX,
-      y: cell.y + deltaY
-    }
-  });
-
-  return cells;
-};
-
-function getTopLeftShipCell(shipCells) {
-  shipCells.sort(function (a, b) {
-    if (a.y > b.y) return 1;
-    if (a.y < b.y) return -1;
-    if (a.y == b.y) {
-      if (a.x > b.x) return 1;
-      if (a.x < b.x) return -1;
-      if (a.x == b.x) return 0;
-    }
-  });
-
-  return shipCells[0];
-}
-
-function canBeDropped(dropCells, droppedShipId, ships) {
-
-  if(!areCellsValid(dropCells)) {
-    return false;
-  }
-
-  for (var i = 0; i < dropCells.length; i++) {
-    var cell = dropCells[i];
-    if (_.find(ships, function (ship) {
-        if (ship.id == droppedShipId) {
-          return false;
-        }
-        var takenCell = _.find(ship.cells, function (shipCell) {
-          return (shipCell.x == cell.x && shipCell.y == cell.y);
-        });
-        return takenCell ? true : false;
-      })) {
-      return false;
-    }
-  };
-  return true;
-}
-
-function isCellValid(cell) {
-  return (cell.x < gameParams.tableSize && cell.y < gameParams.tableSize);
-}
-
-function areCellsValid(cells) {
-  for(var i = 0; i<cells.length; i++) {
-    if(!isCellValid(cells[i])) {
-      return false;
-    }
-  }
-  return true;
-}
+});
 
 module.exports = ClipboardStore;

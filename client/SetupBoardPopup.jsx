@@ -1,6 +1,6 @@
-var React = require('react');
-var _ = require('lodash');
-var Actions = require('./actions');
+var React = require('react')
+  , _ = require('lodash')
+  , Actions = require('./actions');
 
 var ShipPopup = React.createClass({
   pivotShip : function(event) {

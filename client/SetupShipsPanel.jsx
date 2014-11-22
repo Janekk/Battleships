@@ -1,9 +1,9 @@
-var React = require('react');
-var _ = require('lodash');
-var Reflux = require('reflux');
-var Actions = require('./actions');
-var ClipBoardStore = require('./stores/ClipboardStore');
-var ConfigStore = require('./stores/ConfigStore');
+var React = require('react')
+  , _ = require('lodash')
+  , Reflux = require('reflux')
+  , Actions = require('./actions')
+  , ClipBoardStore = require('./stores/ClipboardStore')
+  , SetupShipsStore = require('./stores/SetupShipsStore');
 
 var cellSize = 40;
 
@@ -11,7 +11,7 @@ var ShipsPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   componentDidMount: function() {
-    this.listenTo(ConfigStore, this.loadData);
+    this.listenTo(SetupShipsStore, this.loadData);
     this.listenTo(ClipBoardStore, this.clipboardItemChanged);
 
     Actions.init.getConfig();
@@ -19,7 +19,7 @@ var ShipsPanel = React.createClass({
 
   loadData : function(config) {
     this.setState({
-      items: config.items,
+      items: config,
       selected: null
     })
   },

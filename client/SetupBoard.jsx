@@ -1,10 +1,10 @@
-var React = require('react/addons');
-var Reflux = require('reflux');
-var _ = require('lodash');
-var Actions = require('./actions');
-var ShipPopup = require('./SetupBoardPopup.jsx');
-var Cell = require('./Board/Cell.jsx');
-var Ship = require('./Board/Ship.jsx');
+var React = require('react/addons')
+  , Reflux = require('reflux')
+  , _ = require('lodash')
+  , Actions = require('./actions')
+  , ShipPopup = require('./SetupBoardPopup.jsx')
+  , Cell = require('./Board/Cell.jsx')
+  , Ship = require('./Board/Ship.jsx');
 
 var BoardStore = require('./stores/BoardStore');
 var ClipboardStore = require('./stores/ClipboardStore');

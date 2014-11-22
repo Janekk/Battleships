@@ -1,14 +1,16 @@
-var Reflux = require('Reflux');
-var Actions = require('../actions');
-
-var _ = require('lodash');
+var Reflux = require('Reflux')
+  , Actions = require('../actions')
+  , _ = require('lodash');
 
 var GameStateStore = Reflux.createStore({
   init: function() {
 
     this.socket = io();
-    this.game = {};
+    this.game = {
+      config: {}
+    };
 
+    this.listenTo(Actions.init.setConfig, this.setConfig);
     this.listenTo(Actions.init.startGame, this.initSignIn);
     this.listenTo(Actions.init.signIn, this.initSetup);
     this.listenTo(Actions.game.shoot, this.takeShot);
@@ -51,6 +53,10 @@ var GameStateStore = Reflux.createStore({
   initSignIn: function() {
     this.game.phase = 'sign-in';
     this.trigger(this.game);
+  },
+
+  setConfig: function(config) {
+    this.game.config.boardSize = config.boardSize;
   },
 
   initSetup: function(roomId) {

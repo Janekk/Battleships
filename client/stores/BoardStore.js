@@ -1,7 +1,7 @@
-var Reflux = require('Reflux');
-var Actions = require('../actions');
-var _ = require('lodash');
-var ClipboardStore = require('./ClipboardStore');
+var Reflux = require('Reflux')
+  , Actions = require('../actions')
+  , _ = require('lodash')
+  , ClipboardStore = require('./ClipboardStore');
 
 var GameBoardStore = Reflux.createStore({
   init: function() {
@@ -10,12 +10,11 @@ var GameBoardStore = Reflux.createStore({
       selected: null
     };
     this.listenTo(ClipboardStore, this.dropShip);
-    this.listenTo(Actions.init.ships, this.loadData);
-    this.listenTo(Actions.setup.placeShips, this.sendShipsToServer);
-    this.listenTo(Actions.game.getMyBoard, this.getMyBoard);
+    this.listenTo(Actions.setup.placeShips, this.emitShips);
+    this.listenTo(Actions.game.getMyBoard, this.getBoard);
   },
 
-  sendShipsToServer: function () {
+  emitShips: function () {
     var socket = io();
     var toSend = this.board.ships.map(function(ship) {
       return ship.cells;
@@ -23,15 +22,7 @@ var GameBoardStore = Reflux.createStore({
     socket.emit('place ships', toSend);
   },
 
-  getMyBoard: function() {
-    this.trigger(this.board);
-  },
-
-  loadData: function(data) {
-    var ships = data.ships || [];
-    this.board.ships = ships.map(function(ship){
-      return getNamedShip(ship);
-    });
+  getBoard: function() {
     this.trigger(this.board);
   },
 
