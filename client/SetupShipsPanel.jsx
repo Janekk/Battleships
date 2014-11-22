@@ -6,7 +6,6 @@ var ClipBoardStore = require('./stores/ClipboardStore');
 var ConfigStore = require('./stores/ConfigStore');
 
 var cellSize = 40;
-var borderRadius = 5;
 
 var ShipsPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
@@ -14,6 +13,8 @@ var ShipsPanel = React.createClass({
   componentDidMount: function() {
     this.listenTo(ConfigStore, this.loadData);
     this.listenTo(ClipBoardStore, this.clipboardItemChanged);
+
+    Actions.init.getConfig();
   },
 
   loadData : function(config) {
@@ -76,7 +77,7 @@ var ConfigurationShip = React.createClass({
     var props = {
       width: this.props.size * cellSize,
       height: cellSize
-    }
+    };
 
     var cx = React.addons.classSet;
     var classes = cx({

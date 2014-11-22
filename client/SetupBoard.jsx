@@ -2,12 +2,14 @@ var React = require('react/addons');
 var Reflux = require('reflux');
 var _ = require('lodash');
 var Actions = require('./actions');
-var ShipPopup = require('./ShipPopup');
+var ShipPopup = require('./SetupBoardPopup.jsx');
+var Cell = require('./Board/Cell.jsx');
+var Ship = require('./Board/Ship.jsx');
 
-var GameBoardStore = require('./stores/GameBoardStore');
+var BoardStore = require('./stores/BoardStore');
 var ClipboardStore = require('./stores/ClipboardStore');
 
-var GameBoardSvg = React.createClass({
+var SetupBoard = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   getInitialState: function () {
@@ -18,7 +20,7 @@ var GameBoardSvg = React.createClass({
   },
 
   componentDidMount: function() {
-    this.listenTo(GameBoardStore, this.loadGameBoard);
+    this.listenTo(BoardStore, this.loadGameBoard);
     this.listenTo(ClipboardStore, this.setSelection);
   },
 
@@ -53,12 +55,12 @@ var GameBoardSvg = React.createClass({
           key: x + ' ' + y,
           x: x,
           y: y
-        }
+        };
         cells.push(<Cell {...cellProps} onCellClick={this.handleCellClick.bind(this, cellProps)}/>);
       }.bind(this));
     }.bind(this));
 
-    var ships = []
+    var ships = [];
     this.state.ships.forEach(function (ship, index) {
       ships.push(<Ship key={index} ship={ship} selected={this.state.selected == ship} onShipClick={this.handleShipClick.bind(this, ship)}/>)
     }.bind(this));
@@ -78,54 +80,4 @@ var GameBoardSvg = React.createClass({
   }
 });
 
-var Cell = React.createClass({
-
-  getInitialState: function () {
-    return {selected: false};
-  },
-
-  render: function () {
-    var rectProps = {
-      className: 'cell',
-      key: this.props.x + '.' + this.props.y + '',
-      width: 10,
-      height: 10,
-      x: this.props.x * 10,
-      y: this.props.y * 10
-    }
-
-    return (
-      <rect onClick={this.props.onCellClick} {...rectProps} />)
-  }
-});
-
-var Ship = React.createClass({
-  render: function () {
-    var cells = [];
-    this.props.ship.cells.forEach(function (cell) {
-      var rectProps = {
-        width: 10,
-        height: 10,
-        x: cell.x * 10,
-        y: cell.y * 10,
-        key: cell.x + '.' + cell.y + ''
-      }
-      cells.push(<rect {...rectProps}/>);
-    });
-
-    var cx = React.addons.classSet;
-    var classes = cx({
-      'ship': true,
-      'selected': this.props.selected
-    });
-
-    return (
-      <g className={classes} onClick={this.props.onShipClick}>
-        {cells}
-      </g>
-    )
-  }
-});
-
-
-module.exports = GameBoardSvg;
+module.exports = SetupBoard;

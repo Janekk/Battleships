@@ -11,10 +11,25 @@ var GameBoardStore = Reflux.createStore({
     };
     this.listenTo(ClipboardStore, this.dropShip);
     this.listenTo(Actions.init.ships, this.loadData);
+    this.listenTo(Actions.setup.placeShips, this.sendShipsToServer);
+    this.listenTo(Actions.game.getMyBoard, this.getMyBoard);
+  },
+
+  sendShipsToServer: function () {
+    var socket = io();
+    var toSend = this.board.ships.map(function(ship) {
+      return ship.cells;
+    });
+    socket.emit('place ships', toSend);
+  },
+
+  getMyBoard: function() {
+    this.trigger(this.board);
   },
 
   loadData: function(data) {
-    this.board.ships = data.ships.map(function(ship){
+    var ships = data.ships || [];
+    this.board.ships = ships.map(function(ship){
       return getNamedShip(ship);
     });
     this.trigger(this.board);
@@ -22,14 +37,15 @@ var GameBoardStore = Reflux.createStore({
 
   dropShip: function(clipboard) {
     if(clipboard.action == 'drop') {
+      var dropped;
       if(clipboard.type == 'config') {
-        var dropped = getNamedShip({cells: clipboard.item});
+        dropped = getNamedShip({cells: clipboard.item});
         this.board.ships.push(dropped);
       }
       else {
         var index = this.board.ships.indexOf(clipboard.item.old);
         this.board.ships.splice(index, 1);
-        var dropped = getNamedShip(clipboard.item.ship);
+        dropped = getNamedShip(clipboard.item.ship);
         this.board.ships.push(dropped);
       }
       this.trigger(this.board);

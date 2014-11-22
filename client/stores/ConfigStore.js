@@ -1,6 +1,7 @@
 var Reflux = require('Reflux');
 var Actions = require('../actions');
 var ClipBoardStore = require('./ClipboardStore');
+var GameStore = require('./GameStore');
 
 var _ = require('lodash');
 
@@ -8,12 +9,18 @@ var ConfigurationStore = Reflux.createStore({
   init: function() {
     this.config = null;
 
-    this.listenTo(Actions.init.config, this.loadData);
+    this.listenTo(Actions.init.getConfig, this.loadData);
     this.listenTo(ClipBoardStore, this.updateConfig);
   },
 
-  loadData: function(config) {
-    this.config = config;
+  loadData: function() {
+    this.config = {
+      items: [
+        {size: 1, count: 2},
+        {size: 2, count: 1},
+        {size: 3, count: 1}
+      ]
+    };
     this.trigger(this.config);
   },
 

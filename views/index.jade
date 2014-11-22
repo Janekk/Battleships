@@ -7,15 +7,15 @@ block header
   script(src='/scripts/toastr.min.js')
 block content
   h1= title
-  p Welcome to #{title}
-  .room-area
-    input(type='text', name='room-id', id='room-id', placeholder='room ID')
-    button(type='button', id='join-button') join
-  .ship-area
-    p
-      button(type='button', id='place-ships-button') place ships
-    p
-      button(type='button', id='shoot-button') shoot
+  //p Welcome to #{title}
+  //.room-area
+  //  input(type='text', name='room-id', id='room-id', placeholder='room ID')
+  //  button(type='button', id='join-button') join
+  //.ship-area
+  //  p
+  //    button(type='button', id='place-ships-button') place ships
+  //  p
+  //    button(type='button', id='shoot-button') shoot
   div.gameboard#gameboard
 block footer
   script(src="/scripts/bundle.js")
