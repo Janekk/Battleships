@@ -23,40 +23,25 @@ var paths = {
   }
 };
 
-
 gulp.task('browserify', function () {
-  return gulpClientBundle();
-});
-
-var gulpClientBundle = function () {
-  var plumber = require('gulp-plumber');
-  return browserify(paths.src.client.app,
+  browserify(paths.src.client.app,
     {
       extensions: ['.jsx', '.js']
     })
     .require('react') //chrome tools for React
     .transform('reactify') //don't generate intermediate js files
     .bundle()
+    .on('error', function(err){
+      console.log(err.message);
+    })
     .pipe(source(paths.dest.client.bundle))
-    .pipe(plumber())
     .pipe(gulp.dest(paths.dest.client.scripts));
-}
-
-//var watch = require('gulp-watch');
-gulp.task('watch-browserify', function () {
-  gulp.watch([paths.src.client.scripts], ['browserify']);
 });
 
-//// Rerun the task when a file changes
-//var watch = require('gulp-watch');
-//gulp.task('watch', function() {
-//
-//  watch({glob: [paths.src.client.scripts, paths.src.jsx, paths.dest.bundlesFilter]}, function () {
-//    return gulpClientBundle();
-//  });
-//});
+gulp.task('watch-browserify', function () {
+  gulp.watch([paths.src.client.scripts], ['browserify'])
+});
 
-//"watch" for server
 var nodemon = require('gulp-nodemon');
 gulp.task('watch-server', function () {
     nodemon({
@@ -69,9 +54,8 @@ gulp.task('watch-server', function () {
         'routes'
       ]
     })
-      //.on('change', ['lint'])
-      .on('restart', function () {
-        console.log('restarted!');
-      });
+    .on('restart', function () {
+      console.log('watch-server restarted!');
+    });
   }
 );
