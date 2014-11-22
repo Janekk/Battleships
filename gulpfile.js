@@ -5,7 +5,7 @@ var source = require('vinyl-source-stream');
 var paths = {
   src: {
     client: {
-      scripts: './client/*',
+      scripts: './client/**/*',
       app: './client/main.js'
     },
     server: {
