@@ -19,17 +19,16 @@ var Cell = React.createClass({
 
     var shot;
     if(this.props.shot) {
-      shot = [
-        <line x1={rectProps.x} y1={rectProps.y} x2={rectProps.x + rectProps.width} y2={rectProps.y + rectProps.height} style={{stroke:'red'}} />,
+
+      return(<g>
+        <rect onClick={this.props.onCellClick} {...rectProps} />
+        <line x1={rectProps.x} y1={rectProps.y} x2={rectProps.x + rectProps.width} y2={rectProps.y + rectProps.height} style={{stroke:'red'}} />
         <line x1={rectProps.x} y1={rectProps.y + rectProps.height} x2={rectProps.x + rectProps.width} y2={rectProps.y} style={{stroke:'red'}} />
-      ]
+      </g>);
     }
 
     return (
-      <g>
       <rect onClick={this.props.onCellClick} {...rectProps} />
-        {shot}
-      </g>
     )
 
   }
