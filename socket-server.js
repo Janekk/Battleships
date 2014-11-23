@@ -1,5 +1,6 @@
 module.exports = function(http) {
     var io = require('socket.io')(http);
+    var _ = require('lodash');
     var GameService = require('./models/gameService');
 
     io.on('connection', function(socket) {
@@ -9,8 +10,11 @@ module.exports = function(http) {
             if (socket.username === undefined) { // user isn't in lobby
                 socket.username = username;
 
+                var users = getUsersOfLobby('lobby');
+
                 // enter lobby
                 socket.join('lobby');
+                socket.emit('has entered lobby', { isSuccessful: true, users: users });
                 socket.broadcast.to('lobby').emit('user enters lobby', { id: socket.id, username: username });
             }
         });
@@ -39,7 +43,7 @@ module.exports = function(http) {
                 // leave lobby
                 socket.leave('lobby');
 
-                socket.broadcast.to('lobby').emit('user left lobby', { id: socket.id, username: username });
+                socket.broadcast.to('lobby').emit('user left lobby', { id: socket.id, username: socket.username });
             }
 
             if (socket.gameService) {
@@ -47,6 +51,19 @@ module.exports = function(http) {
             }
         });
     });
+
+    function getUsersOfLobby() {
+        var ns = io.of('/');
+
+        return _.chain(ns.connected)
+            .filter(function(socket) {
+                return socket.username && _.contains(socket.rooms, 'lobby');
+            })
+            .map(function(socket) {
+                return { id: socket.id, username: socket.username };
+            })
+            .value();
+    }
 
     return io;
 };

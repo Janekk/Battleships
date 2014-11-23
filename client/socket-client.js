@@ -7,7 +7,7 @@ module.exports = function() {
         var $joinButton = $('#join-button');
         var $placeShipsButton = $('#place-ships-button');
         var $shootButton = $('#shoot-button');
-        var $setUsernameButton = $('#set-username-button');
+        var $enterLobbyButton = $('#enter-lobby-button');
 
         $joinButton.on('click', function() {
             // disable buttons
@@ -28,14 +28,27 @@ module.exports = function() {
             socket.emit('shoot', { x: 0, y: 0 });
         });
 
-        $setUsernameButton.on('click', function() {
+        $enterLobbyButton.on('click', function() {
             socket.emit('enter lobby', $username.val());
         });
     });
 
-    socket.on('user enters lobby', function(data) {
+    socket.on('has entered lobby', function(result) {
+        if (!result.isSuccessful) { // error
+            toastr.error(result.error);
+            return;
+        }
+
+        // load lobby
+        var $lobby = $('#lobby').empty();
+        $.each(result.users, function(index, user) {
+            $lobby.append('<li data-id"' + user.id + '">' + user.username + '</li>');
+        });
+    });
+
+    socket.on('user enters lobby', function(user) {
         var $lobby = $('#lobby');
-        $lobby.append('<li data-id="' + data.id + '">' + data.username + '</li>');
+        $lobby.append('<li data-id="' + user.id + '">' + user.username + '</li>');
     });
 
     socket.on('room joined', function(result) {
