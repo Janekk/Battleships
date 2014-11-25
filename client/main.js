@@ -12,7 +12,7 @@ var gameData = {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-  React.render(<Game />, document.getElementById('gameboard'));
+  React.render(<Game />, document.getElementById('game'));
 
   Actions.init.setConfig(gameData);
   Actions.init.startGame();

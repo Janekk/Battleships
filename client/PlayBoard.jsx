@@ -7,7 +7,7 @@ var React = require('react/addons')
   , BoardStore = require('./stores/BoardStore')
   , GameStore = require('./stores/GameStore');
 
-var GameBoard = React.createClass({
+var PlayBoard = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   getInitialState: function () {
@@ -19,10 +19,10 @@ var GameBoard = React.createClass({
 
   componentDidMount: function() {
     this.listenTo(GameStore, this.handleGameEvents);
-    if(this.props.myBoard) {
-      this.listenTo(BoardStore, this.loadGameBoard);
-      Actions.game.getMyBoard();
-    }
+    this.listenTo(BoardStore, this.loadGameBoard);
+
+    //initial load
+    this.loadGameBoard(BoardStore.getBoard());
   },
 
   handleGameEvents: function(game) {
@@ -75,9 +75,9 @@ var GameBoard = React.createClass({
 
     return (
       <div>
-        <p>{this.props.myBoard ? "My board" : "Opponent's board" + (this.state.active ? " - YOUR TURN!!!": "") }</p>
+        <p>{this.props.myBoard ? "My board (preview)" : "Opponent's board" + (this.state.active ? " - YOUR TURN!!!": "") }</p>
         <div className="gameboard-table">
-          <svg width="100%" height="100%" viewBox={"0 0 " + this.props.xsize*10 + " " + + this.props.ysize*10}>
+          <svg viewBox={"0 0 " + this.props.xsize*10 + " " + + this.props.ysize*10}>
             {cells}
             {ships}
           </svg>
@@ -87,4 +87,4 @@ var GameBoard = React.createClass({
   }
 });
 
-module.exports = GameBoard;
+module.exports = PlayBoard;

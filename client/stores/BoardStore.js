@@ -11,7 +11,6 @@ var GameBoardStore = Reflux.createStore({
     };
     this.listenTo(ClipboardStore, this.dropShip);
     this.listenTo(Actions.setup.placeShips, this.emitShips);
-    this.listenTo(Actions.game.getMyBoard, this.getBoard);
   },
 
   emitShips: function () {
@@ -23,7 +22,7 @@ var GameBoardStore = Reflux.createStore({
   },
 
   getBoard: function() {
-    this.trigger(this.board);
+    return this.board;
   },
 
   dropShip: function(clipboard) {

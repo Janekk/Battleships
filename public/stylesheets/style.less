@@ -1,8 +1,12 @@
-@import "bootstrap.css";
-@import "bootstrap-theme.css";
+@import "../../node_modules/bootstrap/less/bootstrap";
+
+html, body
+{
+  height: 100%;
+}
 
 body {
-  padding: 50px;
+  padding: 1em;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -10,16 +14,41 @@ a {
   color: #00B7FF;
 }
 
-.boerd-casino {
-  .gameboard {
-    display: block;
-    padding-right: 3em;
-    width: 100%;
+.main {
+  .game {
 
-    .board {
-      float: left;
-      .gameboard-table {
+    #shooting-panel {
+      position: relative;
+    }
 
+    .pb-hidden {
+      @media screen and (max-width: @screen-xs-max) {
+        display: none;
+      }
+    }
+    #switch-board {
+      @media screen and (min-width: @screen-sm-min) {
+        display: none;
+      }
+    }
+
+    .overlay{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      background-color: rgba(0,0,0,0.5); /*dim the background*/
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .turn-overlay-text {
+        font-size: 2em;
+        color: orangered;
+        opacity: 0.5;
       }
     }
   }
@@ -34,6 +63,21 @@ a {
     stroke-width: 0.5;
     opacity: 0.5;
   }
+
+  g.coord {
+    rect {
+      fill: orange;
+      stroke: black;
+      stroke-width: 0.5;
+      opacity: 0.5;
+    }
+
+    text {
+      font-size: 6pt;
+    }
+  }
+
+
 
   g.ship {
     fill: orange;
@@ -51,8 +95,8 @@ a {
   g.config {
     fill: pink;
     stroke: black;
-    stroke-width: 1;
-    font-size: 20px;
+    stroke-width: 0.2;
+    font-size: 7px;
 
     text {
       fill: black;

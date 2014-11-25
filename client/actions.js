@@ -4,8 +4,7 @@ var actions = {
   init: {
     startGame: Reflux.createAction(),
     signIn: Reflux.createAction(),
-    setConfig: Reflux.createAction(),
-    getConfig: Reflux.createAction()
+    setConfig: Reflux.createAction()
   },
   setup: {
     selectConfigItem: Reflux.createAction(),
@@ -16,7 +15,6 @@ var actions = {
 
     },
   game: {
-    getMyBoard: Reflux.createAction(),
     shoot: Reflux.createAction()
   }
 };

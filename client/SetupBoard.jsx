@@ -2,9 +2,10 @@ var React = require('react/addons')
   , Reflux = require('reflux')
   , _ = require('lodash')
   , Actions = require('./actions')
-  , ShipPopup = require('./SetupBoardPopup.jsx')
+  , ShipPopup = require('./SetupBoardPopup')
   , Cell = require('./Board/Cell.jsx')
-  , Ship = require('./Board/Ship.jsx');
+  , Coordinate = require('./Board/Coordinate')
+  , Ship = require('./Board/Ship.jsx')
 
 var BoardStore = require('./stores/BoardStore');
 var ClipboardStore = require('./stores/ClipboardStore');
@@ -48,6 +49,15 @@ var SetupBoard = React.createClass({
   },
 
   render: function () {
+    var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var coords = [];
+    _.times(this.props.xsize, function (x) {
+      coords.push(<Coordinate x={x} y={-1} text={alphabet[x]}/>);
+    });
+    _.times(this.props.ysize, function (y) {
+      coords.push(<Coordinate x={-1} y={y} text={y + ''}/>);
+    });
+
     var cells = [];
     _.times(this.props.xsize, function (x) {
       _.times(this.props.ysize, function (y) {
@@ -65,12 +75,14 @@ var SetupBoard = React.createClass({
       ships.push(<Ship key={index} ship={ship} selected={this.state.selected == ship} onShipClick={this.handleShipClick.bind(this, ship)}/>)
     }.bind(this));
 
+    var viewBox = [-10, -10, (this.props.xsize + 1)*10, (this.props.ysize + 1)*10];
+
     return (
       <div>
-        <p>{"Table name: " + this.props.name}</p>
         <div className="gameboard-table">
           {this.state.selected ? <ShipPopup /> : null}
-          <svg width="100%" height="100%" viewBox={"0 0 " + this.props.xsize*10 + " " + + this.props.ysize*10}>
+          <svg width="100%" height="100%" viewBox={viewBox.join(' ')}>
+            {coords}
             {cells}
             {ships}
           </svg>

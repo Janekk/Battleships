@@ -9,16 +9,11 @@ var ConfigurationStore = Reflux.createStore({
   init: function() {
     this.config = null;
     this.listenTo(Actions.init.setConfig, this.setData);
-    this.listenTo(Actions.init.getConfig, this.flushData);
     this.listenTo(ClipBoardStore, this.updateConfig);
   },
 
   setData: function (config) {
     this.config = config.configShips;
-  },
-
-  flushData: function() {
-    this.trigger(this.config);
   },
 
   updateConfig : function(clipboard) {

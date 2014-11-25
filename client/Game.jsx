@@ -7,7 +7,7 @@ var React = require('react')
   , Actions = require('./actions')
   , _ = require('lodash');
 
-var GamePanel = React.createClass({
+var Game = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   componentDidMount: function () {
@@ -37,45 +37,48 @@ var GamePanel = React.createClass({
       switch (this.state.phase) {
         case 'sign-in':
           panel = (
-            <div className="panel pure-g">
-              <input type='text' name='room-id' ref='roomId' placeholder='room ID' />
-              <button type='button' onClick={this.signIn}>join</button>
-            </div>
+            <form className="form-inline" role="form">
+              <div className="form-group">
+                <div className="input-group">
+                  <label className="sr-only" htmlFor="room-id">room ID</label>
+                  <input type='text' className="form-control" name='room-id' ref='roomId' placeholder='room ID' />
+                </div>
+              </div>
+              <button type='button' className="btn btn-primary" onClick={this.signIn}>join</button>
+            </form>
           );
           break;
         case 'setup':
           panel = (
-            <div className="panel pure-g">
-              <div className="board pure-u-4-5">
-                <SetupBoard name={this.state.roomId} xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
+            <div className="container-fluid">
+              <div className="row">
+                <div className="ships-panel col-xs-4">
+                  <SetupShipsPanel />
+                </div>
+                <div className="col-xs-12 col-sm-8">
+                  <p>Table name: {this.state.roomId}</p>
+                  <SetupBoard name={this.state.roomId} xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
+                </div>
               </div>
-              <div className="ships-panel pure-u-1-5">
-                <SetupShipsPanel />
-              </div>
-              <div>
-                <button type='button' onClick={this.placeShips}>place ships</button>
+              <div className="row">
+                <div className="col-xs-12">
+                  <button type='button' className="btn btn-primary" onClick={this.placeShips}>Ready!</button>
+                </div>
               </div>
             </div>);
           break;
         case 'ready-to-shoot':
-          panel = (
-            <div className="panel pure-g">
-              <div className="board pure-u-1-2">
-                <PlayBoard xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
-              </div>
-              <div className="board pure-u-1-2">
-                <PlayBoard myBoard xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
-              </div>
-            </div>);
+          panel = (<ShootingPanel boardSize={this.state.config.boardSize} />);
           break;
         case 'game-over':
           panel = (
-            <div className="panel pure-g">
+            <div>
               <p>Game over!</p>
               <p>{this.state.payload}</p>
             </div>
           );
           break;
+        case 'player-left':
       }
     }
 
@@ -86,4 +89,75 @@ var GamePanel = React.createClass({
     );
   }
 });
-module.exports = GamePanel;
+
+var ShootingPanel = React.createClass({
+  mixins: [Reflux.ListenerMixin],
+
+  componentDidMount: function() {
+    this.listenTo(GameStore, this.handleGameEvents);
+  },
+
+  getInitialState: function() {
+    return {
+      isOpponentsBoardVisible: true,
+      active: false
+    }
+  },
+
+  handleGameEvents: function(game) {
+    var active = (game.phase == 'game-my-turn');
+    this.setState({
+      active: active,
+      isOpponentsBoardVisible: active
+    });
+  },
+
+  handleSwitch: function() {
+    this.setState({isOpponentsBoardVisible: !this.state.isOpponentsBoardVisible});
+  },
+
+  render: function() {
+    var btnCaption = this.state.isOpponentsBoardVisible ? 'Show my board' : 'Show opponent\'s board';
+
+    var cx = React.addons.classSet;
+    var myBoardClasses = cx({
+      'col-xs-12': true,
+      'col-sm-6': true,
+      'pb-hidden': this.state.isOpponentsBoardVisible
+    });
+
+    var opponentsClasses = cx({
+      'col-xs-12': true,
+      'col-sm-6': true,
+      'pb-hidden': !this.state.isOpponentsBoardVisible
+    });
+
+    var overlay = !this.state.active ?
+      (
+        <div className="overlay">
+          <span className="turn-overlay-text">Opponent's turn</span>
+        </div>
+      ) : null;
+
+    return (
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xs-12">
+            <button type="button" id="switch-board" className="btn btn-default" onClick={this.handleSwitch}>{btnCaption}</button>
+          </div>
+        </div>
+        <div className="row" id="shooting-panel">
+          {overlay}
+          <div className={opponentsClasses}>
+            <PlayBoard xsize={this.props.boardSize} ysize={this.props.boardSize} />
+          </div>
+          <div className={myBoardClasses}>
+            <PlayBoard myBoard xsize={this.props.boardSize} ysize={this.props.boardSize} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+
+module.exports = Game;

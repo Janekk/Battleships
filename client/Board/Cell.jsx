@@ -10,7 +10,6 @@ var Cell = React.createClass({
   render: function () {
     var rectProps = {
       className: 'cell',
-      key: this.props.x + '.' + this.props.y + '',
       width: 10,
       height: 10,
       x: this.props.x * 10,

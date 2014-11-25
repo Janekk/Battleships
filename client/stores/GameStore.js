@@ -15,6 +15,14 @@ var GameStateStore = Reflux.createStore({
     this.listenTo(Actions.init.signIn, this.initSetup);
     this.listenTo(Actions.game.shoot, this.takeShot);
 
+
+    this.socket.on('room joined', function(result) {
+      if (result.isSuccessful) {
+        this.game.phase = 'room-joined';
+        this.trigger(this.game);
+      }
+    }.bind(this));
+
     this.socket.on('ships placed', function(result) {
       if (result.isSuccessful) {
         this.game.phase = 'ready-to-shoot';
@@ -41,6 +49,13 @@ var GameStateStore = Reflux.createStore({
       if (result.isSuccessful) {
         this.game.phase = 'game-opponents-turn';
         this.game.shotPosition = undefined;
+        this.trigger(this.game);
+      }
+    }.bind(this));
+
+    this.socket.on('player left', function(result) {
+      if (!result.isSuccessful) { // error
+        this.game.phase = 'player-left';
         this.trigger(this.game);
       }
     }.bind(this));
