@@ -2,40 +2,35 @@ var React = require('react')
   , _ = require('lodash')
   , Reflux = require('reflux')
   , Actions = require('./actions')
-  , ClipBoardStore = require('./stores/ClipboardStore')
-  , SetupShipsStore = require('./stores/SetupShipsStore');
+  , SetupStore = require('./stores/SetupStore');
 
 var ShipsPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   componentDidMount: function() {
-    this.loadData(SetupShipsStore.config);
-    this.listenTo(SetupShipsStore, this.loadData);
-    this.listenTo(ClipBoardStore, this.clipboardItemChanged);
+    this.loadData(SetupStore.data);
+    this.listenTo(SetupStore, this.loadData);
   },
 
-  loadData : function(config) {
-    this.setState({
-      items: config,
-      selected: null
-    })
-  },
-
-  clipboardItemChanged : function(clipboard) {
-    if(clipboard.action == 'select' && clipboard.type == 'config') {
-      this.setState(React.addons.update(this.state, {
-          selected: {$set: clipboard.item}}
-      ));
+  loadData : function(data) {
+    var state = {};
+    if(data.config) {
+      state.items = data.config;
     }
-    else {
-      this.setState(React.addons.update(this.state, {
-          selected: {$set: null}}
-      ));
+    if('selected' in data && data.selected) {
+      if (data.selected.type == 'config') {
+        state.selected = data.selected.item;
+      }
+      else {
+        state.selected = null;
+      }
     }
+    this.setState(state);
   },
 
   getInitialState: function () {
     return {
+      items: null,
       selected: null
     };
   },

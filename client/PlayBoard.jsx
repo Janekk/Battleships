@@ -4,7 +4,7 @@ var React = require('react/addons')
   , Actions = require('./actions')
   , Cell = require('./Board/Cell')
   , Ship = require('./Board/Ship')
-  , BoardStore = require('./stores/BoardStore')
+  , SetupStore = require('./stores/SetupStore')
   , GameStore = require('./stores/GameStore');
 
 var PlayBoard = React.createClass({
@@ -19,10 +19,10 @@ var PlayBoard = React.createClass({
 
   componentDidMount: function() {
     this.listenTo(GameStore, this.handleGameEvents);
-    this.listenTo(BoardStore, this.loadGameBoard);
+    this.listenTo(SetupStore, this.loadGameBoard);
 
     //initial load
-    this.loadGameBoard(BoardStore.getBoard());
+    this.loadGameBoard(SetupStore.data.ships);
   },
 
   handleGameEvents: function(game) {
@@ -40,8 +40,8 @@ var PlayBoard = React.createClass({
     }
   },
 
-  loadGameBoard: function(gameboard) {
-    this.setState({ships: gameboard.ships});
+  loadGameBoard: function(ships) {
+    this.setState({ships: ships});
   },
 
   handleCellClick: function(cellProps) {

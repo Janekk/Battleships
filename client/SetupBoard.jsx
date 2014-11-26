@@ -6,9 +6,7 @@ var React = require('react/addons')
   , Cell = require('./Board/Cell.jsx')
   , Coordinate = require('./Board/Coordinate')
   , Ship = require('./Board/Ship.jsx')
-
-var BoardStore = require('./stores/BoardStore');
-var ClipboardStore = require('./stores/ClipboardStore');
+  , SetupStore = require('./stores/SetupStore');
 
 var SetupBoard = React.createClass({
   mixins: [Reflux.ListenerMixin],
@@ -21,21 +19,24 @@ var SetupBoard = React.createClass({
   },
 
   componentDidMount: function() {
-    this.listenTo(BoardStore, this.loadGameBoard);
-    this.listenTo(ClipboardStore, this.setSelection);
+    this.listenTo(SetupStore, this.loadGameBoard);
   },
 
-  loadGameBoard: function(gameboard) {
-    this.setState(gameboard);
-  },
-
-  setSelection: function(clipboard) {
-    if(clipboard.type == 'board' && clipboard.action == 'select') {
-      this.setState({selected: clipboard.item});
+  loadGameBoard: function(data) {
+    var state = {};
+    if(data.ships) {
+      state.ships = data.ships;
     }
-    else if(clipboard.type == 'config' && clipboard.action == 'select') {
-      this.setState({selected: null});
+    if('selected' in data && data.selected)
+    {
+      if(data.selected.type == 'board') {
+        state.selected = data.selected.item;
+      }
+      else {
+        state.selected = null;
+      }
     }
+    this.setState(state);
   },
 
   handleShipClick: function (ship, event) {
