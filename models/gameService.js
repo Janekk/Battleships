@@ -281,7 +281,7 @@ function GameService(socket) {
         for (var s = 0; s < thisGameService.ships.length; s++) {
             var ship = thisGameService.ships[s];
             if (ship.healthCount > 0) { // ship is intact
-                for (var p = 0; p < ship.positions; p++) {
+                for (var p = 0; p < ship.positions.length; p++) {
                     var shipPosition = ship.positions[p];
                     if (shipPosition.isDamaged) {
                         continue;

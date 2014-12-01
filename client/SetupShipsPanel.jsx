@@ -42,18 +42,18 @@ var ShipsPanel = React.createClass({
   },
 
   render: function () {
-    var config = _.sortBy(this.state.items, function(cfg){return cfg.size;});
+    var config = _.sortBy(this.state.items, function(cfg){return -cfg.size;});
     var selectedSize = this.state.selected ? this.state.selected.size : null;
 
     var components = [];
     config.forEach(function(cfg, index) {
       var handleClick = this.handleItemClick.bind(this, cfg);
-      components.push(<ConfigurationShip size={cfg.size} index={index} key={cfg.size} selected={cfg.size == selectedSize} count={cfg.count} onClick={handleClick}/>);
+      components.push(<ConfigurationShip config={cfg} index={index} key={cfg.size} selected={cfg.size == selectedSize} count={cfg.count} onClick={handleClick}/>);
     }.bind(this));
 
     return (
-      <div>
-        <svg width="100%" height="100%" viewBox="0 0 30 30">
+      <div className="ships-panel">
+        <svg width="100%" height="100%" viewBox="0 0 100 50">
             {components}
         </svg>
       </div>
@@ -63,15 +63,11 @@ var ShipsPanel = React.createClass({
 
 var ConfigurationShip = React.createClass({
 
-  onDragStart: function (ev) {
-    ev.dataTransfer.setData("text", JSON.stringify({size: this.props.size}));
-  },
-
   render: function () {
     var props = {
-      x: 0,
-      y: this.props.index * 10,
-      width: this.props.size * 10,
+      x: (4 - this.props.config.size) * 10,
+      y: this.props.index * 12,
+      width: this.props.config.size * 10,
       height: 10
     };
 
@@ -86,9 +82,14 @@ var ConfigurationShip = React.createClass({
     });
 
     return (
-      <g className={classes} onClick={this.props.onClick}>
-        <rect {...props} />
-        <text x={props.x} y={props.y + 8} >{"x" + this.props.count}</text>
+      <g>
+        <g className={classes} onClick={this.props.onClick}>
+          <rect {...props} />
+          <text x={props.x + props.width - 10} y={props.y + 8}>{"x" + this.props.count}</text>
+        </g>
+        <g className={classes}>
+          <text x={props.x + props.width + 2} y={props.y + 8}>{this.props.config.name}</text>
+        </g>
       </g>
     );
   }

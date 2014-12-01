@@ -6,6 +6,7 @@ var paths = {
   src: {
     client: {
       scripts: './client/**/*',
+      fonts: './node_modules/bootstrap/fonts/*',
       app: './client/main.js'
     },
     server: {
@@ -17,11 +18,17 @@ var paths = {
   dest: {
     client: {
       scripts: 'public/scripts',
+      fonts: 'public/fonts',
       bundle: 'bundle.js'
     },
     bundlesFilter: '!public/scripts/**/*.js'
   }
 };
+
+gulp.task('init', function () {
+  gulp.src(paths.src.client.fonts)
+  .pipe(gulp.dest(paths.dest.client.fonts));
+});
 
 gulp.task('browserify', function () {
   browserify(paths.src.client.app,

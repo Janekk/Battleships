@@ -125,11 +125,19 @@ var SetupStore = Reflux.createStore({
   },
 
   emitShips: function () {
-    var socket = io();
-    var toSend = this.data.ships.map(function (ship) {
-      return ship.cells;
-    });
-    socket.emit('place ships', toSend);
+    var allPlaced = function() {
+      return (!_.any(this.data.config, function (item) {
+        return (item.count > 0);
+      }))
+    }.bind(this);
+
+    if(allPlaced()) {
+      var socket = io();
+      var toSend = this.data.ships.map(function (ship) {
+        return ship.cells;
+      });
+      socket.emit('place ships', toSend);
+    }
   },
 
   dropShip: function (selected) {

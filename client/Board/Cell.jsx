@@ -16,13 +16,20 @@ var Cell = React.createClass({
       y: this.props.y * 10
     };
 
-    var shot;
     if(this.props.shot) {
+      var shot = this.props.shot;
+      var cx = React.addons.classSet;
+      var classes = cx({
+        'cell': true,
+        'shot': shot,
+        'hit': (shot && shot.hit),
+        'destroyed': (shot && shot.destroyed)
+      });
 
-      return(<g>
+      return(<g className={classes}>
         <rect onClick={this.props.onCellClick} {...rectProps} />
-        <line x1={rectProps.x} y1={rectProps.y} x2={rectProps.x + rectProps.width} y2={rectProps.y + rectProps.height} style={{stroke:'red'}} />
-        <line x1={rectProps.x} y1={rectProps.y + rectProps.height} x2={rectProps.x + rectProps.width} y2={rectProps.y} style={{stroke:'red'}} />
+        <line x1={rectProps.x} y1={rectProps.y} x2={rectProps.x + rectProps.width} y2={rectProps.y + rectProps.height} />
+        <line x1={rectProps.x} y1={rectProps.y + rectProps.height} x2={rectProps.x + rectProps.width} y2={rectProps.y} />
       </g>);
     }
 

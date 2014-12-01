@@ -1,46 +1,271 @@
 @import "../../node_modules/bootstrap/less/bootstrap";
 
-html, body
-{
+@font-face {
+  font-family: army-rust;
+  src: url("../fonts/army-rust.ttf");
+}
+
+html, body {
   height: 100%;
 }
 
 body {
-  padding: 1em;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 2em army-rust, "Lucida Grande", Helvetica, Arial, sans-serif;
+  .default-ui-font();
 }
 
 a {
   color: #00B7FF;
 }
 
+.default-ui-font {
+  letter-spacing: 0.5vw;
+  font-size: 5vw;
+}
+
+.clearfix {
+  :after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
 .main {
+  padding: 0 0.5em 0 0.5em;
+  @media screen {
+    #header {
+      div.title {
+        display: inline-block;
+        @media (min-width: @screen-sm-min) {
+          @media (max-aspect-ratio: 8/5) {
+            width: 60%;
+            h1 {
+              font-family: army-rust;
+              letter-spacing: 0.6vw;
+              font-size: 10vw;
+              width: 100%;
+              margin: 0;
+            }
+          }
+          @media (min-aspect-ratio: 8/5) {
+            width: 70%;
+            h1 {
+              font-family: army-rust;
+              letter-spacing: 0.4vw;
+              font-size: 8vw;
+              width: 100%;
+              margin: 0;
+            }
+          }
+        }
+        @media (max-width: @screen-xs-max) {
+          width: 100%;
+          h1 {
+            font-family: army-rust;
+            letter-spacing: 1.5vw;
+            font-size: 13vw;
+            width: 100%;
+            margin: 0;
+          }
+        }
+      }
+
+      div.logo {
+        display: inline-block;
+        @media (min-width: @screen-sm-min) {
+          @media (min-aspect-ratio: 8/5) {
+            width: 30%;
+          }
+          @media (max-aspect-ratio: 8/5) {
+            width: 40%;
+          }
+        }
+        @media (max-width: @screen-xs-max) {
+          display: none;
+        }
+        img.logo {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .tool-font {
+    font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
+    letter-spacing: initial;
+  }
+
+  .sign-in {
+    .tool-font();
+  }
+
   .game {
+
+    div.setup {
+      .clearfix();
+      .command, button {
+        .tool-font();
+      }
+
+      .confirm {
+        button {
+          float: right;
+        }
+      }
+
+      @media (min-width: @screen-sm-min) {
+
+        .side {
+          display: flex;
+          flex-direction: column;
+          flex-flow: column wrap;
+        }
+        .ships-panel {
+          order: 1;
+          width: 100%;
+        }
+        .confirm {
+          order: 0;
+          width: 100%;
+        }
+
+        @media (min-aspect-ratio: 8/5) {
+          .setup-board {
+            width: 40%;
+            float: left;
+          }
+
+          .side {
+            width: 30%;
+            float: right;
+          }
+        }
+        @media (max-aspect-ratio: 8/5) {
+          .setup-board {
+            width: 68%;
+            float: left;
+          }
+          .side {
+            width: 30%;
+            float: right;
+          }
+        }
+      }
+
+      @media (max-width: @screen-xs-max) {
+        .setup-board {
+          width: 100%;
+          float: left;
+        }
+        .side {
+          width: 100%;
+          float: left;
+
+          .ships-panel {
+            float: left;
+            width: 80%;
+          }
+          .confirm {
+            float: right;
+            width: 20%;
+          }
+        }
+      }
+
+      .ships-panel {
+        letter-spacing: 0.1vw;
+        font-size: 4vw;
+      }
+    }
 
     #shooting-panel {
       position: relative;
-    }
+      .clearfix();
 
-    .pb-hidden {
-      @media screen and (max-width: @screen-xs-max) {
-        display: none;
+      >div {
+        padding: 5px;
+      }
+
+      @media screen {
+        .pb {
+          box-sizing: border-box;
+        }
+
+        @media (max-width: @screen-xs-max) {
+          overflow-x: hidden;
+
+          p.status {
+            letter-spacing: 0.2vw;
+            font-size: 6vw;
+          }
+
+          .pb {
+            width: 100%;
+            transition: 1.0s all ease;
+            transition-delay: 0s;
+          }
+
+          .me {
+            float: right;
+            margin-right: -102%;
+            &.my-board-active {
+              margin-right: 0%;
+            }
+          }
+
+          .opponent {
+            float: left;
+            margin-left: 0%;
+            &.my-board-active {
+              margin-left: -102%;
+            }
+          }
+        }
+
+        @media (min-width: @screen-sm-min) {
+          p.status {
+            @media (min-aspect-ratio: 8/5) {
+              font-size: 2.5vw;
+            }
+            @media (max-aspect-ratio: 8/5) {
+              font-size: 3vw;
+            }
+            letter-spacing: 0.1vw;
+          }
+
+          .pb {
+            @media (min-aspect-ratio: 8/5) {
+              width: 40%;
+            }
+            @media (max-aspect-ratio: 8/5) {
+              width: 50%;
+            }
+            display: inline-block;
+            padding: 0 10px 10px 10px;
+          }
+
+          .me {
+            float: right;
+          }
+          .opponent {
+            float: left;
+          }
+        }
       }
     }
-    #switch-board {
-      @media screen and (min-width: @screen-sm-min) {
-        display: none;
-      }
-    }
 
-    .overlay{
+    .overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       z-index: 10;
-      background-color: rgba(0,0,0,0.5); /*dim the background*/
-
+      background-color: rgba(0, 0, 0, 0.3); /*dim the background*/
       display: flex;
       align-items: center;
       justify-content: center;
@@ -49,6 +274,47 @@ a {
         font-size: 2em;
         color: orangered;
         opacity: 0.5;
+
+        -webkit-animation: turn-blink 0.7s linear infinite;
+        -moz-animation: turn-blink 0.7s linear infinite;
+        -ms-animation: turn-blink 0.7s linear infinite;
+        -o-animation: turn-blink 0.7s linear infinite;
+        animation: turn-blink 0.7s linear infinite;
+      }
+
+      @keyframes turn-blink {
+        0% {
+          opacity: 0.1;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+      @-webkit-keyframes turn-blink {
+        0% {
+          opacity: 0.1;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+    }
+
+    .switch-wrapper {
+      //.clearfix();
+      #switch-board {
+        @media screen and (min-width: @screen-sm-min) {
+          display: none;
+        }
+        width: 100%;
+        .default-ui-font();
+
+        //        &.me {
+        //          float: left;
+        //        }
+        //        &.opponent {
+        //          float: right;
+        //        }
       }
     }
   }
@@ -57,10 +323,18 @@ a {
     float: right;
   }
 
+  g.cell {
+    line {
+      stroke: #8B0000;
+      stroke-width: 0.5;
+      stroke-linecap: round;
+    }
+  }
+
   rect.cell {
     fill: blue;
     stroke: black;
-    stroke-width: 0.5;
+    stroke-width: 0.2;
     opacity: 0.5;
   }
 
@@ -77,8 +351,6 @@ a {
     }
   }
 
-
-
   g.ship {
     fill: orange;
     stroke: black;
@@ -89,6 +361,19 @@ a {
       stroke: black;
       fill: red;
       opacity: 0.2;
+    }
+  }
+
+  g.hit {
+    rect {
+      fill: magenta;
+    }
+  }
+
+  g.destroyed {
+    rect {
+      fill: black;
+      opacity: 0;
     }
   }
 
@@ -121,22 +406,30 @@ a {
     width: 200px;
     height: 80px;
     padding: 16px;
-    z-index:1002;
+    z-index: 1002;
   }
-
-  @keyframes blink {
-    0% { stroke: red; }
-    100% { stroke: white; }
-  }
-  @-webkit-keyframes blink {
-    0% { stroke: red; }
-    100% { stroke: white; }
-  }
-  .blink {
-    -webkit-animation: blink 0.5s linear infinite;
-    -moz-animation: blink 0.5s linear infinite;
-    -ms-animation: blink 0.5s linear infinite;
-    -o-animation: blink 0.5s linear infinite;
-    animation: blink 0.5s linear infinite;
-  }
+//
+//  @keyframes blink {
+//    0% {
+//      stroke: red;
+//    }
+//    100% {
+//      stroke: white;
+//    }
+//  }
+//  @-webkit-keyframes blink {
+//    0% {
+//      stroke: red;
+//    }
+//    100% {
+//      stroke: white;
+//    }
+//  }
+//  .blink {
+//    -webkit-animation: blink 0.5s linear infinite;
+//    -moz-animation: blink 0.5s linear infinite;
+//    -ms-animation: blink 0.5s linear infinite;
+//    -o-animation: blink 0.5s linear infinite;
+//    animation: blink 0.5s linear infinite;
+//  }
 }

@@ -2,8 +2,13 @@ var Reflux = require('Reflux')
   , Actions = require('../actions')
   , _ = require('lodash');
 
+//var GameShot = function(position, isShipHit) {
+//  this.position = position;
+//  this.IsShipHit = isShipHit;
+//};
+
 var GameStateStore = Reflux.createStore({
-  init: function() {
+  init: function () {
 
     this.socket = io();
     this.game = {
@@ -16,44 +21,50 @@ var GameStateStore = Reflux.createStore({
     this.listenTo(Actions.game.shoot, this.takeShot);
 
 
-    this.socket.on('room joined', function(result) {
+    this.socket.on('room joined', function (result) {
       if (result.isSuccessful) {
         this.game.phase = 'room-joined';
         this.trigger(this.game);
       }
     }.bind(this));
 
-    this.socket.on('ships placed', function(result) {
+    this.socket.on('ships placed', function (result) {
       if (result.isSuccessful) {
         this.game.phase = 'ready-to-shoot';
         this.trigger(this.game);
       }
     }.bind(this));
 
-    this.socket.on('activate player', function(result) {
+    this.socket.on('activate player', function (result) {
       if (result.isSuccessful) {
         this.game.phase = 'game-my-turn';
-        this.game.shotPosition = undefined;
+        this.game.shot = undefined;
         this.trigger(this.game);
       }
     }.bind(this));
 
-    this.socket.on('has shot', function(result) {
+    this.socket.on('has shot', function (result) {
       if (result.isSuccessful) {
-        this.game.shotPosition = result.position;
+        this.game.shot = {position: result.position, hit: result.shipWasHit, destroyed: result.shipWasDestroyed}
         this.trigger(this.game);
       }
     }.bind(this));
 
-    this.socket.on('player switched', function(result) {
+    this.socket.on('game over', function (result) {
+      this.game.phase = 'game-over';
+      this.trigger(this.game);
+    }.bind(this));
+
+
+    this.socket.on('player switched', function (result) {
       if (result.isSuccessful) {
         this.game.phase = 'game-opponents-turn';
-        this.game.shotPosition = undefined;
+        this.game.shot = undefined;
         this.trigger(this.game);
       }
     }.bind(this));
 
-    this.socket.on('player left', function(result) {
+    this.socket.on('player left', function (result) {
       if (!result.isSuccessful) { // error
         this.game.phase = 'player-left';
         this.trigger(this.game);
@@ -65,22 +76,22 @@ var GameStateStore = Reflux.createStore({
     this.socket.emit('shoot', cell);
   },
 
-  initSignIn: function() {
+  initSignIn: function () {
     this.game.phase = 'sign-in';
     this.trigger(this.game);
   },
 
-  setConfig: function(config) {
+  setConfig: function (config) {
     this.game.config.boardSize = config.boardSize;
   },
 
-  initSetup: function(roomId) {
-    this.socket.on('game started', function(result) {
-      if(result.isSuccessful) {
+  initSetup: function (roomId) {
+    this.socket.on('game started', function (result) {
+      if (result.isSuccessful) {
         this.game = {
           phase: 'setup',
           roomId: roomId
-          };
+        };
         this.trigger(this.game);
       }
     }.bind(this));

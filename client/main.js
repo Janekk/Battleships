@@ -5,9 +5,10 @@ var React = require('react')
 var gameData = {
   boardSize: 10,
   configShips: [
-      {size: 1, count: 2},
-      {size: 2, count: 1},
-      {size: 3, count: 1}
+      {name: 'Battleship', size: 4, count: 1}/*,
+      {name: 'Submarine', size: 3, count: 1},
+      {name: 'Cruiser', size: 2, count: 2},
+      {name: 'Destroyer', size: 1, count: 2}*/
     ]
 };
 

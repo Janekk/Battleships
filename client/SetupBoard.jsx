@@ -13,23 +13,22 @@ var SetupBoard = React.createClass({
 
   getInitialState: function () {
     return {
-      ships : [],
+      ships: [],
       selected: null
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
     this.listenTo(SetupStore, this.loadGameBoard);
   },
 
-  loadGameBoard: function(data) {
+  loadGameBoard: function (data) {
     var state = {};
-    if(data.ships) {
+    if (data.ships) {
       state.ships = data.ships;
     }
-    if('selected' in data && data.selected)
-    {
-      if(data.selected.type == 'board') {
+    if ('selected' in data && data.selected) {
+      if (data.selected.type == 'board') {
         state.selected = data.selected.item;
       }
       else {
@@ -44,7 +43,7 @@ var SetupBoard = React.createClass({
     Actions.setup.selectShip(ship);
   },
 
-  handleCellClick: function(cellProps) {
+  handleCellClick: function (cellProps) {
     var cell = {x: cellProps.x, y: cellProps.y};
     Actions.setup.selectCell(cell, this.state.ships);
   },
@@ -76,18 +75,16 @@ var SetupBoard = React.createClass({
       ships.push(<Ship key={index} ship={ship} selected={this.state.selected == ship} onShipClick={this.handleShipClick.bind(this, ship)}/>)
     }.bind(this));
 
-    var viewBox = [-10, -10, (this.props.xsize + 1)*10, (this.props.ysize + 1)*10];
+    var viewBox = [-10, -10, (this.props.xsize + 1) * 10, (this.props.ysize + 1) * 10];
 
     return (
-      <div>
-        <div className="gameboard-table">
+      <div className="setup-board">
           {this.state.selected ? <ShipPopup /> : null}
-          <svg width="100%" height="100%" viewBox={viewBox.join(' ')}>
+        <svg width="100%" height="100%" viewBox={viewBox.join(' ')}>
             {coords}
             {cells}
             {ships}
-          </svg>
-        </div>
+        </svg>
       </div>
     );
   }

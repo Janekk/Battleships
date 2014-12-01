@@ -37,7 +37,7 @@ var Game = React.createClass({
       switch (this.state.phase) {
         case 'sign-in':
           panel = (
-            <form className="form-inline" role="form">
+            <form className="form-inline sign-in" role="form">
               <div className="form-group">
                 <div className="input-group">
                   <label className="sr-only" htmlFor="room-id">room ID</label>
@@ -50,21 +50,19 @@ var Game = React.createClass({
           break;
         case 'setup':
           panel = (
-            <div className="container-fluid">
-              <div className="row">
-                <div className="ships-panel col-xs-4">
-                  <SetupShipsPanel />
-                </div>
-                <div className="col-xs-12 col-sm-8">
-                  <p>Table name: {this.state.roomId}</p>
-                  <SetupBoard name={this.state.roomId} xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
+            <div className="setup">
+              <div className="command">
+                Place ships on the gameboard!
+              </div>
+              <div className="side">
+                <SetupShipsPanel />
+                <div className="confirm">
+                  <button type='button' className="btn btn-default" onClick={this.placeShips}>
+                    <span className="glyphicon glyphicon-check"></span> Ready!
+                  </button>
                 </div>
               </div>
-              <div className="row">
-                <div className="col-xs-12">
-                  <button type='button' className="btn btn-primary" onClick={this.placeShips}>Ready!</button>
-                </div>
-              </div>
+              <SetupBoard name={this.state.roomId} xsize={this.state.config.boardSize} ysize={this.state.config.boardSize} />
             </div>);
           break;
         case 'ready-to-shoot':
@@ -117,19 +115,34 @@ var ShootingPanel = React.createClass({
   },
 
   render: function() {
-    var btnCaption = this.state.isOpponentsBoardVisible ? 'Show my board' : 'Show opponent\'s board';
+    var switchBtn = (function(){
+      if(this.state.isOpponentsBoardVisible) {
+        return(
+          <button type="button" id="switch-board" className="btn btn-link opponent" onClick={this.handleSwitch}>
+            <span className="text">Show my board </span>
+            <span className="glyphicon glyphicon-chevron-right"></span>
+          </button>);
+      }
+      else {
+        return(
+          <button type="button" id="switch-board" className="btn btn-link me" onClick={this.handleSwitch}>
+            <span className="glyphicon glyphicon-chevron-left"></span>
+            <span className="text"> Show opponent's board</span>
+          </button>);
+      }
+    }.bind(this))();
 
     var cx = React.addons.classSet;
     var myBoardClasses = cx({
-      'col-xs-12': true,
-      'col-sm-6': true,
-      'pb-hidden': this.state.isOpponentsBoardVisible
+      'pb': true,
+      'me': true,
+      'my-board-active': !this.state.isOpponentsBoardVisible
     });
 
     var opponentsClasses = cx({
-      'col-xs-12': true,
-      'col-sm-6': true,
-      'pb-hidden': !this.state.isOpponentsBoardVisible
+      'pb': true,
+      'opponent': true,
+      'my-board-active': !this.state.isOpponentsBoardVisible
     });
 
     var overlay = !this.state.active ?
@@ -139,20 +152,21 @@ var ShootingPanel = React.createClass({
         </div>
       ) : null;
 
+
     return (
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-xs-12">
-            <button type="button" id="switch-board" className="btn btn-default" onClick={this.handleSwitch}>{btnCaption}</button>
-          </div>
+      <div>
+        <div className="switch-wrapper">
+          {switchBtn}
         </div>
-        <div className="row" id="shooting-panel">
-          {overlay}
-          <div className={opponentsClasses}>
-            <PlayBoard xsize={this.props.boardSize} ysize={this.props.boardSize} />
-          </div>
-          <div className={myBoardClasses}>
-            <PlayBoard myBoard xsize={this.props.boardSize} ysize={this.props.boardSize} />
+        <div id="shooting-panel">
+          <div>
+            {overlay}
+            <div className={opponentsClasses}>
+              <PlayBoard xsize={this.props.boardSize} ysize={this.props.boardSize} />
+            </div>
+            <div className={myBoardClasses}>
+              <PlayBoard myBoard xsize={this.props.boardSize} ysize={this.props.boardSize} />
+            </div>
           </div>
         </div>
       </div>

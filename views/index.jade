@@ -6,7 +6,11 @@ block header
   meta(name="viewport" content="width=device-width")
   //script(src='/scripts/toastr.min.js')
 block content
-  h1 #{title}
+  div#header
+    div.title
+      h1 #{title}
+    div.logo
+      img.logo(src='/images/Battleship.png')
   div.game#game
 block footer
   script(src="/scripts/bundle.js")
