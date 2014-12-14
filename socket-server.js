@@ -38,7 +38,7 @@ module.exports = function(http) {
 
         socket.on('invite user', function(userID) {
             if (!socket.username) { // user isn't in lobby
-                socket.emit('user invited', messageHelper.toResult(new Error('You are not in the lobby.')));
+                socket.emit('user invited', messageHelper.toResult(new Error('You\'re not in the lobby.')));
                 return;
             }
 
@@ -66,6 +66,37 @@ module.exports = function(http) {
             otherSocket.emit('invitation', { id: socket.id, username: socket.username });
 
             socket.emit('user invited', messageHelper.toResult());
+        });
+
+        socket.on('invitation feedback', function(invaderUserID, isAccepted) {
+            if (!socket.username) { // not in the lobby
+                socket.emit('invitation feedback', messageHelper.toResult(new Error('You\'re not in the lobby.')));
+                return;
+            }
+
+            if (!_.contains(socket.invaders, invaderUserID)) { // not invited by this user
+                socket.emit('invitation feedback', messageHelper.toResult(new Error('You\'re not invited by this user!')));
+                return;
+            }
+
+            // remove invitation
+            socket.invaders = _.pull(socket.invaders, invaderUserID);
+
+            var otherSocket = io.sockets.socket(invaderUserID);
+            var response = messageHelper.toResult({
+                isAccepted: isAccepted,
+                user: {
+                    id: socket.id,
+                    username: socket.username
+                }
+            });
+
+            socket.emit('invitation feedback', response);
+            otherSocket.emit('invitation feedback', response);
+
+            if (isAccepted) {
+                // start game
+            }
         });
 
         socket.on('join room', function(roomID) {
