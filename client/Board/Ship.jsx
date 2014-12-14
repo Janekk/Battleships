@@ -2,9 +2,9 @@ var React = require('react/addons');
 var _ = require('lodash');
 
 var Ship = React.createClass({
-  render: function () {
+  render() {
     var cells = [];
-    this.props.ship.cells.forEach(function (cell) {
+    this.props.ship.cells.forEach((cell) => {
       var rectProps = {
         width: 10,
         height: 10,
@@ -22,7 +22,7 @@ var Ship = React.createClass({
     });
 
     return (
-      <g className={classes} onClick={this.props.onShipClick}>
+      <g className={classes} onClick={this.props.onShipClick} onDoubleClick={this.props.onShipDoubleClick}>
         {cells}
       </g>
     )

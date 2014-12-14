@@ -3,8 +3,9 @@ var Reflux = require('Reflux')
   , _ = require('lodash')
   , BoardUtils = require('../Board/BoardUtils');
 
-var SetupStore = Reflux.createStore({
-  init: function () {
+var SetupStore;
+SetupStore = Reflux.createStore({
+  init() {
     this.state = {
       ships: [],
       selected: null,
@@ -20,11 +21,11 @@ var SetupStore = Reflux.createStore({
     this.listenTo(Actions.setup.pivotShip, this.tryPivot);
   },
 
-  getConfig: function () {
+  getConfig() {
     return this.state.config;
   },
 
-  selectConfigItem: function (ship) {
+  selectConfigItem(ship) {
     this.state.selected = {
       type: 'config',
       item: ship
@@ -32,17 +33,19 @@ var SetupStore = Reflux.createStore({
     this.trigger({selected: this.state.selected});
   },
 
-  selectShip: function (ship) {
+  selectShip(ship) {
     var current = this.state.selected ? this.state.selected.item : null;
 
-    this.state.selected = {
-      type: 'board',
-      item: (current != ship) ? ship : null
-    };
-    this.trigger({selected: this.state.selected});
+    if (current != ship) {
+      this.state.selected = {
+        type: 'board',
+        item: ship
+      };
+      this.trigger({selected: this.state.selected});
+    }
   },
 
-  tryPivot: function () {
+  tryPivot() {
     var ship = this.state.selected.item;
 
     if (ship.cells.length > 1) {
@@ -51,7 +54,7 @@ var SetupStore = Reflux.createStore({
 
       var topLeft = this.utils.getTopLeftShipCell(ship.cells);
       var pivoted = [topLeft];
-      _.times(ship.cells.length - 1, function (i) {
+      for (var i = 0; i < ship.cells.length - 1; i++) {
         var cell;
         if (isHorizontal) {
           cell = {x: topLeft.x, y: topLeft.y + i + 1};
@@ -67,7 +70,7 @@ var SetupStore = Reflux.createStore({
           pivoted = null;
           return;
         }
-      }.bind(this));
+      }
 
       if (pivoted && this.utils.canBeDropped(pivoted, ship.id, this.state.ships)) {
         this.state.selected = {
@@ -79,10 +82,9 @@ var SetupStore = Reflux.createStore({
         this.trigger({ships: this.state.ships, selected: this.state.selected});
       }
     }
-
   },
 
-  tryDrop: function (cell) {
+  tryDrop(cell) {
     var selected = this.state.selected;
     var ships = this.state.ships;
     if (selected) {
@@ -97,7 +99,7 @@ var SetupStore = Reflux.createStore({
           this.dropShip(this.state.selected);
           this.state.selected = null;
 
-          var configShip = _.find(this.state.config, function (item) {
+          var configShip = _.find(this.state.config, (item) => {
             return (item.size == selected.item.size);
           });
           configShip.count--;
@@ -119,28 +121,28 @@ var SetupStore = Reflux.createStore({
     }
   },
 
-  setConfig: function (config) {
+  setConfig(config) {
     this.utils.boardSize = config.boardSize;
     this.state.config = config.configShips;
   },
 
-  emitShips: function () {
-    var allPlaced = function() {
-      return (!_.any(this.state.config, function (item) {
+  emitShips() {
+    var allPlaced = () => {
+      return (!_.any(this.state.config, (item) => {
         return (item.count > 0);
       }))
-    }.bind(this);
+    };
 
-    if(allPlaced()) {
+    if (allPlaced()) {
       var socket = io();
-      var toSend = this.state.ships.map(function (ship) {
+      var toSend = this.state.ships.map((ship) => {
         return ship;
       });
       socket.emit('place ships', toSend);
     }
   },
 
-  dropShip: function (selected) {
+  dropShip(selected) {
     var dropped;
     if (selected.type == 'config') {
       dropped = getNamedShip({cells: selected.item});

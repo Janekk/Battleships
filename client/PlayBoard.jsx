@@ -10,17 +10,17 @@ var React = require('react/addons')
 var PlayBoard = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
-  getInitialState: function () {
+  getInitialState() {
     return {
       ships : []
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.listenTo(GameplayStore, this.handleGameEvents);
   },
 
-  handleGameEvents: function(game) {
+  handleGameEvents(game) {
     if(game.phase == 'game-my-turn') {
       this.setState({active: true});
     }
@@ -29,17 +29,17 @@ var PlayBoard = React.createClass({
     }
   },
 
-  handleCellClick: function(cellProps) {
+  handleCellClick(cellProps) {
     var cell = {x: cellProps.x, y: cellProps.y};
     Actions.game.shoot(cell);
   },
 
-  render: function () {
+  render() {
     var cells = [];
-    _.times(this.props.xsize, function (x) {
-      _.times(this.props.ysize, function (y) {
+    for(var x = 0; x < this.props.xsize; x++) {
+      for(var y = 0; y < this.props.ysize; y++) {
         var shotAtCell = this.props.board ?
-          _.find(this.props.board.shots, function (shot) {
+          _.find(this.props.board.shots, (shot) => {
             return (shot.position.x == x && shot.position.y == y);
         }) : null;
         var canShoot = !this.props.previewBoard && !shotAtCell;
@@ -51,14 +51,14 @@ var PlayBoard = React.createClass({
           onCellClick: canShoot ? this.handleCellClick.bind(this, {x: x, y: y}) : null
         };
         cells.push(<Cell {...cellProps} />);
-      }.bind(this));
-    }.bind(this));
+      };
+    };
 
     var ships = [];
     if(this.props.board) {
-      this.props.board.ships.forEach(function (ship, index) {
+      this.props.board.ships.forEach((ship, index) => {
         ships.push(<GameShip key={index} ship={ship} />)
-      }.bind(this));
+      });
     }
 
     return (

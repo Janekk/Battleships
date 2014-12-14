@@ -3,7 +3,7 @@ var Reflux = require('Reflux')
   , _ = require('lodash');
 
 var GameplayStore = Reflux.createStore({
-  init: function () {
+  init() {
 
     this.socket = io();
     this.game = {
@@ -16,73 +16,65 @@ var GameplayStore = Reflux.createStore({
     this.listenTo(Actions.game.shoot, this.takeShot);
 
 
-    this.socket.on('room joined', function (result) {
+    this.socket.on('room joined', (result) => {
       if (result.isSuccessful) {
         this.game.phase = 'room-joined';
         this.trigger(this.game);
       }
-    }.bind(this));
+    });
 
-    this.socket.on('ships placed', function (result) {
+    this.socket.on('ships placed', (result) => {
       if (result.isSuccessful) {
         this.game.phase = 'ready-to-shoot';
         this.trigger(this.game);
       }
-    }.bind(this));
+    });
 
-    this.socket.on('activate player', function (result) {
+    this.socket.on('activate player', (result) => {
       if (result.isSuccessful) {
         this.game.phase = 'game-my-turn';
         this.game.shot = undefined;
         this.trigger(this.game);
       }
-    }.bind(this));
+    });
 
-    //this.socket.on('has shot', function (result) {
-    //  if (result.isSuccessful) {
-    //    this.game.shot = {position: result.position, hit: result.shipWasHit, destroyed: result.shipWasDestroyed}
-    //    this.trigger(this.game);
-    //  }
-    //}.bind(this));
-
-    this.socket.on('game over', function (result) {
+    this.socket.on('game over', (result) => {
       this.game.phase = 'game-over';
       this.game.hasWon = result.hasWon;
       this.trigger(this.game);
-    }.bind(this));
+    });
 
-
-    this.socket.on('player switched', function (result) {
+    this.socket.on('player switched', (result) => {
       if (result.isSuccessful) {
         this.game.phase = 'game-opponents-turn';
         this.game.shot = undefined;
         this.trigger(this.game);
       }
-    }.bind(this));
+    });
 
-    this.socket.on('player left', function (result) {
+    this.socket.on('player left', (result) => {
       if (!result.isSuccessful) { // error
         this.game.phase = 'player-left';
         this.trigger(this.game);
       }
-    }.bind(this));
+    });
   },
 
-  takeShot: function (cell) {
+  takeShot(cell) {
     this.socket.emit('shoot', cell);
   },
 
-  initSignIn: function () {
+  initSignIn() {
     this.game.phase = 'sign-in';
     this.trigger(this.game);
   },
 
-  setConfig: function (config) {
+  setConfig(config) {
     this.game.config.boardSize = config.boardSize;
   },
 
-  initSetup: function (roomId) {
-    this.socket.on('game started', function (result) {
+  initSetup(roomId) {
+    this.socket.on('game started', (result) => {
       if (result.isSuccessful) {
         this.game = {
           phase: 'setup',
@@ -90,7 +82,7 @@ var GameplayStore = Reflux.createStore({
         };
         this.trigger(this.game);
       }
-    }.bind(this));
+    });
     this.socket.emit('join room', roomId);
   }
 });

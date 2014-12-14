@@ -4,7 +4,7 @@ var BoardUtils = {
 
   boardSize: 0,
 
-  orderShipCells: function(shipCells) {
+  orderShipCells(shipCells) {
     shipCells.sort(function (a, b) {
       if (a.y > b.y) return 1;
       if (a.y < b.y) return -1;
@@ -16,17 +16,17 @@ var BoardUtils = {
     });
   },
 
-  getTopLeftShipCell: function(shipCells) {
+  getTopLeftShipCell(shipCells) {
     this.orderShipCells(shipCells);
     return shipCells[0];
   },
 
-  getBottomRightShipCell: function(shipCells) {
+  getBottomRightShipCell(shipCells) {
     this.orderShipCells(shipCells);
     return shipCells[shipCells.length - 1];
   },
 
-  getAdjacentCells: function(shipCells) {
+  getAdjacentCells(shipCells) {
     var topLeft = this.getTopLeftShipCell(shipCells);
     var BottomRight = this.getBottomRightShipCell(shipCells);
 
@@ -47,7 +47,7 @@ var BoardUtils = {
     return adjacentCells;
   },
 
-  canBeDropped: function(dropCells, droppedShipId, ships) {
+  canBeDropped(dropCells, droppedShipId, ships) {
     if(!this.areCellsValid(dropCells)) {
       return false;
     }
@@ -70,11 +70,11 @@ var BoardUtils = {
     return true;
   },
 
-  isCellValid: function(cell) {
+  isCellValid(cell) {
     return (cell.x < this.boardSize && cell.y < this.boardSize);
   },
 
-  areCellsValid: function(cells) {
+  areCellsValid(cells) {
     for(var i = 0; i<cells.length; i++) {
       if(!this.isCellValid(cells[i])) {
         return false;
@@ -83,7 +83,7 @@ var BoardUtils = {
     return true;
   },
 
-  getDropCellsForConfigItem: function(cell, ship) {
+  getDropCellsForConfigItem(cell, ship) {
     var result = [];
     for (var i = 0; i < ship.size; i++) {
       result.push({x: cell.x + i, y: cell.y});
@@ -91,16 +91,12 @@ var BoardUtils = {
     return result;
   },
 
-  getDroppedCellsForShip: function(cell, ship) {
+  getDroppedCellsForShip(cell, ship) {
     var topLeft = this.getTopLeftShipCell(ship.cells);
     var deltaX = cell.x - topLeft.x;
     var deltaY = cell.y - topLeft.y;
 
-    return ship.cells.map(function (cell) {
-      return {
-        x: cell.x + deltaX,
-        y: cell.y + deltaY
-      }
+    return ship.cells.map((cell)  => { return { x: cell.x + deltaX, y: cell.y + deltaY }
     });
   }
 }

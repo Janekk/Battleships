@@ -2,11 +2,11 @@ var React = require('react/addons');
 var _ = require('lodash');
 
 var Ship = React.createClass({
-  render: function () {
+  render() {
     var cx = React.addons.classSet;
 
     var cells = [];
-    this.props.ship.cells.forEach(function (cell) {
+    this.props.ship.cells.forEach((cell) => {
       var rectProps = {
         width: 10,
         height: 10,

@@ -31,12 +31,10 @@ gulp.task('init', function () {
 });
 
 gulp.task('browserify', function () {
-  browserify(paths.src.client.app,
-    {
-      extensions: ['.jsx', '.js']
-    })
+  browserify({extensions: ['.jsx', '.js']})
+    .transform('reactify', {"es6": true}) //don't generate intermediate js files
+    .require(paths.src.client.app, { entry: true })
     .require('react') //chrome tools for React
-    .transform('reactify') //don't generate intermediate js files
     .bundle()
     .on('error', function(err){
       console.log(err.message);

@@ -3,11 +3,11 @@ var _ = require('lodash');
 
 var Cell = React.createClass({
 
-  getInitialState: function () {
+  getInitialState() {
     return {selected: false};
   },
 
-  render: function () {
+  render() {
     var rectProps = {
       className: 'cell',
       width: 10,

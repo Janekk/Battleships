@@ -13,7 +13,7 @@ var gameData = {
 };
 
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   React.render(<Game />, document.getElementById('game'));
 
   Actions.init.setConfig(gameData);

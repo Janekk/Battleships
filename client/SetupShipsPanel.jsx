@@ -7,12 +7,12 @@ var React = require('react')
 var ShipsPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.loadData(SetupStore.state);
     this.listenTo(SetupStore, this.loadData);
   },
 
-  loadData : function(data) {
+  loadData(data) {
     var state = {};
     if(data.config) {
       state.items = data.config;
@@ -28,28 +28,28 @@ var ShipsPanel = React.createClass({
     this.setState(state);
   },
 
-  getInitialState: function () {
+  getInitialState() {
     return {
       items: null,
       selected: null
     };
   },
 
-  handleItemClick: function (item) {
+  handleItemClick(item) {
     if(item.count > 0) {
       Actions.setup.selectConfigItem(item);
     }
   },
 
-  render: function () {
-    var config = _.sortBy(this.state.items, function(cfg){return -cfg.size;});
+  render() {
+    var config = _.sortBy(this.state.items, (cfg) => {return -cfg.size;});
     var selectedSize = this.state.selected ? this.state.selected.size : null;
 
     var components = [];
-    config.forEach(function(cfg, index) {
+    config.forEach((cfg, index) => {
       var handleClick = this.handleItemClick.bind(this, cfg);
       components.push(<ConfigurationShip config={cfg} index={index} key={cfg.size} selected={cfg.size == selectedSize} count={cfg.count} onClick={handleClick}/>);
-    }.bind(this));
+    });
 
     return (
       <div className="ships-panel">
@@ -63,7 +63,7 @@ var ShipsPanel = React.createClass({
 
 var ConfigurationShip = React.createClass({
 
-  render: function () {
+  render() {
     var props = {
       x: (4 - this.props.config.size) * 10,
       y: this.props.index * 12,

@@ -49,7 +49,7 @@ var model = {
 
 var GameboardStore = Reflux.createStore({
 
-  init: function () {
+  init() {
     this.socket = io();
 
     this.listenTo(Actions.game.initGameboard, this.triggerStateChange.bind(this));
@@ -58,7 +58,7 @@ var GameboardStore = Reflux.createStore({
     this.socket.on('has shot', this.onShotReceived.bind(this));
   },
 
-  initAfterSetup: function(game) {
+  initAfterSetup(game) {
     if(game.phase == 'ready-to-shoot') {
       this.data = new model.StoreData({
         isGameStarted: false,
@@ -69,7 +69,7 @@ var GameboardStore = Reflux.createStore({
     }
   },
 
-  onShotReceived: function(result) {
+  onShotReceived(result) {
     if (result.isSuccessful && this.data.isGameStarted) {
 
       var shot = new model.Shot({
@@ -86,19 +86,19 @@ var GameboardStore = Reflux.createStore({
         if(result.shipWasDestroyed) {
           boardToUpdate.ships.push(new model.Ship({
             id: result.ship.id,
-            cells: result.ship.positions.map(function(position) {
+            cells: result.ship.positions.map((position) => {
               return new model.ShipCell({x: position.x, y: position.y})
             })
           }));
 
           var adjacentCells = BoardUtils.getAdjacentCells(result.ship.positions);
           var adjacentShots = _.chain(adjacentCells)
-          .filter(function(adjacent) {
-            return _.any(boardToUpdate.shots, function(takenShot) {
+          .filter((adjacent) => {
+            return _.any(boardToUpdate.shots, (takenShot) => {
               return !(takenShot.position.x == adjacent.x && takenShot.position.y == adjacent.y);
             })
           })
-          .map(function(adj) { return new model.Shot({
+          .map((adj) => { return new model.Shot({
             position: {x: adj.x, y: adj.y},
             isHit: false,
             isDestroyed: false,
@@ -112,11 +112,8 @@ var GameboardStore = Reflux.createStore({
         boardToUpdate = this.data.previewBoard;
         boardToUpdate.shots.push(shot);
         if(shot.isHit) {
-          var myShip = _.find(boardToUpdate.ships, function(ship) {
-            return (ship.id == result.ship.id);
-          });
-
-          var updateCell = _.find(myShip.cells, function(cell) {
+          var myShip = _.find(boardToUpdate.ships, (ship) => { return (ship.id == result.ship.id); });
+          var updateCell = _.find(myShip.cells, (cell) => {
             return (cell.x == result.position.x && cell.y == result.position.y);
           });
           updateCell.isHit = true;
@@ -126,16 +123,19 @@ var GameboardStore = Reflux.createStore({
     }
   },
 
-  triggerStateChange : function() {
+  triggerStateChange() {
     this.trigger(new model.StoreData({
       isGameStarted: this.data.isGameStarted,
       isMyTurn: this.data.isMyTurn,
-      previewBoard: new model.Gameboard({ shots: _.filter(this.data.previewBoard.shots, function(shot) {return !shot.isHit}), ships: this.data.previewBoard.ships}),
+      previewBoard: new model.Gameboard({ shots: _.filter(this.data.previewBoard.shots, (shot) =>
+      {
+        return !shot.isHit}), ships: this.data.previewBoard.ships
+      }),
       shootingBoard: this.data.shootingBoard
     }))
   },
 
-  setGamePhase: function (game) {
+  setGamePhase(game) {
     if(game.phase == 'game-opponents-turn' || game.phase == 'game-my-turn' || game.phase == 'ready-to-shoot') {
       this.data.isGameStarted = true;
 

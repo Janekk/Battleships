@@ -2,7 +2,7 @@ var React = require('react/addons');
 var _ = require('lodash');
 
 var Coordinate = React.createClass({
-  render: function () {
+  render() {
     var rectProps = {
       width: 10,
       height: 10,

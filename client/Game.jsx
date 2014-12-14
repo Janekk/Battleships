@@ -11,28 +11,28 @@ var React = require('react')
 var Game = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
-  componentDidMount: function () {
+  componentDidMount() {
     this.listenTo(GameStore, this.switchGameState);
   },
 
-  switchGameState: function (state) {
+  switchGameState(state) {
     if (state.phase != 'game-my-turn' && state.phase != 'game-opponents-turn') {
       this.setState(state);
     }
   },
 
-  signIn: function () {
+  signIn() {
     var roomId = this.refs.roomId.getDOMNode().value;
     if (roomId) {
       Actions.init.signIn(roomId);
     }
   },
 
-  placeShips: function () {
+  placeShips() {
     Actions.setup.placeShips();
   },
 
-  render: function () {
+  render() {
     var panel;
     if (this.state) {
       switch (this.state.phase) {
@@ -94,13 +94,13 @@ var Game = React.createClass({
 var ShootingPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
-  componentDidMount: function () {
+  componentDidMount() {
     this.listenTo(GameStore, this.onGamePhaseChange);
     this.listenTo(GameboardStore, this.onGameBoardChange);
     Actions.game.initGameboard();
   },
 
-  getInitialState: function () {
+  getInitialState() {
     return {
       isOpponentsBoardVisible: true,
       active: false,
@@ -109,7 +109,7 @@ var ShootingPanel = React.createClass({
     }
   },
 
-  onGamePhaseChange: function (game) {
+  onGamePhaseChange(game) {
     var active = (game.phase == 'game-my-turn');
     this.setState({
       active: active,
@@ -117,18 +117,18 @@ var ShootingPanel = React.createClass({
     });
   },
 
-  onGameBoardChange: function (gameboard) {
+  onGameBoardChange(gameboard) {
     this.setState({
       previewBoard: gameboard.previewBoard,
       shootingBoard: gameboard.shootingBoard
     });
   },
 
-  handleSwitch: function () {
+  handleSwitch() {
     this.setState({isOpponentsBoardVisible: !this.state.isOpponentsBoardVisible});
   },
 
-  render: function () {
+  render() {
     var switchBtn = (function () {
       if (this.state.isOpponentsBoardVisible) {
         return (
