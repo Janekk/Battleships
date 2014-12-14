@@ -1,12 +1,12 @@
 function GameService(socket) {
     var io = socket.server;
     var _ = require('lodash');
+    var messageHelper = require('../helper/message');
     var Ship = require('./ship');
     var Position = require('./position');
 
     this.socket = socket;
     this.opponentGameService = undefined;
-    this.roomID = undefined;
     this.isReady = false;               // if TRUE booth players are connected
     this.ships = [];                    // contains the ships for the player
     this.intactShipsCount = undefined;  // number of intact ships; on "0" current player lose
@@ -38,7 +38,7 @@ function GameService(socket) {
             throw new Error('"name" is undefined');
         }
 
-        thisGameService.socket.emit(name, transformData(data));
+        thisGameService.socket.emit(name, messageHelper.toResult(data));
     };
 
     /**
@@ -69,93 +69,21 @@ function GameService(socket) {
             throw new Error('"name" is undefined');
         }
 
-        if (!thisGameService.roomID) { // no room joined
-            throw new Error('you are not in a room!');
-        }
-
         skipSender = skipSender || false;
 
-        if (skipSender) { // send to room (without sender)
-            socket.broadcast.to(thisGameService.roomID).emit(name, transformData(data));
-        }
-        else { // send to room (including sender)
-            io.sockets.in(thisGameService.roomID).emit(name, transformData(data));
-        }
-    };
-
-    /**
-     * Transform data to an result object with "isSuccessful" field.
-     * @param {string|error|object} [data] - optional, if data is an error "isSuccessful" will set to FALSE otherwise "isSuccessful" is TRUE
-     */
-    function transformData(data) {
-        var result;
-
-        if (_.isUndefined(data)) { // no data
-            result = { isSuccessful: true };
-        }
-        else if (_.isString(data)) { // string
-            result = {
-                isSuccessful: true,
-                message: data
-            };
-        }
-        else if (data instanceof Error) { // error
-            result = {
-                isSuccessful: false,
-                error: data.message
-            };
-        }
-        else if (_.isObject(data)) { // object
-            result = _.merge({ isSuccessful: true }, data);
-        }
-        else { // unsupported type
-            throw new Error('type not supported', data);
+        if (!skipSender) {
+            thisGameService.sendToMe(name, messageHelper.toResult(data));
         }
 
-        return result;
-    }
-
-    this.joinRoom = function(roomID) {
-        if (!roomID) { // no roomID
-            return;
-        }
-
-        if (thisGameService.roomID) { // already in a room
-            this.sendToMe('room joined', new Error('You are already in a room'));
-            return;
-        }
-
-        var roomSockets = getSocketsOfRoom(roomID);
-        if (roomSockets.length >= 2) {
-            thisGameService.sendToMe('room joined', new Error('There are too many users in this room!'));
-            return;
-        }
-
-        thisGameService.roomID = roomID;
-        thisGameService.socket.join(roomID);
-
-        if (roomSockets.length == 0) { // no opponent
-            thisGameService.sendToMe('room joined', 'waiting for player...');
-        }
-        else { // has opponent
-            var opponentSocket = _.find(roomSockets, function(s) {
-                return s.id !== thisGameService.socket.id;
-            });
-
-            thisGameService.connectWithOpponent(opponentSocket);
-            thisGameService.sendToMe('room joined');
-            thisGameService.sendToOpponent('info-message', 'player joined');
-
-            setTimeout(function() {
-                thisGameService.isReady = true;
-                thisGameService.opponentGameService.isReady = true;
-                thisGameService.sendToRoom('game started');
-            }, 2500);
-        }
+        thisGameService.sendToOpponent(name, messageHelper.toResult(data));
     };
 
     this.connectWithOpponent = function(opponentSocket) {
         if (!opponentSocket) {
+            return;
+        }
+
+        if (!opponentSocket.gameService) { // no GameService available
             return;
         }
 
@@ -337,24 +265,7 @@ function GameService(socket) {
             thisGameService.opponentGameService.disconnectOpponent();
             thisGameService.disconnectOpponent();
         }
-
-        if (thisGameService.roomID) {
-            // leave room
-            thisGameService.socket.leave(thisGameService.roomID);
-        }
     };
-
-    function getSocketsOfRoom(roomID, namespace) {
-        var ns = io.of(namespace || '/');
-
-        if (!roomID || !ns) {
-            return [];
-        }
-
-        return _.filter(ns.connected, function(socket) {
-            return _.contains(socket.rooms, roomID);
-        });
-    }
 
     function getRandomNumber(min, max) {
         return Math.floor((Math.random() * max) + min);
