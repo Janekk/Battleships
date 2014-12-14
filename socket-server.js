@@ -6,7 +6,7 @@ module.exports = function(http) {
 
     io.on('connection', function(socket) {
         socket.invaders = []; // contains socket-IDs from users who invited this player
-        //socket.gameService = new GameService(socket);
+        socket.gameService = new GameService(socket);
 
         socket.on('enter lobby', function(username) {
             if (socket.username) { // user is already in lobby
@@ -96,11 +96,15 @@ module.exports = function(http) {
 
             if (isAccepted) {
                 // start game
-            }
-        });
+                socket.gameService.connectWithOpponent(otherSocket);
 
-        socket.on('join room', function(roomID) {
-            socket.gameService.joinRoom(roomID);
+                setTimeout(function() {
+                    var thisGameService = socket.gameService;
+                    thisGameService.isReady = true;
+                    thisGameService.opponentGameService.isReady = true;
+                    thisGameService.sendToRoom('game started');
+                }, 2500);
+            }
         });
 
         socket.on('place ships', function(shipsData) {
