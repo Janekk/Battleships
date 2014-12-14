@@ -1,6 +1,7 @@
 function GameService(socket) {
     var io = socket.server;
     var _ = require('lodash');
+    var messageHelper = require('../helper/message');
     var Ship = require('./ship');
     var Position = require('./position');
 
@@ -38,7 +39,7 @@ function GameService(socket) {
             throw new Error('"name" is undefined');
         }
 
-        thisGameService.socket.emit(name, transformData(data));
+        thisGameService.socket.emit(name, messageHelper.toResult(data));
     };
 
     /**
@@ -76,44 +77,12 @@ function GameService(socket) {
         skipSender = skipSender || false;
 
         if (skipSender) { // send to room (without sender)
-            socket.broadcast.to(thisGameService.roomID).emit(name, transformData(data));
+            socket.broadcast.to(thisGameService.roomID).emit(name, messageHelper.toResult(data));
         }
         else { // send to room (including sender)
-            io.sockets.in(thisGameService.roomID).emit(name, transformData(data));
+            io.sockets.in(thisGameService.roomID).emit(name, messageHelper.toResult(data));
         }
     };
-
-    /**
-     * Transform data to an result object with "isSuccessful" field.
-     * @param {string|error|object} [data] - optional, if data is an error "isSuccessful" will set to FALSE otherwise "isSuccessful" is TRUE
-     */
-    function transformData(data) {
-        var result;
-
-        if (_.isUndefined(data)) { // no data
-            result = { isSuccessful: true };
-        }
-        else if (_.isString(data)) { // string
-            result = {
-                isSuccessful: true,
-                message: data
-            };
-        }
-        else if (data instanceof Error) { // error
-            result = {
-                isSuccessful: false,
-                error: data.message
-            };
-        }
-        else if (_.isObject(data)) { // object
-            result = _.merge({ isSuccessful: true }, data);
-        }
-        else { // unsupported type
-            throw new Error('type not supported', data);
-        }
-
-        return result;
-    }
 
     this.joinRoom = function(roomID) {
         if (!roomID) { // no roomID
