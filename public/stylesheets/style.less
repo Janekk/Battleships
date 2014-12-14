@@ -34,6 +34,32 @@ a {
   }
 }
 
+
+@keyframes blink {
+  0% {
+    stroke: red;
+  }
+  100% {
+    stroke: black;
+  }
+}
+@-webkit-keyframes blink {
+  0% {
+    stroke: red;
+  }
+  100% {
+    stroke: black;
+  }
+}
+
+.blink {
+  -webkit-animation: blink 1s linear infinite;
+  -moz-animation: blink 1s linear infinite;
+  -ms-animation: blink 1s linear infinite;
+  -o-animation: blink 1s linear infinite;
+  animation: blink 1s linear infinite;
+}
+
 .main {
   padding: 0 0.5em 0 0.5em;
   @media screen {
@@ -278,7 +304,7 @@ a {
 
       .turn-overlay-text {
         font-size: 2em;
-        color: orangered;
+        color: red;
         opacity: 0.5;
 
         -webkit-animation: turn-blink 0.7s linear infinite;
@@ -368,12 +394,6 @@ a {
     fill: #B0C4DE;
     stroke: black;
     stroke-width: 0.5;
-
-    &.selected {
-      stroke: black;
-      fill: red;
-      opacity: 0.2;
-    }
   }
 
   g.hit {
@@ -403,10 +423,17 @@ a {
     }
 
     &.selected {
-      fill: orange;
+      text {
+        fill: gray;
+      }
+    }
+
+    &.selected {
+      .blink();
     }
     &.inactive {
       fill: #F8F8FF;
+      opacity: 0.4;
     }
   }
 
@@ -423,28 +450,4 @@ a {
     padding: 16px;
     z-index: 1002;
   }
-//
-//  @keyframes blink {
-//    0% {
-//      stroke: red;
-//    }
-//    100% {
-//      stroke: white;
-//    }
-//  }
-//  @-webkit-keyframes blink {
-//    0% {
-//      stroke: red;
-//    }
-//    100% {
-//      stroke: white;
-//    }
-//  }
-//  .blink {
-//    -webkit-animation: blink 0.5s linear infinite;
-//    -moz-animation: blink 0.5s linear infinite;
-//    -ms-animation: blink 0.5s linear infinite;
-//    -o-animation: blink 0.5s linear infinite;
-//    animation: blink 0.5s linear infinite;
-//  }
 }

@@ -52,10 +52,12 @@ var SetupBoard = React.createClass({
     var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var coords = [];
     _.times(this.props.xsize, function (x) {
-      coords.push(<Coordinate x={x} y={-1} key={x} text={alphabet[x]}/>);
+      var y = -1;
+      coords.push(<Coordinate x={x} y={y} key={x + '' + y} text={alphabet[x]}/>);
     });
     _.times(this.props.ysize, function (y) {
-      coords.push(<Coordinate x={-1} y={y} key={y} text={y + ''}/>);
+      var x = -1;
+      coords.push(<Coordinate x={x} y={y} key={x + '' + y} text={y + ''}/>);
     });
 
     var cells = [];

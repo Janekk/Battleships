@@ -74,8 +74,7 @@ var ConfigurationShip = React.createClass({
     var cx = React.addons.classSet;
     var classes = cx({
       'config': true,
-      'blink': true,
-      'selected': this.props.selected,
+      'selected': this.props.selected && (this.props.count > 0),
       'inactive': (this.props.count == 0),
       'ship': true,
       'configuration-ship': true
