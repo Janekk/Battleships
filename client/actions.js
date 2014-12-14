@@ -15,7 +15,8 @@ var actions = {
 
     },
   game: {
-    shoot: Reflux.createAction()
+    shoot: Reflux.createAction(),
+    initGameboard: Reflux.createAction()
   }
 };
 

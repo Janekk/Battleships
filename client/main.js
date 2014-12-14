@@ -5,12 +5,13 @@ var React = require('react')
 var gameData = {
   boardSize: 10,
   configShips: [
-      {name: 'Battleship', size: 4, count: 1}/*,
+      {name: 'Battleship', size: 4, count: 1},
       {name: 'Submarine', size: 3, count: 1},
-      {name: 'Cruiser', size: 2, count: 2},
-      {name: 'Destroyer', size: 1, count: 2}*/
+      {name: 'Cruiser', size: 2, count: 1},
+      {name: 'Destroyer', size: 1, count: 1}
     ]
 };
+
 
 document.addEventListener('DOMContentLoaded', function () {
   React.render(<Game />, document.getElementById('game'));
@@ -18,3 +19,4 @@ document.addEventListener('DOMContentLoaded', function () {
   Actions.init.setConfig(gameData);
   Actions.init.startGame();
 });
+

@@ -196,11 +196,11 @@ function GameService(socket) {
         // transform ships
         _.forEach(shipsData, function(shipData) {
             var positions = [];
-            _.forEach(shipData, function(positionData) {
-                positions.push(new Position(positionData.x, positionData.y));
+            _.forEach(shipData.cells, function(ship) {
+                positions.push(new Position(ship.x, ship.y));
             });
 
-            thisGameService.ships.push(new Ship(positions));
+            thisGameService.ships.push(new Ship(shipData.id, positions));
         });
         thisGameService.intactShipsCount = shipsData.length;
 
@@ -250,14 +250,16 @@ function GameService(socket) {
         // save position
         thisGameService.shoots.push(position);
 
-        var result = thisGameService.checkForHit(position);
+        var result = thisGameService.opponentGameService.checkForHit(position);
         thisGameService.sendToRoom('has shot', result);
 
-        if (thisGameService.intactShipsCount <= 0) { // all ships are damaged
+        var iLost = (thisGameService.intactShipsCount <= 0);
+        var opponentLost = (thisGameService.opponentGameService.intactShipsCount <= 0);
+        if (iLost || opponentLost) { // all ships are damaged
             // game over
             setTimeout(function() {
-                thisGameService.sendToMe('game over', { hasWon: false });
-                thisGameService.sendToOpponent('game over', { hasWon: true });
+                thisGameService.sendToMe('game over', { hasWon: !iLost });
+                thisGameService.sendToOpponent('game over', { hasWon: !opponentLost });
             }, 2500);
         }
         else {
@@ -301,6 +303,7 @@ function GameService(socket) {
                         return {
                             shipWasHit: true,
                             shipWasDestroyed: shipWasDestroyed,
+                            ship: ship,
                             position: { x: shipPosition.x, y: shipPosition.y }
                         };
                     }

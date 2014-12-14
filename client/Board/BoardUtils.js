@@ -1,10 +1,10 @@
 var _ = require('lodash');
 
-function BoardUtils() {
+var BoardUtils = {
 
-  this.boardSize = 0;
+  boardSize: 0,
 
-  this.getTopLeftShipCell = function(shipCells) {
+  orderShipCells: function(shipCells) {
     shipCells.sort(function (a, b) {
       if (a.y > b.y) return 1;
       if (a.y < b.y) return -1;
@@ -14,17 +14,47 @@ function BoardUtils() {
         if (a.x == b.x) return 0;
       }
     });
+  },
 
+  getTopLeftShipCell: function(shipCells) {
+    this.orderShipCells(shipCells);
     return shipCells[0];
-  };
+  },
 
-  this.canBeDropped = function(dropCells, droppedShipId, ships) {
+  getBottomRightShipCell: function(shipCells) {
+    this.orderShipCells(shipCells);
+    return shipCells[shipCells.length - 1];
+  },
+
+  getAdjacentCells: function(shipCells) {
+    var topLeft = this.getTopLeftShipCell(shipCells);
+    var BottomRight = this.getBottomRightShipCell(shipCells);
+
+    var xMin = Math.max(0, topLeft.x - 1);
+    var yMin = Math.max(0, topLeft.y - 1);
+    var xMax = Math.min(10, BottomRight.x + 1);
+    var yMax = Math.min(10, BottomRight.y + 1);
+
+    var adjacentCells = [];
+    for(var x = xMin; x <= xMax; x++) {
+      for(var y = yMin; y <= yMax; y++) {
+        var shipCell = (x >= topLeft.x && x <= BottomRight.x && y >= topLeft.y && y <= BottomRight.y);
+        if(!shipCell) {
+          adjacentCells.push({x: x, y: y});
+        }
+      }
+    }
+    return adjacentCells;
+  },
+
+  canBeDropped: function(dropCells, droppedShipId, ships) {
     if(!this.areCellsValid(dropCells)) {
       return false;
     }
+    var dropArea = dropCells.concat(this.getAdjacentCells(dropCells));
 
-    for (var i = 0; i < dropCells.length; i++) {
-      var cell = dropCells[i];
+    for (var i = 0; i < dropArea.length; i++) {
+      var cell = dropArea[i];
       if (_.find(ships, function (ship) {
           if (ship.id == droppedShipId) {
             return false;
@@ -38,30 +68,30 @@ function BoardUtils() {
       }
     }
     return true;
-  };
+  },
 
-  this.isCellValid = function(cell) {
+  isCellValid: function(cell) {
     return (cell.x < this.boardSize && cell.y < this.boardSize);
-  };
+  },
 
-  this.areCellsValid = function(cells) {
+  areCellsValid: function(cells) {
     for(var i = 0; i<cells.length; i++) {
       if(!this.isCellValid(cells[i])) {
         return false;
       }
     }
     return true;
-  };
+  },
 
-  this.getDropCellsForConfigItem = function(cell, ship) {
+  getDropCellsForConfigItem: function(cell, ship) {
     var result = [];
     for (var i = 0; i < ship.size; i++) {
       result.push({x: cell.x + i, y: cell.y});
     }
     return result;
-  };
+  },
 
-  this.getDroppedCellsForShip = function(cell, ship) {
+  getDroppedCellsForShip: function(cell, ship) {
     var topLeft = this.getTopLeftShipCell(ship.cells);
     var deltaX = cell.x - topLeft.x;
     var deltaY = cell.y - topLeft.y;
@@ -72,7 +102,7 @@ function BoardUtils() {
         y: cell.y + deltaY
       }
     });
-  };
+  }
 }
 
 module.exports = BoardUtils;

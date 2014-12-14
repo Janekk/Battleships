@@ -2,12 +2,7 @@ var Reflux = require('Reflux')
   , Actions = require('../actions')
   , _ = require('lodash');
 
-//var GameShot = function(position, isShipHit) {
-//  this.position = position;
-//  this.IsShipHit = isShipHit;
-//};
-
-var GameStateStore = Reflux.createStore({
+var GameplayStore = Reflux.createStore({
   init: function () {
 
     this.socket = io();
@@ -43,15 +38,16 @@ var GameStateStore = Reflux.createStore({
       }
     }.bind(this));
 
-    this.socket.on('has shot', function (result) {
-      if (result.isSuccessful) {
-        this.game.shot = {position: result.position, hit: result.shipWasHit, destroyed: result.shipWasDestroyed}
-        this.trigger(this.game);
-      }
-    }.bind(this));
+    //this.socket.on('has shot', function (result) {
+    //  if (result.isSuccessful) {
+    //    this.game.shot = {position: result.position, hit: result.shipWasHit, destroyed: result.shipWasDestroyed}
+    //    this.trigger(this.game);
+    //  }
+    //}.bind(this));
 
     this.socket.on('game over', function (result) {
       this.game.phase = 'game-over';
+      this.game.hasWon = result.hasWon;
       this.trigger(this.game);
     }.bind(this));
 
@@ -99,4 +95,4 @@ var GameStateStore = Reflux.createStore({
   }
 });
 
-module.exports = GameStateStore;
+module.exports = GameplayStore;

@@ -5,13 +5,13 @@ var Reflux = require('Reflux')
 
 var SetupStore = Reflux.createStore({
   init: function () {
-    this.data = {
+    this.state = {
       ships: [],
       selected: null,
       config: null
     };
 
-    this.utils = new BoardUtils();
+    this.utils = BoardUtils;
     this.listenTo(Actions.init.setConfig, this.setConfig);
     this.listenTo(Actions.setup.placeShips, this.emitShips);
     this.listenTo(Actions.setup.selectConfigItem, this.selectConfigItem);
@@ -21,29 +21,29 @@ var SetupStore = Reflux.createStore({
   },
 
   getConfig: function () {
-    return this.data.config;
+    return this.state.config;
   },
 
   selectConfigItem: function (ship) {
-    this.data.selected = {
+    this.state.selected = {
       type: 'config',
       item: ship
     };
-    this.trigger({selected: this.data.selected});
+    this.trigger({selected: this.state.selected});
   },
 
   selectShip: function (ship) {
-    var current = this.data.selected ? this.data.selected.item : null;
+    var current = this.state.selected ? this.state.selected.item : null;
 
-    this.data.selected = {
+    this.state.selected = {
       type: 'board',
       item: (current != ship) ? ship : null
     };
-    this.trigger({selected: this.data.selected});
+    this.trigger({selected: this.state.selected});
   },
 
   tryPivot: function () {
-    var ship = this.data.selected.item;
+    var ship = this.state.selected.item;
 
     if (ship.cells.length > 1) {
 
@@ -69,51 +69,51 @@ var SetupStore = Reflux.createStore({
         }
       }.bind(this));
 
-      if (pivoted && this.utils.canBeDropped(pivoted, ship.id, this.data.ships)) {
-        this.data.selected = {
+      if (pivoted && this.utils.canBeDropped(pivoted, ship.id, this.state.ships)) {
+        this.state.selected = {
           type: 'board',
-          item: {ship: {id: this.data.selected.item.id, cells: pivoted}, old: this.data.selected.item}
+          item: {ship: {id: this.state.selected.item.id, cells: pivoted}, old: this.state.selected.item}
         };
-        this.dropShip(this.data.selected);
-        this.data.selected = null;
-        this.trigger({ships: this.data.ships, selected: this.data.selected});
+        this.dropShip(this.state.selected);
+        this.state.selected = null;
+        this.trigger({ships: this.state.ships, selected: this.state.selected});
       }
     }
 
   },
 
   tryDrop: function (cell) {
-    var selected = this.data.selected;
-    var ships = this.data.ships;
+    var selected = this.state.selected;
+    var ships = this.state.ships;
     if (selected) {
       if (selected.type == 'config') {
         var cells = this.utils.getDropCellsForConfigItem(cell, selected.item);
 
         if (this.utils.canBeDropped(cells, null, ships)) {
-          this.data.selected = {
+          this.state.selected = {
             type: selected.type,
             item: cells
           };
-          this.dropShip(this.data.selected);
-          this.data.selected = null;
+          this.dropShip(this.state.selected);
+          this.state.selected = null;
 
-          var configShip = _.find(this.data.config, function (item) {
+          var configShip = _.find(this.state.config, function (item) {
             return (item.size == selected.item.size);
           });
           configShip.count--;
         }
-        this.trigger(this.data);
+        this.trigger(this.state);
       }
       else if (selected.type == 'board') {
         var cells = this.utils.getDroppedCellsForShip(cell, selected.item);
         if (this.utils.canBeDropped(cells, selected.item.id, ships)) {
-          this.data.selected = {
+          this.state.selected = {
             type: selected.type,
             item: {ship: {id: selected.item.id, cells: cells}, old: selected.item}
           };
-          this.dropShip(this.data.selected);
-          this.data.selected = null;
-          this.trigger({ships: this.data.ships, selected: this.data.selected});
+          this.dropShip(this.state.selected);
+          this.state.selected = null;
+          this.trigger({ships: this.state.ships, selected: this.state.selected});
         }
       }
     }
@@ -121,20 +121,20 @@ var SetupStore = Reflux.createStore({
 
   setConfig: function (config) {
     this.utils.boardSize = config.boardSize;
-    this.data.config = config.configShips;
+    this.state.config = config.configShips;
   },
 
   emitShips: function () {
     var allPlaced = function() {
-      return (!_.any(this.data.config, function (item) {
+      return (!_.any(this.state.config, function (item) {
         return (item.count > 0);
       }))
     }.bind(this);
 
     if(allPlaced()) {
       var socket = io();
-      var toSend = this.data.ships.map(function (ship) {
-        return ship.cells;
+      var toSend = this.state.ships.map(function (ship) {
+        return ship;
       });
       socket.emit('place ships', toSend);
     }
@@ -144,13 +144,13 @@ var SetupStore = Reflux.createStore({
     var dropped;
     if (selected.type == 'config') {
       dropped = getNamedShip({cells: selected.item});
-      this.data.ships.push(dropped);
+      this.state.ships.push(dropped);
     }
     else {
-      var index = this.data.ships.indexOf(selected.item.old);
-      this.data.ships.splice(index, 1);
+      var index = this.state.ships.indexOf(selected.item.old);
+      this.state.ships.splice(index, 1);
       dropped = getNamedShip(selected.item.ship);
-      this.data.ships.push(dropped);
+      this.state.ships.push(dropped);
     }
   }
 });

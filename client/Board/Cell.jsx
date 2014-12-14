@@ -22,8 +22,8 @@ var Cell = React.createClass({
       var classes = cx({
         'cell': true,
         'shot': shot,
-        'hit': (shot && shot.hit),
-        'destroyed': (shot && shot.destroyed)
+        'hit': (shot && shot.isHit),
+        'adjacent': (shot && shot.isAdjacentToShip)
       });
 
       return(<g className={classes}>

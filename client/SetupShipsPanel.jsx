@@ -8,7 +8,7 @@ var ShipsPanel = React.createClass({
   mixins: [Reflux.ListenerMixin],
 
   componentDidMount: function() {
-    this.loadData(SetupStore.data);
+    this.loadData(SetupStore.state);
     this.listenTo(SetupStore, this.loadData);
   },
 
