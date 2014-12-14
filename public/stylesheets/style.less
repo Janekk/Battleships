@@ -38,17 +38,21 @@ a {
 @keyframes blink {
   0% {
     stroke: red;
+    stroke-width: 0.2;
   }
   100% {
     stroke: black;
+    stroke-width: 0.5;
   }
 }
 @-webkit-keyframes blink {
   0% {
     stroke: red;
+    stroke-width: 0.2;
   }
   100% {
     stroke: black;
+    stroke-width: 0.5;
   }
 }
 
@@ -374,15 +378,15 @@ a {
   //regular cell
   rect.cell {
     fill: #20B2AA;
-    stroke: black;
+    stroke: gray;
     stroke-width: 0.2;
   }
 
   g.coord {
     rect {
       fill: white;
-      stroke: black;
-      stroke-width: 0.5;
+      stroke: gray;
+      stroke-width: 0.2;
     }
 
     text {
@@ -394,6 +398,10 @@ a {
     fill: #B0C4DE;
     stroke: black;
     stroke-width: 0.5;
+
+    &.selected {
+      .blink();
+    }
   }
 
   g.hit {
@@ -419,7 +427,7 @@ a {
     font-size: 9px;
 
     text {
-      fill: black;
+      fill: #333;
     }
 
     &.selected {
