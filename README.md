@@ -1,3 +1,5 @@
+![alt battleship logo](http://battleship.coding-lemur.de/images/Battleship.png)
+
 Battleships
 ===========
 
