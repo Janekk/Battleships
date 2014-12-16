@@ -12,4 +12,4 @@ It's round based and uses Socket.io to make websocket calls. For the frondend we
 - [ ] make lobby instead use a anonmyous room-ID
 - [ ] Firefox OS App
 
-[Try our demo!](http://battleship.coding-lemur.de/)
+[Try our demo!](http://battleships.coding-lemur.de/)
