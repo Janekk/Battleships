@@ -53,7 +53,7 @@ var Game = React.createClass({
           panel = (
             <div className="setup">
               <div className="command">
-              Place ships on the gameboard!
+                Place ships on the gameboard by selecting a ship and clicking on a target field. Double-click to pivot the ship.
               </div>
               <div className="side">
                 <SetupShipsPanel />
