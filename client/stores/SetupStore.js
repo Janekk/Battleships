@@ -36,7 +36,10 @@ SetupStore = Reflux.createStore({
   selectShip(ship) {
     var current = this.state.selected ? this.state.selected.item : null;
 
-    if (current != ship) {
+    if(current == ship) {
+      this.tryPivot();
+    }
+    else {
       this.state.selected = {
         type: 'board',
         item: ship
