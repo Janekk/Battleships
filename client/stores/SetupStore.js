@@ -1,19 +1,37 @@
 var Reflux = require('Reflux')
   , Actions = require('../actions')
   , _ = require('lodash')
-  , BoardUtils = require('../Board/BoardUtils');
+  , BoardUtils = require('../Board/BoardUtils')
+  , gameEvents = require('../../game/gameEvents')
+  , ConfigStore = require('./ConfigStore')
+  , phase = require('../GameStates')
+  , GameplayStore = require('./GameplayStore');
 
-var SetupStore;
-SetupStore = Reflux.createStore({
-  init() {
+function getNamedShip(ship) {
+  return {id: ship.id ? ship.id : _.uniqueId(), cells: ship.cells};
+}
+
+var SetupStore = Reflux.createStore({
+
+  reset() {
     this.state = {
       ships: [],
       selected: null,
-      config: null
+      config: null,
+      allPlaced: false
     };
+  },
+
+  getState() {
+    return this.state;
+  },
+
+  init() {
+    this.reset();
 
     this.utils = BoardUtils;
-    this.listenTo(Actions.init.setConfig, this.setConfig);
+    this.listenTo(GameplayStore, this.checkGamePhase);
+    this.listenTo(ConfigStore, this.setConfig);
     this.listenTo(Actions.setup.placeShips, this.emitShips);
     this.listenTo(Actions.setup.selectConfigItem, this.selectConfigItem);
     this.listenTo(Actions.setup.selectShip, this.selectShip);
@@ -21,8 +39,16 @@ SetupStore = Reflux.createStore({
     this.listenTo(Actions.setup.pivotShip, this.tryPivot);
   },
 
-  getConfig() {
-    return this.state.config;
+  checkGamePhase(game) {
+    if(game.phase <= phase.inLobby) {
+      this.reset();
+    }
+  },
+
+  setConfig(config) {
+    this.utils.boardSize = config.boardSize;
+    this.state.config = config;
+    this.trigger(this.state);
   },
 
   selectConfigItem(ship) {
@@ -30,26 +56,24 @@ SetupStore = Reflux.createStore({
       type: 'config',
       item: ship
     };
-    this.trigger({selected: this.state.selected});
+    this.trigger(this.state);
   },
 
   selectShip(ship) {
     var current = this.state.selected ? this.state.selected.item : null;
 
-    if(current == ship) {
-      this.tryPivot();
-    }
-    else {
+    if (current != ship) {
       this.state.selected = {
         type: 'board',
         item: ship
       };
-      this.trigger({selected: this.state.selected});
+      this.trigger(this.state);
     }
   },
 
   tryPivot() {
-    var ship = this.state.selected.item;
+    var {state} = this;
+    var ship = state.selected.item;
 
     if (ship.cells.length > 1) {
 
@@ -75,93 +99,86 @@ SetupStore = Reflux.createStore({
         }
       }
 
-      if (pivoted && this.utils.canBeDropped(pivoted, ship.id, this.state.ships)) {
-        this.state.selected = {
+      if (pivoted && this.utils.canBeDropped(pivoted, ship.id, state.ships)) {
+        state.selected = {
           type: 'board',
-          item: {ship: {id: this.state.selected.item.id, cells: pivoted}, old: this.state.selected.item}
+          item: {ship: {id: state.selected.item.id, cells: pivoted}, old: state.selected.item}
         };
-        this.dropShip(this.state.selected);
-        this.state.selected = null;
-        this.trigger({ships: this.state.ships, selected: this.state.selected});
+        this.dropShip(state.selected);
+        state.selected = null;
+        this.trigger(state);
       }
     }
   },
 
   tryDrop(cell) {
-    var selected = this.state.selected;
-    var ships = this.state.ships;
+    var {state} = this, ships = state.ships;
+    var selected = state.selected;
     if (selected) {
       if (selected.type == 'config') {
         var cells = this.utils.getDropCellsForConfigItem(cell, selected.item);
 
         if (this.utils.canBeDropped(cells, null, ships)) {
-          this.state.selected = {
+          state.selected = {
             type: selected.type,
             item: cells
           };
-          this.dropShip(this.state.selected);
-          this.state.selected = null;
+          this.dropShip(state.selected);
+          state.selected = null;
 
-          var configShip = _.find(this.state.config, (item) => {
+          var configShip = _.find(state.config.ships, (item) => {
             return (item.size == selected.item.size);
           });
           configShip.count--;
         }
-        this.trigger(this.state);
       }
       else if (selected.type == 'board') {
         var cells = this.utils.getDroppedCellsForShip(cell, selected.item);
         if (this.utils.canBeDropped(cells, selected.item.id, ships)) {
-          this.state.selected = {
+          state.selected = {
             type: selected.type,
             item: {ship: {id: selected.item.id, cells: cells}, old: selected.item}
           };
-          this.dropShip(this.state.selected);
-          this.state.selected = null;
-          this.trigger({ships: this.state.ships, selected: this.state.selected});
+          this.dropShip(state.selected);
+          state.selected = null;
         }
       }
+      state.allPlaced = (!_.any(this.state.config.ships, (item) => {return (item.count > 0);}));
+      this.trigger(state);
     }
   },
 
-  setConfig(config) {
-    this.utils.boardSize = config.boardSize;
-    this.state.config = config.configShips;
-  },
-
   emitShips() {
+    var {state} = this;
     var allPlaced = () => {
-      return (!_.any(this.state.config, (item) => {
+      return (!_.any(state.config.ships, (item) => {
         return (item.count > 0);
       }))
     };
 
     if (allPlaced()) {
       var socket = io();
-      var toSend = this.state.ships.map((ship) => {
+      var toSend = state.ships.map((ship) => {
         return ship;
       });
-      socket.emit('place ships', toSend);
+      socket.emit(gameEvents.client.placeShips, toSend);
     }
   },
 
   dropShip(selected) {
+    var {state} = this;
     var dropped;
     if (selected.type == 'config') {
       dropped = getNamedShip({cells: selected.item});
-      this.state.ships.push(dropped);
+      state.ships.push(dropped);
     }
     else {
-      var index = this.state.ships.indexOf(selected.item.old);
-      this.state.ships.splice(index, 1);
+      var index = state.ships.indexOf(selected.item.old);
+      state.ships.splice(index, 1);
       dropped = getNamedShip(selected.item.ship);
-      this.state.ships.push(dropped);
+      state.ships.push(dropped);
     }
   }
 });
-
-function getNamedShip(ship) {
-  return {id: ship.id ? ship.id : _.uniqueId(), cells: ship.cells};
-}
 
 module.exports = SetupStore;

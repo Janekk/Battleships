@@ -1,41 +1,11 @@
 var React = require('react/addons')
-  , Reflux = require('reflux')
   , _ = require('lodash')
   , Actions = require('./actions')
-  , Cell = require('./Board/Cell.jsx')
+  , {Cell} = require('./Board/Cell')
   , Coordinate = require('./Board/Coordinate')
-  , Ship = require('./Board/Ship.jsx')
-  , SetupStore = require('./stores/SetupStore');
+  , Ship = require('./Board/Ship');
 
 var SetupBoard = React.createClass({
-  mixins: [Reflux.ListenerMixin],
-
-  getInitialState() {
-    return {
-      ships: [],
-      selected: null
-    };
-  },
-
-  componentDidMount() {
-    this.listenTo(SetupStore, this.loadGameBoard);
-  },
-
-  loadGameBoard(data) {
-    var state = {};
-    if (data.ships) {
-      state.ships = data.ships;
-    }
-    if ('selected' in data && data.selected) {
-      if (data.selected.type == 'board') {
-        state.selected = data.selected.item;
-      }
-      else {
-        state.selected = null;
-      }
-    }
-    this.setState(state);
-  },
 
   handleShipClick(ship, event) {
     event.stopPropagation();
@@ -50,24 +20,33 @@ var SetupBoard = React.createClass({
 
   handleCellClick(cellProps) {
     var cell = {x: cellProps.x, y: cellProps.y};
-    Actions.setup.selectCell(cell, this.state.ships);
+    Actions.setup.selectCell(cell, this.props.setup.ships);
   },
 
   render() {
-    var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var coords = [];
-    for(var x = 0; x < this.props.xsize; x++) {
+    var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', coords = [];
+    var selected, {setup} = this.props;
+    if (setup.selected) {
+      if (setup.selected.type == 'board') {
+        selected = setup.selected.item;
+      }
+      else {
+        selected = null;
+      }
+    }
+
+    for(var x = 0; x < setup.config.boardSize; x++) {
       var y = -1;
       coords.push(<Coordinate x={x} y={y} key={x + '' + y} text={alphabet[x]}/>);
     };
-    for(var y = 0; y < this.props.ysize; y++) {
+    for(var y = 0; y < setup.config.boardSize; y++) {
       var x = -1;
       coords.push(<Coordinate x={x} y={y} key={x + '' + y} text={y + ''}/>);
     };
 
     var cells = [];
-    for(var x = 0; x < this.props.xsize; x++) {
-      for(var y = 0; y < this.props.ysize; y++) {
+    for(var x = 0; x < setup.config.boardSize; x++) {
+      for(var y = 0; y < setup.config.boardSize; y++) {
         var cellProps = {
           key: x + ' ' + y,
           x: x,
@@ -77,22 +56,22 @@ var SetupBoard = React.createClass({
       };
     };
 
-    var ships = this.state.ships.map((ship, index) => {
+    var ships = setup.ships.map((ship, index) => {
       var shipProps = {
         key: index,
         ship: ship,
-        selected: (this.state.selected == ship),
+        selected: (selected == ship),
         onShipClick: this.handleShipClick.bind(this, ship),
         onShipDoubleClick: this.pivotShip.bind(this, ship)
       }
       return (<Ship {...shipProps}/>);
     });
 
-    var viewBox = [-10, -10, (this.props.xsize + 1) * 10, (this.props.ysize + 1) * 10];
+    var viewBox = [-10, -10, (setup.config.boardSize + 1) * 10, (setup.config.boardSize + 1) * 10];
 
     return (
-      <div className="setup-board">
-        <svg width="100%" height="100%" viewBox={viewBox.join(' ')}>
+      <div className="board setup">
+        <svg viewBox={viewBox.join(' ')}>
             {coords}
             {cells}
             {ships}

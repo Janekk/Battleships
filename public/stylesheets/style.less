@@ -1,59 +1,131 @@
-@import "../../node_modules/bootstrap/less/bootstrap";
+@import "reset.css";
+@import "reset.css";
+@import "bootstrap-import";
+@import "font-awesome.css";
+@import "toast.min.css";
+@import url(http://fonts.googleapis.com/css?family=Raleway:200,400,700,800);
 
 @font-face {
   font-family: army-rust;
-  src: url("../fonts/army-rust.ttf");
+  src: url("../fonts/army-rust.eot"),
+  url('../fonts/army-rust.ttf');
 }
+
+@height-footer: 40px;
+@height-header: 42px;
+@bg-hf: #333;
+
+@color-gameboard: #20B2AA;
+@color-alt: firebrick;
+@color-sidenav-hover: #F08080;
+
+@bg: #E9EAED;
+@bg-menu: #6B3B3B;
+@input-bg: @bg;
+
+@btn-primary-color: #fff;
+@btn-primary-bg: firebrick;
+@btn-primary-border: darken(@btn-primary-bg, 5%);
+
+@fill-ship: #B0C4DE;
+@fill-ship-hit: red;
 
 html, body {
   height: 100%;
-}
+  background: @bg;
+  input[type="text"] {
 
-body {
-  font: 2em army-rust, "Lucida Grande", Helvetica, Arial, sans-serif;
-  .default-ui-font();
-}
+    @media (max-width: @screen-xs-max) {
+      width: 100%;
+    }
+    @media (min-width: @screen-sm-min) {
+      width: 100%;
+      max-width: @screen-xs-max;
+    }
 
-a {
-  color: #00B7FF;
-}
+    background-color: whitesmoke;
+    border: solid 1px #888;
+    color: #333;
+    padding: 0 8px 0 8px;
+  }
+  a {
+    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+    }
+    &:active {
+      text-decoration: none;
+    }
+    &:focus {
+      text-decoration: none;
+    }
+  }
 
-.default-ui-font {
-  letter-spacing: 0.5vw;
-  font-size: 5vw;
-}
-
-.clearfix {
-  :after {
-    visibility: hidden;
-    display: block;
-    font-size: 0;
-    content: " ";
-    clear: both;
-    height: 0;
+  .clearfix {
+    .clearfix();
   }
 }
 
+@-webkit-keyframes opacity-blink {
+  0%{
+    opacity:1;
+  }
+  100%{
+    opacity:0;
+  }
+}
+
+@keyframes opacity-blink {
+  0%{
+    opacity:1;
+  }
+  100%{
+    opacity:0;
+  }
+}
 
 @keyframes blink {
   0% {
     stroke: red;
-    stroke-width: 0.2;
   }
   100% {
-    stroke: black;
-    stroke-width: 0.5;
+    stroke: gray;
   }
 }
+
 @-webkit-keyframes blink {
   0% {
     stroke: red;
-    stroke-width: 0.2;
   }
   100% {
-    stroke: black;
-    stroke-width: 0.5;
+    stroke: gray;
   }
+}
+
+@keyframes blink-config {
+  0% {
+    fill: firebrick;
+  }
+  100% {
+    fill: gray;
+  }
+}
+
+@-webkit-keyframes blink-config {
+  0% {
+    fill: firebrick;
+  }
+  100% {
+    fill: gray;
+  }
+}
+
+.blink-config {
+  -webkit-animation: blink-config 1s linear infinite;
+  -moz-animation: blink-config 1s linear infinite;
+  -ms-animation: blink-config 1s linear infinite;
+  -o-animation: blink-config 1s linear infinite;
+  animation: blink-config 1s linear infinite;
 }
 
 .blink {
@@ -64,48 +136,267 @@ a {
   animation: blink 1s linear infinite;
 }
 
-.main {
-  padding: 0 0.5em 0 0.5em;
-  @media screen {
-    #header {
+@opacity-blink-duration: 0.6s;
+@opacity-blink-iterations: 10;
+
+.opacity-blink {
+  -webkit-animation: opacity-blink @opacity-blink-duration linear @opacity-blink-iterations;
+  -moz-animation: opacity-blink @opacity-blink-duration linear @opacity-blink-iterations;
+  -ms-animation: opacity-blink @opacity-blink-duration linear @opacity-blink-iterations;
+  -o-animation: opacity-blink @opacity-blink-duration linear @opacity-blink-iterations;
+  animation: opacity-blink @opacity-blink-duration linear @opacity-blink-iterations;
+}
+
+.tool-font {
+  font-family: "Raleway", Arial, sans-serif;
+  letter-spacing: initial;
+
+
+  @media (max-width: @screen-xs-max) {
+    font-size: 14px;
+  }
+
+  @media (min-width: @screen-sm-min) {
+    font-size: 16px;
+  }
+
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+
+  #react-root {
+    min-height: 100%;
+    position: relative;
+  }
+
+  .hf-links() {
+    color: white;
+    &:hover {
+      color: lighten(@color-alt, 20%);
+    }
+  }
+
+  .hf {
+    background: @bg-hf;
+    width: 100%;
+    .tool-font();
+
+    span {
+      color: lightgray;
+      font-weight: 500;
+    }
+
+    a {
+      font-weight: 700;
+      .hf-links();
+
+      span {
+        color: inherit;
+        font-weight: inherit;
+      }
+    }
+  }
+
+  #header {
+    height: @height-header;
+
+    .header-controls() {
+      color: @color-alt;
+      &:hover {
+        color: lighten(@color-alt, 20%);
+      }
+    }
+
+    .nav-item-after() {
+      background: gray;
+      content: '';
+      height: 24px;
+      left: 10px;
+      position: relative;
+      display: inline-block;
+      top: 6px;
+      width: 1px;
+    }
+
+    .user-id {
+      padding: 14px 20px 5px 10px;
+      display: inline-block;
+      float: right;
+      text-align: right;
+
+      @media (max-width: @screen-xs-max) {
+        width: 83%;
+      }
+
+      @media (min-width: @screen-sm-min) {
+        width: 55%;
+      }
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      .versus {
+        color: red;
+      }
+    }
+
+    #nav-btn {
+      float: left;
+      padding: 8px 8px 2px 8px;
+      display: inline-block;
+      .header-controls();
+
+      @media (min-width: @screen-sm-min) {
+        display: none;
+      }
+    }
+
+    #side-nav {
+      @media (max-width: @screen-xs-max) {
+        display: none;
+
+        &.active-nav {
+          display: block;
+        }
+
+        .pointer {
+          position: absolute;
+          left: 15px;
+          top: @height-header;
+          width: 0;
+          height: 0;
+          border-left: 10px solid transparent;
+          border-right: 10px solid transparent;
+          border-bottom: 10px solid @bg-menu;
+        }
+      }
+      @media (min-width: @screen-sm-min) {
+        display: inline-block;
+      }
+
+      #nav-list {
+        @media (max-width: @screen-xs-max) {
+          padding: 16px 8px 8px 20px;
+          position: absolute;
+          left: 3px;
+          width: 250px;
+          z-index: 100;
+          margin-top: @height-header + 10px;
+          -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+          box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+
+          background: @bg-menu;
+
+          li {
+            line-height: 2.5em;
+            a {
+              font-size: 1.2em;
+              font-weight: 500;
+              text-decoration: none;
+              span {
+                margin-left: 10px;
+              }
+
+              color: white;
+              &:hover {
+                color: @color-sidenav-hover;
+              }
+            }
+          }
+        }
+        @media (min-width: @screen-sm-min) {
+          li {
+            padding: 5px 10px 5px 10px;
+            line-height: 1.5em;
+            display: inline-block;
+            a {
+              font-size: 1.2em;
+              font-weight: 500;
+              text-decoration: none;
+              span {
+                margin-left: 10px;
+              }
+
+              color: white;
+              &:hover {
+                color: @color-sidenav-hover;
+              }
+            }
+
+            &:after {
+              .nav-item-after();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: @height-footer;
+    padding: 8px;
+    text-align: center;
+    div.content {
+    }
+  }
+
+  #main {
+
+    @media (min-width: @screen-sm-min) {
+      padding: 10px 16px (@height-footer + 10px) 16px;
+    }
+    @media (max-width: @screen-xs-max) {
+      padding: 5px 8px (@height-footer + 5px) 8px;
+    }
+
+    #game-header {
       div.title {
         display: inline-block;
+
+        h1 {
+          width: 100%;
+          margin: 0;
+          color: @color-alt;
+          font-family: army-rust;
+        }
+
         @media (min-width: @screen-sm-min) {
           @media (max-aspect-ratio: 8/5) {
             width: 60%;
             h1 {
-              font-family: army-rust;
               letter-spacing: 0.6vw;
               font-size: 10vw;
-              width: 100%;
-              margin: 0;
+              line-height: 11vw;
             }
           }
           @media (min-aspect-ratio: 8/5) {
             width: 70%;
             h1 {
-              font-family: army-rust;
               letter-spacing: 0.4vw;
               font-size: 8vw;
-              width: 100%;
-              margin: 0;
+              line-height: 9vw;
             }
           }
         }
         @media (max-width: @screen-xs-max) {
           width: 100%;
           h1 {
-            font-family: army-rust;
             letter-spacing: 1.5vw;
             font-size: 13vw;
-            width: 100%;
-            margin: 0;
+            line-height: 14vw;
           }
         }
       }
 
       div.logo {
         display: inline-block;
+        vertical-align: top;
         @media (min-width: @screen-sm-min) {
           @media (min-aspect-ratio: 8/5) {
             width: 30%;
@@ -118,348 +409,609 @@ a {
           display: none;
         }
         img.logo {
+          vertical-align: initial;
           width: 100%;
         }
       }
     }
-  }
 
-  .tool-font {
-    font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
-    letter-spacing: initial;
-  }
-
-  .sign-in {
-    div {
-      margin-top: 10px;
-    }
-    font-size: 48px;
-    button.btn {
-      font-size: 48px;
-    }
-  }
-
-  .game {
-
-    div.setup {
-      .clearfix();
-      .command, button {
-        .tool-font();
+    .sign-in {
+      font-size: 16px;
+      div {
+        margin-top: 10px;
       }
 
-      .command {
-        margin-bottom: 10px;
+      input {
+        font-family: "Raleway", Arial, sans-serif;
       }
 
-      .confirm {
-        button {
-          float: right;
-        }
+      button.btn {
+        line-height: 1;
       }
 
       @media (min-width: @screen-sm-min) {
-
-        .side {
-          display: flex;
-          flex-direction: column;
-          flex-flow: column wrap;
-        }
-        .ships-panel {
-          order: 1;
-          width: 100%;
-        }
-        .confirm {
-          order: 0;
-          width: 100%;
-        }
-
-        @media (min-aspect-ratio: 8/5) {
-          .setup-board {
-            width: 40%;
-            float: left;
-          }
-
-          .side {
-            width: 30%;
-            float: right;
-          }
-        }
-        @media (max-aspect-ratio: 8/5) {
-          .setup-board {
-            width: 68%;
-            float: left;
-          }
-          .side {
-            width: 30%;
-            float: right;
-          }
+        font-size: 2em;
+        button.btn {
+          font-size: 2em;
         }
       }
-
       @media (max-width: @screen-xs-max) {
-        .setup-board {
-          width: 100%;
-          float: left;
+        font-size: 1.5em;
+        button.btn {
+          font-size: 1.5em;
         }
-        .side {
-          width: 100%;
-          float: left;
-
-          .ships-panel {
-            float: left;
-            width: 80%;
-          }
-          .confirm {
-            float: right;
-            width: 20%;
-          }
-        }
-      }
-
-      .ships-panel {
-        letter-spacing: 0.1vw;
-        font-size: 4vw;
       }
     }
 
-    #shooting-panel {
-      position: relative;
-      .clearfix();
+    #game {
+      font: 24px army-rust, "Lucida Grande", Helvetica, Arial, sans-serif;
 
-      >div {
-        padding: 5px;
-      }
+      .lobby {
+        @bg-lobby: #debdbd;
 
-      @media screen {
-        .pb {
-          box-sizing: border-box;
+        .tool-font();
+
+        .header {
+          padding: 10px 0;
         }
 
-        @media (max-width: @screen-xs-max) {
-          overflow-x: hidden;
+        .content {
+          -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+          box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 
-          p.status {
-            letter-spacing: 0.2vw;
-            font-size: 6vw;
+          .no-user {
+            font-weight: 700;
+            line-height: 2em;
+            background: @bg-lobby;
           }
 
-          .pb {
+          @media (min-width: @screen-sm-min) {
+            width: 80%;
+            min-width: @screen-sm-min;
+          }
+          @media (min-width: @screen-md-min) {
+            width: @screen-sm-min;
+          }
+          @media (max-width: @screen-xs-max) {
             width: 100%;
-            transition: 1.0s all ease;
-            transition-delay: 0s;
+          }
+          overflow: auto;
+
+          .header {
+            padding: 10px 5px 10px 5px;
+            background: #B7C4EA;
           }
 
-          .me {
-            float: right;
-            margin-right: -102%;
-            &.my-board-active {
-              margin-right: 0%;
+          .user-list {
+
+            .user-item {
+              padding: 5px;
+              overflow: hidden;
+              border: solid #B7C4EA;
+              background: @bg-lobby;
+              border-width: 1px 0 0 0;
+              vertical-align: middle;
+
+              .user-name, .user-invitation {
+                display: inline-block;
+              }
+              .user-name {
+                float: left;
+                max-width: 65%;
+                font-weight: 700;
+              }
+              .user-invitation {
+                float: right;
+              }
             }
           }
+        }
+      }
 
-          .opponent {
-            float: left;
-            margin-left: 0%;
-            &.my-board-active {
-              margin-left: -102%;
+      div.setup {
+        .clearfix();
+        .command, button {
+          .tool-font();
+        }
+
+        .command {
+          margin-bottom: 10px;
+        }
+
+        .confirm {
+          button {
+            float: right;
+            &:enabled {
+              color: #fff;
+              background: @color-alt;
             }
           }
         }
 
         @media (min-width: @screen-sm-min) {
-          p.status {
-            @media (min-aspect-ratio: 8/5) {
-              font-size: 2.5vw;
-            }
-            @media (max-aspect-ratio: 8/5) {
-              font-size: 3vw;
-            }
-            letter-spacing: 0.1vw;
-          }
 
-          .pb {
-            @media (min-aspect-ratio: 8/5) {
-              width: 40%;
-            }
-            @media (max-aspect-ratio: 8/5) {
-              width: 50%;
-            }
-            display: inline-block;
-            padding: 0 10px 10px 10px;
-          }
-
-          .me {
+          .side {
+            width: 30%;
             float: right;
+
+            .ships-panel {
+              padding: 15px 0 0 15px;
+              width: 100%;
+            }
           }
-          .opponent {
+
+          .board.setup {
+            width: 70%;
             float: left;
+
+            @media (min-aspect-ratio: 8/5) {
+              svg {
+                height: 65vh;
+              }
+            }
+
+            @media (max-aspect-ratio: 8/5) {
+              svg {
+                height: 80vh;
+              }
+            }
+          }
+        }
+
+        @media (max-width: @screen-xs-max) {
+          width: 100%;
+
+          .board.setup {
+            svg {
+              height: 90vw;
+            }
+          }
+
+          .side {
+            width: 100%;
+            float: left;
+
+            .ships-panel {
+              float: left;
+              width: 80%;
+            }
+            .confirm {
+              float: right;
+              width: 20%;
+            }
+          }
+        }
+
+        .ships-panel {
+          letter-spacing: 0.1vw;
+          font-size: 4vw;
+        }
+      }
+
+      #shooting-panel {
+        position: relative;
+        .clearfix();
+
+        > div {
+          padding: 5px;
+        }
+
+        g.cell.shot.update g{
+          .opacity-blink();
+        }
+
+        g.ship.update {
+          .opacity-blink();
+        }
+
+        @media screen {
+          .pb {
+            box-sizing: border-box;
+
+            p.status {
+              text-align: center;
+
+              span.shoot {
+                color: @color-alt;
+
+                -webkit-animation: turn-blink 0.8s linear infinite;
+                -moz-animation: turn-blink 0.8s linear infinite;
+                -ms-animation: turn-blink 0.8s linear infinite;
+                -o-animation: turn-blink 0.8s linear infinite;
+                animation: turn-blink 0.8s linear infinite;
+              }
+            }
+          }
+
+          /* svg {height: } - to prevent IE sizing glitches from IE */
+          @media (max-width: @screen-xs-max) {
+            overflow-x: hidden;
+
+            .pb {
+              @media (min-aspect-ratio: 8/5) {
+                display: inline-block;
+                width: 50%;
+                svg {
+                  height: 45vw;
+                }
+
+                p.status {
+                  font-size: 8vw;
+                }
+              }
+
+              @media (max-aspect-ratio: 8/5) {
+                width: 100%;
+                svg {
+                  height: 95vw;
+                }
+
+                p.status {
+                  font-size: 8vw;
+                }
+              }
+
+              svg {
+                height: 95vw;
+              }
+
+              p.status {
+                letter-spacing: 0.05em;
+              }
+            }
+
+            @media (max-aspect-ratio: 8/5) {
+
+              .pb {
+                transition: 1.0s all ease;
+                transition-delay: 1s;
+
+                &.switched {
+                  transition-delay: 0s;
+                }
+
+                &.me {
+                  float: right;
+                  margin-right: -102%;
+                  &.my-board-active {
+                    margin-right: 0%;
+                  }
+                }
+
+                &.opponent {
+                  float: left;
+                  margin-left: 0%;
+                  &.my-board-active {
+                    margin-left: -102%;
+                  }
+                }
+              }
+            }
+            .board.play {
+              svg {
+                width: 100%;
+              }
+            }
+          }
+
+          @media (min-width: @screen-sm-min) {
+            p.status {
+              @media (min-aspect-ratio: 8/5) {
+                font-size: 3vw;
+              }
+              @media (max-aspect-ratio: 8/5) {
+                font-size: 4vw;
+              }
+              letter-spacing: 0.05em;
+            }
+
+            .pb {
+              @media (min-aspect-ratio: 8/5) {
+                width: 45%;
+                svg {
+                  height: 40vw;
+                }
+              }
+              @media (max-aspect-ratio: 8/5) {
+                width: 50%;
+                svg {
+                  height: 45vw;
+                }
+              }
+              display: inline-block;
+              padding: 0 10px 10px 10px;
+            }
+
+            .me {
+              float: right;
+            }
+
+            .opponent {
+              float: left;
+            }
+          }
+        }
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.3); /*dim the background*/
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .turn-overlay-text {
+          font-size: 12vw;
+          color: rgb(107, 12, 12);
+
+          -webkit-animation: turn-blink 0.8s linear infinite;
+          -moz-animation: turn-blink 0.8s linear infinite;
+          -ms-animation: turn-blink 0.8s linear infinite;
+          -o-animation: turn-blink 0.8s linear infinite;
+          animation: turn-blink 0.8s linear infinite;
+        }
+
+        @keyframes turn-blink {
+          0% {
+            opacity: 0.3;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+        @-webkit-keyframes turn-blink {
+          0% {
+            opacity: 0.1;
+          }
+          100% {
+            opacity: 0.6;
+          }
+        }
+      }
+
+      .switch-wrapper {
+
+        #switch-board {
+          @media (min-width: @screen-sm-min), (min-aspect-ratio: 8/5) {
+            display: none;
+          }
+
+          width: 100%;
+          font-size: 7vw;
+          font-weight: 700;
+          font-family: "Raleway", Arial, sans-serif;
+          @btn-primary-bg: gray;
+          @btn-primary-border: darken(gray, 5%);
+        }
+      }
+
+      .game-over {
+        font-size: 3em;
+
+        p.win {
+          color: rgba(76, 174, 76, 1);
+        }
+
+        button {
+          .tool-font();
+        }
+      }
+    }
+
+    .ships-panel {
+      float: right;
+    }
+
+    //shot cell without ship
+    g.cell {
+      &.shot {
+        line {
+          stroke: red;
+          stroke-width: 0.5;
+          stroke-linecap: round;
+        }
+        &.adjacent {
+          line {
+            stroke: gray;
           }
         }
       }
     }
 
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10;
-      background-color: rgba(0, 0, 0, 0.3); /*dim the background*/
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      .turn-overlay-text {
-        font-size: 2em;
-        color: red;
-        opacity: 0.5;
-
-        -webkit-animation: turn-blink 0.7s linear infinite;
-        -moz-animation: turn-blink 0.7s linear infinite;
-        -ms-animation: turn-blink 0.7s linear infinite;
-        -o-animation: turn-blink 0.7s linear infinite;
-        animation: turn-blink 0.7s linear infinite;
-      }
-
-      @keyframes turn-blink {
-        0% {
-          opacity: 0.1;
-        }
-        100% {
-          opacity: 0.6;
-        }
-      }
-      @-webkit-keyframes turn-blink {
-        0% {
-          opacity: 0.1;
-        }
-        100% {
-          opacity: 0.6;
-        }
-      }
-    }
-
-    .switch-wrapper {
-      //.clearfix();
-      #switch-board {
-        @media screen and (min-width: @screen-sm-min) {
-          display: none;
-        }
-        width: 100%;
-        .default-ui-font();
-
-        //        &.me {
-        //          float: left;
-        //        }
-        //        &.opponent {
-        //          float: right;
-        //        }
-      }
-    }
-  }
-
-  .ships-panel {
-    float: right;
-  }
-
-  //shot cell without ship
-  g.cell {
-    &.shot {
-      line {
-        stroke: red;
-        stroke-width: 0.5;
-        stroke-linecap: round;
-      }
-      &.adjacent {
-        line {
-          stroke: gray;
-        }
-      }
-    }
-  }
-
-  //regular cell
-  rect.cell {
-    fill: #20B2AA;
-    stroke: gray;
-    stroke-width: 0.2;
-  }
-
-  g.coord {
-    rect {
-      fill: white;
+    //regular cell
+    rect.cell {
+      fill: @color-gameboard;
       stroke: gray;
       stroke-width: 0.2;
     }
 
-    text {
-      font-size: 6pt;
-    }
-  }
-
-  g.ship {
-    fill: #B0C4DE;
-    stroke: black;
-    stroke-width: 0.5;
-
-    &.selected {
-      .blink();
-    }
-  }
-
-  g.hit {
-    rect {
-      fill: magenta;
-    }
-  }
-
-  rect.hit {
-    fill: magenta;
-  }
-
-  g.destroyed {
-    rect {
-      fill: black;
-    }
-  }
-
-  g.config {
-    fill: #B0C4DE;
-    stroke: black;
-    stroke-width: 0.2;
-    font-size: 9px;
-
-    text {
-      fill: #333;
-    }
-
-    &.selected {
-      text {
-        fill: gray;
+    .pb.me {
+      rect.cell {
+        fill: #88A5A4;
       }
     }
 
-    &.selected {
-      .blink();
+    g.coord {
+      rect {
+        fill: white;
+        stroke: gray;
+        stroke-width: 0.2;
+      }
+
+      text {
+        font-size: 6pt;
+      }
     }
-    &.inactive {
-      fill: #F8F8FF;
-      opacity: 0.4;
+
+    g.ship {
+      fill: @fill-ship;
+      stroke: black;
+      stroke-width: 0.5;
+
+      &.selected {
+        stroke: red;
+      }
+    }
+
+    g.hit {
+      rect {
+        fill: @fill-ship-hit;
+      }
+    }
+
+    rect.hit {
+      fill: @fill-ship-hit;
+    }
+
+    .pb.opponent {
+
+      g.ship {
+        fill: #41F46E;
+      }
+
+      rect.hit {
+        stroke: black;
+        stroke-width: 0.5;
+        fill: @fill-ship-hit;
+      }
+    }
+
+    g.config {
+      fill: #B0C4DE;
+      stroke: black;
+      stroke-width: 0.2;
+      font-size: 9px;
+
+      text {
+        fill: #333;
+      }
+
+      &.selected {
+        text {
+          fill: firebrick;
+        }
+      }
+
+      &.inactive {
+        fill: #F8F8FF;
+        opacity: 0.4;
+      }
+    }
+
+    .setup.board {
+      g.selected {
+        .blink();
+      }
+    }
+
+    .ship-popup {
+      background: red;
+      padding: 100px;
     }
   }
+}
 
-  div.ship-popup {
-    border-radius: 20px;
-    border: 2px solid lightskyblue;
-    background: white;
+/*Toastr animations*/
+.animated {
+  -webkit-animation-duration: 0.8s;
+  animation-duration: 0.8s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
 
-    position: absolute;
-    top: 1%;
-    left: 1%;
-    width: 200px;
-    height: 80px;
-    padding: 16px;
-    z-index: 1002;
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+.fadeIn {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+
+@-webkit-keyframes fadeOut {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fadeOut {
+  -webkit-animation-name: fadeOut;
+  animation-name: fadeOut;
+}
+
+#overlay {
+  visibility: hidden;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 1000;
+
+  &.visible {
+    visibility: visible;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .box {
+    .tool-font();
+    font-weight: 700;
+    width: 40%;
+    min-width: 300px;
+    min-height: 100px;
+    margin: 100px auto;
+    background-color: #fff;
+    border: 1px solid #000;
+    text-align: center;
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 7px;
+
+    .question {
+      padding: 15px;
+    }
+
+    .buttons {
+      margin-top: 15px;
+      border-top: 1px solid #e5e5e5;
+      padding: 10px 15px 15px 15px;
+      text-align: right;
+
+      button {
+        margin-left: 10px;
+      }
+    }
   }
 }

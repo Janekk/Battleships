@@ -25,10 +25,21 @@ var paths = {
   }
 };
 
+var run = require('gulp-run');
 gulp.task('init', function () {
+
   gulp.src(paths.src.client.fonts)
-  .pipe(gulp.dest(paths.dest.client.fonts));
+    .pipe(gulp.dest(paths.dest.client.fonts));
+
+  run('node ./node_modules/jquery-builder/bin/builder.js')
+    .pipe(gulp.dest('public/scripts/jquery.js'));
 });
+
+var argv = require('yargs').argv;
+var uglify = require('gulp-uglify');
+var gulpif = require('gulp-if');
+var buffer = require('vinyl-buffer');
+var production = !!(argv.production); // true if --production flag is used
 
 gulp.task('browserify', function () {
   browserify({extensions: ['.jsx', '.js']})
@@ -40,7 +51,18 @@ gulp.task('browserify', function () {
       console.log(err.message);
     })
     .pipe(source(paths.dest.client.bundle))
+    .pipe(buffer())
+    .pipe(gulpif(production, uglify()))
     .pipe(gulp.dest(paths.dest.client.scripts));
+});
+
+var less = require('gulp-less');
+var path = require('path');
+
+gulp.task('less', function () {
+  gulp.src('./public/stylesheets/*.less')
+    .pipe(less())
+    .pipe(gulp.dest('./public/stylesheets'));
 });
 
 gulp.task('watch-browserify', function () {
@@ -53,11 +75,7 @@ gulp.task('watch-server', function () {
       script: 'app.js',
       ext: 'js jsx json',
       ignore: ['client/*', 'public/*', 'gulpfile.js'],
-      watch: [
-        'app.js',
-        'views',
-        'routes'
-      ]
+      watch: ['app.js', 'game', 'views', 'routes']
     })
     .on('restart', function () {
       console.log('watch-server restarted!');

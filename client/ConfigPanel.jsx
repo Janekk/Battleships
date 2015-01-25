@@ -1,39 +1,8 @@
 var React = require('react')
   , _ = require('lodash')
-  , Reflux = require('reflux')
-  , Actions = require('./actions')
-  , SetupStore = require('./stores/SetupStore');
+  , Actions = require('./actions');
 
-var ShipsPanel = React.createClass({
-  mixins: [Reflux.ListenerMixin],
-
-  componentDidMount() {
-    this.loadData(SetupStore.state);
-    this.listenTo(SetupStore, this.loadData);
-  },
-
-  loadData(data) {
-    var state = {};
-    if(data.config) {
-      state.items = data.config;
-    }
-    if('selected' in data && data.selected) {
-      if (data.selected.type == 'config') {
-        state.selected = data.selected.item;
-      }
-      else {
-        state.selected = null;
-      }
-    }
-    this.setState(state);
-  },
-
-  getInitialState() {
-    return {
-      items: null,
-      selected: null
-    };
-  },
+var ConfigPanel = React.createClass({
 
   handleItemClick(item) {
     if(item.count > 0) {
@@ -42,8 +11,19 @@ var ShipsPanel = React.createClass({
   },
 
   render() {
-    var config = _.sortBy(this.state.items, (cfg) => {return -cfg.size;});
-    var selectedSize = this.state.selected ? this.state.selected.size : null;
+    var selected, {setup} = this.props;
+
+    if(setup.selected) {
+      if (setup.selected.type == 'config') {
+        selected = setup.selected.item;
+      }
+      else {
+        selected = null;
+      }
+    }
+
+    var config = setup.config ? _.sortBy(setup.config.ships, (cfg) => {return -cfg.size;}) : [];
+    var selectedSize = selected ? selected.size : null;
 
     var components = [];
     config.forEach((cfg, index) => {
@@ -51,9 +31,10 @@ var ShipsPanel = React.createClass({
       components.push(<ConfigurationShip config={cfg} index={index} key={cfg.size} selected={cfg.size == selectedSize} count={cfg.count} onClick={handleClick}/>);
     });
 
+    var svgViewbox = [0, 0,100, (config.length * 10) +  10];
     return (
       <div className="ships-panel">
-        <svg width="100%" height="100%" viewBox="0 0 100 50">
+        <svg width="100%" height="100%" viewBox={svgViewbox.join(' ')}>
             {components}
         </svg>
       </div>
@@ -94,4 +75,4 @@ var ConfigurationShip = React.createClass({
   }
 });
 
-module.exports = ShipsPanel;
+module.exports = ConfigPanel;

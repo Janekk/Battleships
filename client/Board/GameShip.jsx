@@ -3,10 +3,10 @@ var _ = require('lodash');
 
 var Ship = React.createClass({
   render() {
-    var cx = React.addons.classSet;
+    var {props} = this, cx = React.addons.classSet;
 
     var cells = [];
-    this.props.ship.cells.forEach((cell) => {
+    props.ship.cells.forEach((cell) => {
       var rectProps = {
         width: 10,
         height: 10,
@@ -20,11 +20,12 @@ var Ship = React.createClass({
 
     var classes = cx({
       'ship': true,
-      'destroyed': this.props.isDestroyed
+      'destroyed': props.isDestroyed,
+      'update': props.update
     });
 
     return (
-      <g className={classes} onClick={this.props.onShipClick}>
+      <g className={classes} onClick={props.onShipClick}>
         {cells}
       </g>
     )

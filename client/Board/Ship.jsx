@@ -18,7 +18,8 @@ var Ship = React.createClass({
     var cx = React.addons.classSet;
     var classes = cx({
       'ship': true,
-      'selected': this.props.selected
+      'selected': this.props.selected,
+      'update': this.props.update
     });
 
     return (

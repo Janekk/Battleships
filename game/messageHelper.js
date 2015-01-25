@@ -31,5 +31,9 @@ module.exports = {
         }
 
         return result;
+    },
+
+    OK: function() {
+        return this.toResult();
     }
 };

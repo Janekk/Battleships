@@ -1,89 +1,130 @@
 var Reflux = require('Reflux')
   , Actions = require('../actions')
-  , _ = require('lodash');
+  , _ = require('lodash')
+  , phase = require('../GameStates')
+  , gameEvents = require('../../game/gameEvents');
 
 var GameplayStore = Reflux.createStore({
   init() {
 
     this.socket = io();
-    this.game = {
-      config: {}
-    };
+    this.game = {};
 
-    this.listenTo(Actions.init.setConfig, this.setConfig);
-    this.listenTo(Actions.init.startGame, this.initSignIn);
-    this.listenTo(Actions.init.signIn, this.initSetup);
+    this.listenTo(Actions.init.showSignIn, this.initSignIn);
+    this.listenTo(Actions.init.signIn, this.initStoresOnSignIn);
+    this.listenTo(Actions.init.signIn, this.enterLobby);
     this.listenTo(Actions.game.shoot, this.takeShot);
+    this.listenTo(Actions.game.quit, this.quitGame);
+    this.listenTo(Actions.init.signOut, this.signOut);
 
+    this.socket.on('disconnect', () => {
+      this.game = {phase: phase.signIn};
+      this.trigger(this.game);
+    });
 
-    this.socket.on('room joined', (result) => {
+    this.socket.on('connect_error', this.updateConnectionStatus);
+    this.socket.on('connect_timeout', this.updateConnectionStatus);
+
+    this.socket.on(gameEvents.server.gameStarted, (result) => {
       if (result.isSuccessful) {
-        this.game.phase = 'room-joined';
+        this.game.phase = phase.setup;
+        this.game.opponent = result.opponent;
         this.trigger(this.game);
       }
     });
 
-    this.socket.on('ships placed', (result) => {
+    this.socket.on(gameEvents.server.shipsPlaced, (result) => {
       if (result.isSuccessful) {
-        this.game.phase = 'ready-to-shoot';
+        this.game.phase = phase.readyToShoot;
         this.trigger(this.game);
       }
     });
 
-    this.socket.on('activate player', (result) => {
+    this.socket.on(gameEvents.server.activatePlayer, (result) => {
       if (result.isSuccessful) {
-        this.game.phase = 'game-my-turn';
-        this.game.shot = undefined;
+        this.game.phase = phase.gameMyTurn;
+        this.game.shotUpdate = undefined;
         this.trigger(this.game);
       }
     });
 
-    this.socket.on('game over', (result) => {
-      this.game.phase = 'game-over';
+    this.socket.on(gameEvents.server.gameOver, (result) => {
+      this.game.phase = phase.gameOver;
       this.game.hasWon = result.hasWon;
       this.trigger(this.game);
     });
 
-    this.socket.on('player switched', (result) => {
+    this.socket.on(gameEvents.server.playerSwitched, (result) => {
       if (result.isSuccessful) {
-        this.game.phase = 'game-opponents-turn';
-        this.game.shot = undefined;
+        this.game.phase = phase.gameOpponentsTurn;
+        this.game.shotUpdate = undefined;
         this.trigger(this.game);
       }
     });
 
-    this.socket.on('player left', (result) => {
-      if (!result.isSuccessful) { // error
-        this.game.phase = 'player-left';
+    this.socket.on(gameEvents.server.playerLeft, (result) => {
+      if (result.isSuccessful) {
+        this.game.phase = phase.inLobby;
+        this.trigger(this.game);
+      }
+    });
+
+    this.socket.on(gameEvents.server.signOutStatus, (result) => {
+      if (result.isSuccessful) {
+        this.game = {phase: phase.signIn};
+        this.trigger(this.game);
+      }
+    });
+
+    this.socket.on(gameEvents.server.quitGameStatus, (result) => {
+      if (result.isSuccessful) {
+        this.game.phase = phase.inLobby;
         this.trigger(this.game);
       }
     });
   },
 
-  takeShot(cell) {
-    this.socket.emit('shoot', cell);
+  initStoresOnSignIn() {
+    require('./LobbyStore');
+    require('./ConfigStore');
   },
 
-  initSignIn() {
-    this.game.phase = 'sign-in';
+  quitGame() {
+    this.socket.emit(gameEvents.client.quitGame);
+  },
+
+  signOut() {
+    this.socket.emit(gameEvents.client.signOut);
+  },
+
+  updateConnectionStatus() {
+    this.game = {phase: phase.signIn};
     this.trigger(this.game);
   },
 
-  setConfig(config) {
-    this.game.config.boardSize = config.boardSize;
+  takeShot(cell) {
+    this.socket.emit(gameEvents.client.shoot, cell);
   },
 
-  initSetup(roomId) {
-    this.socket.on('game started', (result) => {
-      if (result.isSuccessful) {
-        this.game = {
-          phase: 'setup',
-          roomId: roomId
-        };
+  initSignIn() {
+    this.game = {phase: phase.signIn};
+    this.trigger(this.game);
+  },
+
+  enterLobby(userName) {
+
+    if(!(/^[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9]{3,16}$/).test(userName)) {
+      return Actions.common.error('UserID has to be between 4 and 16 characters long and cannot start with a number!');
+    }
+
+    this.socket.on(gameEvents.server.enterLobbyStatus, (result) => {
+      if(result.isSuccessful) {
+        this.game.phase = phase.inLobby;
+        this.game.user = result.user;
         this.trigger(this.game);
       }
     });
-    this.socket.emit('join room', roomId);
+    this.socket.emit(gameEvents.client.enterLobby, userName);
   }
 });
 

@@ -6,11 +6,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
 
 var app = express();
 var http = require('http').Server(app);
-var io = require('./socket-server')(http);
+var io = require('socket.io')(http);
+var LobbyService = require('./game/LobbyService');
+var Game = require('./game/BattleshipsService');
+
+var lobby = new LobbyService(io, Game);
+lobby.start();
 
 app.set('port', process.env.PORT || 3000);
 
@@ -28,7 +32,6 @@ app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -3,41 +3,63 @@ var _ = require('lodash');
 
 var Cell = React.createClass({
 
-  getInitialState() {
-    return {selected: false};
-  },
-
   render() {
+    var {props} = this;
     var rectProps = {
       className: 'cell',
       width: 10,
       height: 10,
-      x: this.props.x * 10,
-      y: this.props.y * 10
+      x: props.x * 10,
+      y: props.y * 10
     };
 
-    if(this.props.shot) {
-      var shot = this.props.shot;
+    if (props.shot) {
+      var shot = props.shot;
       var cx = React.addons.classSet;
       var classes = cx({
         'cell': true,
-        'shot': shot,
-        'hit': (shot && shot.isHit),
+        'shot': !!shot,
+        'update': this.props.update,
+        //'hit': (shot && shot.isHit),
         'adjacent': (shot && shot.isAdjacentToShip)
       });
 
-      return(<g className={classes}>
-        <rect onClick={this.props.onCellClick} {...rectProps} />
-        <line x1={rectProps.x} y1={rectProps.y} x2={rectProps.x + rectProps.width} y2={rectProps.y + rectProps.height} />
-        <line x1={rectProps.x} y1={rectProps.y + rectProps.height} x2={rectProps.x + rectProps.width} y2={rectProps.y} />
-      </g>);
+      return (
+        <g className={classes}>
+          <rect onClick={props.onCellClick} {...rectProps} />
+          <g>
+            <line x1={rectProps.x} y1={rectProps.y} x2={rectProps.x + rectProps.width} y2={rectProps.y + rectProps.height} />
+            <line x1={rectProps.x} y1={rectProps.y + rectProps.height} x2={rectProps.x + rectProps.width} y2={rectProps.y} />
+          </g>
+        </g>);
     }
 
     return (
-      <rect onClick={this.props.onCellClick} {...rectProps} />
+      <rect onClick={props.onCellClick} {...rectProps} />
     )
-
   }
 });
 
-module.exports = Cell;
+
+var Hit = React.createClass({
+
+  render() {
+    var {props} = this;
+    var rectProps = {
+      width: 10,
+      height: 10,
+      x: props.x * 10,
+      y: props.y * 10
+    };
+
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'hit': true,
+      'update': this.props.update
+    });
+
+    return (<rect className={classes} onClick={props.onCellClick} {...rectProps} />);
+  }
+});
+
+module.exports = {Cell, Hit};
