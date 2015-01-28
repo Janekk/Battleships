@@ -1,5 +1,6 @@
-var _ = require('lodash');
-var messageHelper = require('./messageHelper');
+var _ = require('lodash')
+  , messageHelper = require('./messageHelper')
+  , validator = require('./Validator');
 
 var Lobby = function () {
   var users = [];
@@ -25,6 +26,11 @@ var Lobby = function () {
   this.enterLobby = function (username, wasPlaying) {
     if (!username) {
       return messageHelper.toResult(new Error('User name is empty.'));
+    }
+
+    var validationError = validator.validateUserId(username);
+    if(validationError) {
+      return messageHelper.toResult(new Error(validationError));
     }
 
     var storedUser = _.find(users, {id: username});

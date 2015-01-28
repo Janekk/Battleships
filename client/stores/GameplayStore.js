@@ -2,7 +2,8 @@ var Reflux = require('Reflux')
   , Actions = require('../actions')
   , _ = require('lodash')
   , phase = require('../GameStates')
-  , gameEvents = require('../../game/gameEvents');
+  , gameEvents = require('../../game/gameEvents')
+  , validator = require('../../game/Validator');
 
 var GameplayStore = Reflux.createStore({
   init() {
@@ -112,9 +113,9 @@ var GameplayStore = Reflux.createStore({
   },
 
   enterLobby(userName) {
-
-    if(!(/^[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9]{3,16}$/).test(userName)) {
-      return Actions.common.error('UserID has to be between 4 and 16 characters long and cannot start with a number!');
+    var validationError = validator.validateUserId(userName);
+    if(validationError) {
+      return Actions.common.error(validationError);
     }
 
     this.socket.on(gameEvents.server.enterLobbyStatus, (result) => {
