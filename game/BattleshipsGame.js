@@ -45,10 +45,10 @@ var BattleshipsGame = function (emitter, userAId, userBId) {
     return {
       boardSize: 10,
       ships: [
-        //{name: 'Battleship', size: 4, count: 1},
-        //{name: 'Submarine', size: 3, count: 1},
-        {name: 'Cruiser', size: 2, count: 1},
-        {name: 'Destroyer', size: 1, count: 1}
+        {name: 'Battleship', size: 4, count: 1},
+        {name: 'Submarine', size: 3, count: 2},
+        {name: 'Cruiser', size: 2, count: 2},
+        {name: 'Destroyer', size: 1, count: 2}
       ]};
   };
 

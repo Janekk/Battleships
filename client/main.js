@@ -52,29 +52,27 @@ var Body = React.createClass({
     return (
       <div id="react-root" onClick={this.setNavPanelVisibility}>
 
-        <div id="fb-root"></div>
-        <script src="/scripts/fb-like.js"></script>
-
         <div id="header" className="hf">
         {state.app.signedIn ?
           <div id="nav-btn">
             <i className="fa fa-bars fa-2x" ref="navBtn" />
           </div> : null
-        }
+          }
         {state.app.signedIn ?
           <div className="user-id">
             <span>User: {state.app.userId}
             {state.app.opponentId ?
-              <span> | <span className="versus">vs.</span> {state.app.opponentId} </span>  : null}
+              <span> |
+                <span className="versus">vs.</span> {state.app.opponentId} </span> : null}
             </span>
           </div> : null
-        }
+          }
           <NavPanel ref="nav" show={state.showNav} {...state.app} />
         {!state.app.signedIn ?
           <div className="user-id">
             <span>Please sign in</span>
           </div> : null
-        }
+          }
         </div>
         <div id="main">
           <div id="game-header">
@@ -91,8 +89,14 @@ var Body = React.createClass({
           </div>
         </div>
         <div id="footer" className="hf">
-          <div className="content">Copyright © 2015
-            <a target="_blank" href="//janekk.github.io"> - Janekk</a>
+          <div className="social">
+            <div className="g-plus" data-action="share" data-annotation="none"></div>
+            <a href="https://twitter.com/share" className="twitter-share-button" data-count="none">Tweet</a>
+            <div className="fb-share-button" data-layout="button"></div>
+          </div>
+          <div className="content"> ©
+            <a target="_blank" href="//janekk.github.io">&nbsp;Janekk&nbsp;</a>
+            2015
           </div>
         </div>
         <ModalBox ref="modal"/>

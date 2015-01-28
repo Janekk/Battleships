@@ -67,20 +67,20 @@ html, body {
 }
 
 @-webkit-keyframes opacity-blink {
-  0%{
-    opacity:1;
+  0% {
+    opacity: 1;
   }
-  100%{
-    opacity:0;
+  100% {
+    opacity: 0;
   }
 }
 
 @keyframes opacity-blink {
-  0%{
-    opacity:1;
+  0% {
+    opacity: 1;
   }
-  100%{
-    opacity:0;
+  100% {
+    opacity: 0;
   }
 }
 
@@ -150,7 +150,6 @@ html, body {
 .tool-font {
   font-family: "Raleway", Arial, sans-serif;
   letter-spacing: initial;
-
 
   @media (max-width: @screen-xs-max) {
     font-size: 14px;
@@ -340,9 +339,31 @@ html, body {
     bottom: 0;
     width: 100%;
     height: @height-footer;
-    padding: 8px;
+    padding: 8px 4px;
     text-align: center;
-    div.content {
+
+    .content {
+      display: inline-block;
+      vertical-align: bottom;
+    }
+    .social {
+      display: inline-block;
+      font-size: 1px;
+
+      > div, > iframe {
+        margin: 0 5px;
+        vertical-align: top;
+      }
+    }
+
+    /* This gets Facebook to fall into place */
+    .social iframe {
+      vertical-align: middle;
+    }
+
+    /* Set an optional width for your button wrappers */
+    .social span {
+      display: inline-block;
     }
   }
 
@@ -366,30 +387,20 @@ html, body {
           font-family: army-rust;
         }
 
-        @media (min-width: @screen-sm-min) {
-          @media (max-aspect-ratio: 8/5) {
-            width: 60%;
-            h1 {
-              letter-spacing: 0.6vw;
-              font-size: 10vw;
-              line-height: 11vw;
-            }
-          }
-          @media (min-aspect-ratio: 8/5) {
-            width: 70%;
-            h1 {
-              letter-spacing: 0.4vw;
-              font-size: 8vw;
-              line-height: 9vw;
-            }
+        @media (max-aspect-ratio: 8/5) {
+          width: 60%;
+          h1 {
+            letter-spacing: 0.6vw;
+            font-size: 10vw;
+            line-height: 11vw;
           }
         }
-        @media (max-width: @screen-xs-max) {
-          width: 100%;
+        @media (min-aspect-ratio: 8/5) {
+          width: 70%;
           h1 {
-            letter-spacing: 1.5vw;
-            font-size: 13vw;
-            line-height: 14vw;
+            letter-spacing: 0.4vw;
+            font-size: 8vw;
+            line-height: 9vw;
           }
         }
       }
@@ -397,16 +408,12 @@ html, body {
       div.logo {
         display: inline-block;
         vertical-align: top;
-        @media (min-width: @screen-sm-min) {
-          @media (min-aspect-ratio: 8/5) {
-            width: 30%;
-          }
-          @media (max-aspect-ratio: 8/5) {
-            width: 40%;
-          }
+
+        @media (min-aspect-ratio: 8/5) {
+          width: 30%;
         }
-        @media (max-width: @screen-xs-max) {
-          display: none;
+        @media (max-aspect-ratio: 8/5) {
+          width: 40%;
         }
         img.logo {
           vertical-align: initial;
@@ -528,8 +535,8 @@ html, body {
           }
         }
 
-        @media (min-width: @screen-sm-min) {
-
+        @media (min-aspect-ratio: 1/1) {
+          width: 100%;
           .side {
             width: 30%;
             float: right;
@@ -544,21 +551,13 @@ html, body {
             width: 70%;
             float: left;
 
-            @media (min-aspect-ratio: 8/5) {
-              svg {
-                height: 65vh;
-              }
-            }
-
-            @media (max-aspect-ratio: 8/5) {
-              svg {
-                height: 80vh;
-              }
+            svg {
+              height: 65vh;
             }
           }
         }
 
-        @media (max-width: @screen-xs-max) {
+        @media (max-aspect-ratio: 1/1) {
           width: 100%;
 
           .board.setup {
@@ -596,7 +595,7 @@ html, body {
           padding: 5px;
         }
 
-        g.cell.shot.update g{
+        g.cell.shot.update g {
           .opacity-blink();
         }
 
@@ -623,111 +622,55 @@ html, body {
             }
           }
 
+          overflow-x: hidden;
           /* svg {height: } - to prevent IE sizing glitches from IE */
-          @media (max-width: @screen-xs-max) {
-            overflow-x: hidden;
-
-            .pb {
-              @media (min-aspect-ratio: 8/5) {
-                display: inline-block;
-                width: 50%;
-                svg {
-                  height: 45vw;
-                }
-
-                p.status {
-                  font-size: 8vw;
-                }
-              }
-
-              @media (max-aspect-ratio: 8/5) {
-                width: 100%;
-                svg {
-                  height: 95vw;
-                }
-
-                p.status {
-                  font-size: 8vw;
-                }
-              }
-
+          .pb {
+            @media (min-aspect-ratio: 1/1) {
+              display: inline-block;
+              width: 50%;
               svg {
-                height: 95vw;
+                height: 35vw;
               }
 
               p.status {
-                letter-spacing: 0.05em;
+                font-size: 4.5vw;
               }
             }
 
-            @media (max-aspect-ratio: 8/5) {
+            @media (max-aspect-ratio: 1/1) {
+              width: 100%;
+              transition: 1.0s all ease;
+              transition-delay: 1s;
 
-              .pb {
-                transition: 1.0s all ease;
-                transition-delay: 1s;
+              &.switched {
+                transition-delay: 0s;
+              }
 
-                &.switched {
-                  transition-delay: 0s;
-                }
-
-                &.me {
-                  float: right;
-                  margin-right: -102%;
-                  &.my-board-active {
-                    margin-right: 0%;
-                  }
-                }
-
-                &.opponent {
-                  float: left;
-                  margin-left: 0%;
-                  &.my-board-active {
-                    margin-left: -102%;
-                  }
+              &.me {
+                float: right;
+                margin-right: -102%;
+                &.my-board-active {
+                  margin-right: 0%;
                 }
               }
-            }
-            .board.play {
+
+              &.opponent {
+                float: left;
+                margin-left: 0%;
+                &.my-board-active {
+                  margin-left: -102%;
+                }
+              }
+
               svg {
+                height: 90vw;
                 width: 100%;
               }
-            }
-          }
 
-          @media (min-width: @screen-sm-min) {
-            p.status {
-              @media (min-aspect-ratio: 8/5) {
-                font-size: 3vw;
+              p.status {
+                font-size: 7vw;
+                letter-spacing: 0.05em;
               }
-              @media (max-aspect-ratio: 8/5) {
-                font-size: 4vw;
-              }
-              letter-spacing: 0.05em;
-            }
-
-            .pb {
-              @media (min-aspect-ratio: 8/5) {
-                width: 45%;
-                svg {
-                  height: 40vw;
-                }
-              }
-              @media (max-aspect-ratio: 8/5) {
-                width: 50%;
-                svg {
-                  height: 45vw;
-                }
-              }
-              display: inline-block;
-              padding: 0 10px 10px 10px;
-            }
-
-            .me {
-              float: right;
-            }
-
-            .opponent {
-              float: left;
             }
           }
         }
@@ -777,7 +720,7 @@ html, body {
       .switch-wrapper {
 
         #switch-board {
-          @media (min-width: @screen-sm-min), (min-aspect-ratio: 8/5) {
+          @media (min-aspect-ratio: 1/1) {
             display: none;
           }
 

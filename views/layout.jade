@@ -1,7 +1,29 @@
 doctype html
-html
+html(itemscope itemtype="http://schema.org/Product")
     head
         title= title
+        meta(name="keywords" content="battleship,online,html5,browser,game,javascript,reactJS,css,web,sockets")
+        meta(property="og:title" content="Battleships - online game")
+        meta(property="og:site_name" content="Battleships")
+        meta(property="fb:app_id" content="633605170101399")
+        meta(property="og:image" content="http://battleships.mobi/images/logo.png")
+        meta(property="og:image:type" content="image/png")
+        meta(property="og:image:width" content="1024")
+        meta(property="og:image:height" content="1024")
+        meta(property="og:url" content="http://battleships.mobi")
+        meta(name="description" content="Play the classic Battleships board game online in your browser!")
+        meta(property="og:description" content="Play the classic Battleships board game online in your browser!")
+
+        meta(itemprop="name" content="Battleships - online game")
+        meta(itemprop="description" content="Play the classic board game Battleships online in your browser!")
+        meta(itemprop="image" content="http://battleships.mobi/images/logo.png")
+
+        meta(name="twitter:card" content="summary")
+        meta(name="twitter:url" content="http://battleships.mobi")
+        meta(name="twitter:title" content="Battleships - online game")
+        meta(name="twitter:description" content="Play the classic board game Battleships online in your browser!")
+        meta(name="twitter:image" content="http://battleships.mobi/images/logo.png")
+
         link(rel='stylesheet', href='/stylesheets/style.css')
         script(src='/socket.io/socket.io.js')
         meta(name="viewport" content="initial-scale=1, maximum-scale=1")
