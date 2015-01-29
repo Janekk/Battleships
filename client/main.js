@@ -2,18 +2,14 @@ var React = require('react')
   , Reflux = require('reflux')
   , Game = require('./Game')
   , Actions = require('./actions')
-  , AppStore = require('./stores/UserStore');
+  , AppStore = require('./stores/UserStore')
+  , utils = require('./utils')
 
 var ReactToastr = require('react-toastr');
 var {ToastContainer} = ReactToastr;
 var NavPanel = require('./NavPanel');
 var ToastMessageFactory = React.createFactory(ReactToastr.ToastMessage.animation);
 var ModalBox = require('./ModalBox');
-
-function childOf(c, p) {
-  while ((c = c.parentNode) && c !== p);
-  return !!c
-};
 
 
 var Body = React.createClass({
@@ -39,7 +35,7 @@ var Body = React.createClass({
       this.setState({showNav: !state.showNav});
     }
     else {
-      var isOutsideNav = !(e.target == refs.nav.getDOMNode()) && !childOf(e.target, refs.nav.getDOMNode());
+      var isOutsideNav = !(e.target == refs.nav.getDOMNode()) && !utils.isElementChildOf(e.target, refs.nav.getDOMNode());
 
       if (isOutsideNav) {
         this.setState({showNav: false});

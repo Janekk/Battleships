@@ -1,9 +1,5 @@
-var React = require('react');
-
-function childOf(c, p) {
-  while ((c = c.parentNode) && c !== p);
-  return !!c
-};
+var React = require('react')
+  , utils = require('./utils');
 
 var ModalBox = React.createClass({
 
@@ -49,7 +45,7 @@ var ModalBox = React.createClass({
   },
 
   onOverlayClick(e) {
-    if(!childOf(e.target, this.refs.box.getDOMNode())) {
+    if(!utils.isElementChildOf(e.target, this.refs.box.getDOMNode())) {
       this.decline();
     }
   },
