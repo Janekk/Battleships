@@ -1,4 +1,5 @@
 var Reflux = require('Reflux')
+  , socket = require('../socket')
   , _ = require('lodash')
   , gameEvents = require('../../game/gameEvents')
   , phase = require('../gameStates')
@@ -14,10 +15,10 @@ var GameEventsStore = Reflux.createStore({
     this.listenTo(InvitationStore, this.handleInvitationEvent);
     this.listenTo(AppStore, this.setUser)
 
-    var socket = io();
-
-    socket.on('disconnect', () => {
-      this.handleErrorResult({error: 'You\'ve been disconnected from the server!'})
+    socket.on('disconnect', (status) => {
+      if(status != 'forced close') {
+        this.handleErrorResult({error: 'You\'ve been disconnected from the server!'});
+      }
     });
 
     socket.on(gameEvents.server.enterLobbyStatus, (result) => {

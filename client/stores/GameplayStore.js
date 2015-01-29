@@ -1,4 +1,5 @@
 var Reflux = require('Reflux')
+  , socket = require('../socket')
   , Actions = require('../actions')
   , _ = require('lodash')
   , phase = require('../GameStates')
@@ -8,7 +9,6 @@ var Reflux = require('Reflux')
 var GameplayStore = Reflux.createStore({
   init() {
 
-    this.socket = io();
     this.game = {};
 
     this.listenTo(Actions.init.showSignIn, this.initSignIn);
@@ -18,15 +18,15 @@ var GameplayStore = Reflux.createStore({
     this.listenTo(Actions.game.quit, this.quitGame);
     this.listenTo(Actions.init.signOut, this.signOut);
 
-    this.socket.on('disconnect', () => {
+    socket.on('disconnect', () => {
       this.game = {phase: phase.signIn};
       this.trigger(this.game);
     });
 
-    this.socket.on('connect_error', this.updateConnectionStatus);
-    this.socket.on('connect_timeout', this.updateConnectionStatus);
+    socket.on('connect_error', this.updateConnectionStatus);
+    socket.on('connect_timeout', this.updateConnectionStatus);
 
-    this.socket.on(gameEvents.server.gameStarted, (result) => {
+    socket.on(gameEvents.server.gameStarted, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.setup;
         this.game.opponent = result.opponent;
@@ -34,14 +34,14 @@ var GameplayStore = Reflux.createStore({
       }
     });
 
-    this.socket.on(gameEvents.server.shipsPlaced, (result) => {
+    socket.on(gameEvents.server.shipsPlaced, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.readyToShoot;
         this.trigger(this.game);
       }
     });
 
-    this.socket.on(gameEvents.server.activatePlayer, (result) => {
+    socket.on(gameEvents.server.activatePlayer, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.gameMyTurn;
         this.game.shotUpdate = undefined;
@@ -49,13 +49,13 @@ var GameplayStore = Reflux.createStore({
       }
     });
 
-    this.socket.on(gameEvents.server.gameOver, (result) => {
+    socket.on(gameEvents.server.gameOver, (result) => {
       this.game.phase = phase.gameOver;
       this.game.hasWon = result.hasWon;
       this.trigger(this.game);
     });
 
-    this.socket.on(gameEvents.server.playerSwitched, (result) => {
+    socket.on(gameEvents.server.playerSwitched, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.gameOpponentsTurn;
         this.game.shotUpdate = undefined;
@@ -63,21 +63,27 @@ var GameplayStore = Reflux.createStore({
       }
     });
 
-    this.socket.on(gameEvents.server.playerLeft, (result) => {
+    socket.on(gameEvents.server.playerLeft, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.inLobby;
         this.trigger(this.game);
       }
     });
 
-    this.socket.on(gameEvents.server.signOutStatus, (result) => {
+    socket.on(gameEvents.server.signOutStatus, (result) => {
       if (result.isSuccessful) {
         this.game = {phase: phase.signIn};
+
+
+        if(socket) {
+          socket.io.close();
+        }
+
         this.trigger(this.game);
       }
     });
 
-    this.socket.on(gameEvents.server.quitGameStatus, (result) => {
+    socket.on(gameEvents.server.quitGameStatus, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.inLobby;
         this.trigger(this.game);
@@ -91,11 +97,11 @@ var GameplayStore = Reflux.createStore({
   },
 
   quitGame() {
-    this.socket.emit(gameEvents.client.quitGame);
+    socket.emit(gameEvents.client.quitGame);
   },
 
   signOut() {
-    this.socket.emit(gameEvents.client.signOut);
+    socket.emit(gameEvents.client.signOut);
   },
 
   updateConnectionStatus() {
@@ -104,7 +110,7 @@ var GameplayStore = Reflux.createStore({
   },
 
   takeShot(cell) {
-    this.socket.emit(gameEvents.client.shoot, cell);
+    socket.emit(gameEvents.client.shoot, cell);
   },
 
   initSignIn() {
@@ -118,14 +124,16 @@ var GameplayStore = Reflux.createStore({
       return Actions.common.error(validationError);
     }
 
-    this.socket.on(gameEvents.server.enterLobbyStatus, (result) => {
+    socket.connect();
+
+    socket.on(gameEvents.server.enterLobbyStatus, (result) => {
       if(result.isSuccessful) {
         this.game.phase = phase.inLobby;
         this.game.user = result.user;
         this.trigger(this.game);
       }
     });
-    this.socket.emit(gameEvents.client.enterLobby, userName);
+    socket.emit(gameEvents.client.enterLobby, userName);
   }
 });
 

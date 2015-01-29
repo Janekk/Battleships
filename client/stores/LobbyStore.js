@@ -1,4 +1,5 @@
 var Reflux = require('Reflux')
+  , socket = require('../socket')
   , Actions = require('../actions')
   , _ = require('lodash')
   , gameEvents = require('../../game/gameEvents')
@@ -30,9 +31,7 @@ var LobbyStore = Reflux.createStore({
     this.listenTo(GameplayStore, this.resetOnSignIn);
     this.listenTo(AppStore, this.setUser);
 
-    this.socket = io();
-
-    this.socket.on(gameEvents.server.lobbyUpdate, (update) => {
+    socket.on(gameEvents.server.lobbyUpdate, (update) => {
       var {state} = this;
       update.users.forEach((user) => {
         user.hasInvited = !!_.find(update.invitations, {from: user.id, to: state.userId});
@@ -43,14 +42,14 @@ var LobbyStore = Reflux.createStore({
       this.trigger(state);
     });
 
-    this.socket.on(gameEvents.server.invitationForward, (data) => {
+    socket.on(gameEvents.server.invitationForward, (data) => {
       var {state} = this;
       var invitingUser = _.find(state.users, {id: data.invitation.from});
       invitingUser.hasInvited = true;
       this.trigger(state);
     });
 
-    this.socket.on(gameEvents.server.invitationRequestStatus, (status) => {
+    socket.on(gameEvents.server.invitationRequestStatus, (status) => {
       if (status.isSuccessful) {
         var {state} = this;
         var invitedUser = _.find(state.users, {id: status.invitation.to});

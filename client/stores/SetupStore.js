@@ -1,4 +1,5 @@
 var Reflux = require('Reflux')
+  , socket = require('../socket')
   , Actions = require('../actions')
   , _ = require('lodash')
   , BoardUtils = require('../Board/BoardUtils')
@@ -157,7 +158,6 @@ var SetupStore = Reflux.createStore({
     };
 
     if (allPlaced()) {
-      var socket = io();
       var toSend = state.ships.map((ship) => {
         return ship;
       });

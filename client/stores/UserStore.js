@@ -1,4 +1,5 @@
 var Reflux = require('Reflux')
+  , socket = require('../socket')
   , _ = require('lodash')
   , phase = require('../GameStates')
   , Actions = require('../actions')
@@ -7,8 +8,6 @@ var Reflux = require('Reflux')
 
 var UserStore = Reflux.createStore({
   init() {
-
-    this.socket = io();
 
     this.state = {
       signedIn: false,

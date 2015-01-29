@@ -1,6 +1,22 @@
+
+(function initSocket() {
+  var socket = require('./socket'); //init and cache socket instance
+  socket.io.close();
+
+  var GameplayStore = require('./stores/GameplayStore');
+
+  GameplayStore.listen(function(game) {
+    if(game.phase == phase.signIn) {
+      //close socket when not signed-in
+      socket.io.close();
+    };
+  });
+})();
+
 var React = require('react')
   , Reflux = require('reflux')
   , Game = require('./Game')
+  , phase = require('./GameStates')
   , Actions = require('./actions')
   , AppStore = require('./stores/UserStore')
   , utils = require('./utils')
@@ -10,7 +26,6 @@ var {ToastContainer} = ReactToastr;
 var NavPanel = require('./NavPanel');
 var ToastMessageFactory = React.createFactory(ReactToastr.ToastMessage.animation);
 var ModalBox = require('./ModalBox');
-
 
 var Body = React.createClass({
   mixins: [Reflux.listenTo(AppStore, 'onAppStateChange')],

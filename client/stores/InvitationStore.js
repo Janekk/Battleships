@@ -1,4 +1,5 @@
  var Reflux = require('Reflux')
+  , socket = require('../socket')
   , Actions = require('../actions')
   , _ = require('lodash')
   , gameEvents = require('../../game/gameEvents');
@@ -6,12 +7,11 @@
 var InvitationStore = Reflux.createStore({
 
   init() {
-    this.socket = io();
-    this.socket.on(gameEvents.server.invitationRequestStatus, (result) => {
+    socket.on(gameEvents.server.invitationRequestStatus, (result) => {
       this.handleErrorResult(result);
     });
 
-    this.socket.on(gameEvents.server.invitationForward, (result) => {
+    socket.on(gameEvents.server.invitationForward, (result) => {
       if (!this.handleErrorResult(result)) {
         this.trigger({
           type: 'info',
@@ -21,7 +21,7 @@ var InvitationStore = Reflux.createStore({
       }
     });
 
-    this.socket.on(gameEvents.server.invitationResponse, (result) => {
+    socket.on(gameEvents.server.invitationResponse, (result) => {
       if (!this.handleErrorResult(result)) {
         this.trigger({
           type: result.accepted ? 'success' : 'info',
@@ -47,12 +47,12 @@ var InvitationStore = Reflux.createStore({
   },
 
   inviteUser(userId) {
-    this.socket.emit(gameEvents.client.invitationRequest, userId);
+    socket.emit(gameEvents.client.invitationRequest, userId);
   },
 
   acceptInvitation(accepted, receiverId, senderId) {
     var response = {accepted: accepted, invitation: {from: senderId, to: receiverId}};
-    this.socket.emit(gameEvents.client.invitationResponse, response);
+    socket.emit(gameEvents.client.invitationResponse, response);
   }
 });
 
