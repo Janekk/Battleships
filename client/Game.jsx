@@ -61,7 +61,7 @@ var SetupPanel = React.createClass({
         {this.state.setup.config ?
           <div>
             <div className="command">
-              Place ships on the gameboard by selecting a ship and clicking on a target field. Double-click to pivot the ship.
+              Place ships on the gameboard by selecting a ship and clicking on a target field. Double-click to pivot the ship. Ships can't be adjacent to each other!
             </div>
             <div className="side">
               <div className="confirm">
