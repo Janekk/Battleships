@@ -25,13 +25,10 @@ var SetupBoard = React.createClass({
 
   render() {
     var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', coords = [];
-    var selected, {setup} = this.props;
+    var selectedId, {setup} = this.props;
     if (setup.selected) {
       if (setup.selected.type == 'board') {
-        selected = setup.selected.item;
-      }
-      else {
-        selected = null;
+        selectedId = setup.selected.item.id;
       }
     }
 
@@ -56,11 +53,11 @@ var SetupBoard = React.createClass({
       };
     };
 
-    var ships = setup.ships.map((ship, index) => {
+    var ships = setup.ships.map((ship) => {
       var shipProps = {
-        key: index,
+        key: ship.id,
         ship: ship,
-        selected: (selected == ship),
+        selected: (selectedId == ship.id),
         onShipClick: this.handleShipClick.bind(this, ship),
         onShipDoubleClick: this.pivotShip.bind(this, ship)
       }

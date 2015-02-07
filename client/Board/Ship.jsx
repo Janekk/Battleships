@@ -1,7 +1,13 @@
-var React = require('react/addons');
-var _ = require('lodash');
+var React = require('react/addons')
+  , _ = require('lodash')
+  , utils = require('../utils');
 
 var Ship = React.createClass({
+
+  componentDidMount() {
+    utils.addDoubleTapEvent(this.getDOMNode());
+  },
+
   render() {
     var cells = [];
     this.props.ship.cells.forEach((cell) => {
@@ -23,10 +29,11 @@ var Ship = React.createClass({
     });
 
     return (
-      <g className={classes} onClick={this.props.onShipClick} onDoubleClick={this.props.onShipDoubleClick}>
+      <g className={classes} onClick={this.props.onShipClick} onDoubleClick={this.props.onShipDoubleClick} >
         {cells}
       </g>
     )
   }
 });
+
 module.exports = Ship;

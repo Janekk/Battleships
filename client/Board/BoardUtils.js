@@ -91,12 +91,12 @@ var BoardUtils = {
     return result;
   },
 
-  getDroppedCellsForShip(cell, ship) {
-    var topLeft = this.getTopLeftShipCell(ship.cells);
+  getDroppedCellsForShip(cell, originalCells) {
+    var topLeft = this.getTopLeftShipCell(originalCells);
     var deltaX = cell.x - topLeft.x;
     var deltaY = cell.y - topLeft.y;
 
-    return ship.cells.map((cell)  => { return { x: cell.x + deltaX, y: cell.y + deltaY }
+    return originalCells.map((cell)  => { return { x: cell.x + deltaX, y: cell.y + deltaY }
     });
   }
 }

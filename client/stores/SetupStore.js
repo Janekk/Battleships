@@ -66,15 +66,15 @@ var SetupStore = Reflux.createStore({
     if (current != ship) {
       this.state.selected = {
         type: 'board',
-        item: ship
+        item: {id: ship.id}
       };
       this.trigger(this.state);
     }
   },
 
   tryPivot() {
-    var {state} = this;
-    var ship = state.selected.item;
+    var {state} = this, {selected} = state;
+    var ship = _.find(state.ships, {id: selected.item.id});
 
     if (ship.cells.length > 1) {
 
@@ -101,11 +101,11 @@ var SetupStore = Reflux.createStore({
       }
 
       if (pivoted && this.utils.canBeDropped(pivoted, ship.id, state.ships)) {
-        state.selected = {
-          type: 'board',
-          item: {ship: {id: state.selected.item.id, cells: pivoted}, old: state.selected.item}
-        };
-        this.dropShip(state.selected);
+        //state.selected = {
+        //  type: 'board',
+        //  item: {ship: {id: state.selected.item.id, cells: pivoted}, old: state.selected.item}
+        //};
+        this.dropShip(pivoted, ship.id);
         state.selected = null;
         this.trigger(state);
       }
@@ -134,13 +134,10 @@ var SetupStore = Reflux.createStore({
         }
       }
       else if (selected.type == 'board') {
-        var cells = this.utils.getDroppedCellsForShip(cell, selected.item);
+        var ship = _.find(state.ships, {id: selected.item.id})
+        var cells = this.utils.getDroppedCellsForShip(cell, ship.cells);
         if (this.utils.canBeDropped(cells, selected.item.id, ships)) {
-          state.selected = {
-            type: selected.type,
-            item: {ship: {id: selected.item.id, cells: cells}, old: selected.item}
-          };
-          this.dropShip(state.selected);
+          this.dropShip(cells, ship.id);
           state.selected = null;
         }
       }
@@ -165,18 +162,20 @@ var SetupStore = Reflux.createStore({
     }
   },
 
-  dropShip(selected) {
+  dropShip(selected, id) {
     var {state} = this;
     var dropped;
-    if (selected.type == 'config') {
-      dropped = getNamedShip({cells: selected.item});
-      state.ships.push(dropped);
-    }
-    else {
-      var index = state.ships.indexOf(selected.item.old);
-      state.ships.splice(index, 1);
-      dropped = getNamedShip(selected.item.ship);
-      state.ships.push(dropped);
+    switch(selected.type){
+      case 'config':
+        dropped = getNamedShip({cells: selected.item});
+        state.ships.push(dropped);
+        break;
+      case 'board':
+      default:
+        _.remove(state.ships, {id: id});
+        dropped = {id: id, cells: selected};
+        state.ships.push(dropped);
+        break;
     }
   }
 });
