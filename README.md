@@ -1,4 +1,4 @@
-![alt battleship logo](http://battleships.mobi/images/Battleship.png)
+![alt battleship logo](https://github.com/Janekk/Janekk.github.io/blob/master/assets/posts/battleships_banner.png)
 
 Battleships
 ===========
