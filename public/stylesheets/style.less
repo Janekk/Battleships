@@ -339,7 +339,7 @@ html, body {
     bottom: 0;
     width: 100%;
     height: @height-footer;
-    padding: 8px 4px;
+    padding: 8px 1px;
     text-align: center;
 
     .content {
@@ -462,6 +462,13 @@ html, body {
           padding: 10px 0;
         }
 
+        .single-player {
+          margin: 1em 0;
+          button {
+            margin-left: 0.5em;
+          }
+        }
+
         .content {
           -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
           box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
@@ -528,6 +535,7 @@ html, body {
         .confirm {
           button {
             float: right;
+            padding: 1em 0.5em;
             &:enabled {
               color: #fff;
               background: @color-alt;
@@ -627,9 +635,33 @@ html, body {
           .pb {
             @media (min-aspect-ratio: 1/1) {
               display: inline-block;
-              width: 50%;
+              &.opponent {
+                width: 43%;
+              }
+
+              &.me {
+                width: 43%;
+                float: right;
+              }
+
               svg {
-                height: 35vw;
+                height: 36vw;
+              }
+
+              @media(max-width: @screen-md-min) {
+
+                &.opponent {
+                  width: 49%;
+                }
+
+                &.me {
+                  width: 49%;
+                  float: right;
+                }
+
+                svg {
+                  height: 46vw;
+                }
               }
 
               p.status {
@@ -932,7 +964,7 @@ html, body {
     .tool-font();
     font-weight: 700;
     width: 40%;
-    min-width: 300px;
+    min-width: 250px;
     min-height: 100px;
     margin: 100px auto;
     background-color: #fff;

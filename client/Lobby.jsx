@@ -24,7 +24,7 @@ var Lobby = React.createClass({
     this.setState(update);
   },
 
-  handleInvitationClick: function (user) {
+  handleInvitationClick(user) {
     var {state} = this;
     if (user.hasInvited) {
       Actions.init.acceptInvitation(true, state.userId, user.id);
@@ -32,6 +32,10 @@ var Lobby = React.createClass({
     else {
       Actions.init.inviteUser(user.id);
     }
+  },
+
+  onSinglePlay() {
+    Actions.init.playSingle(this.state.userId);
   },
 
   render() {
@@ -49,6 +53,12 @@ var Lobby = React.createClass({
             <p>Invite other users or accept an invitation to start playing!</p>
           </div>
 
+          <div className="single-player">You can also play in
+            <button className="btn btn-primary" onClick={this.onSinglePlay}>
+              Single Player Mode
+            </button>
+          </div>
+
           <div className="content">
             <div className="header">Signed-in users:</div>
             <div className="user-list">
@@ -62,6 +72,11 @@ var Lobby = React.createClass({
         <div className="no-user">
           <p>There are currently no other users in the lobby.</p>
           <p>Please wait or invite a friend!</p>
+          <div className="single-player">You can also play in
+            <button className="btn btn-primary" onClick={this.onSinglePlay}>
+            Single Player Mode
+          </button>
+          </div>
         </div>
         }
       </div>

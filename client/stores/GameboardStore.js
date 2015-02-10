@@ -4,7 +4,7 @@ var Reflux = require('Reflux')
   , _ = require('lodash')
   , GameplayStore = require('./GameplayStore')
   , SetupStore = require('./SetupStore')
-  , BoardUtils = require('../Board/BoardUtils')
+  , BoardUtils = require('../../game/BoardUtils')
   , phase = require('../GameStates')
   , gameEvents = require('../../game/gameEvents');
 

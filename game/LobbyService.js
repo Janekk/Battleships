@@ -4,7 +4,7 @@ var _ = require('lodash')
   , Lobby = require('./Lobby')
   , EventEmitter = require('events').EventEmitter;
 
-module.exports = function (io, Game) {
+module.exports = function (io, gameService) {
 
   var _lobby = new Lobby();
   var _games = [];
@@ -78,6 +78,10 @@ module.exports = function (io, Game) {
         this.onInvitationResponse(socket, response);
       }.bind(this));
 
+      socket.on(gameEvents.client.playSingle, function () {
+        this.onPlaySingle(socket);
+      }.bind(this));
+
       socket.on(gameEvents.client.quitGame, function () {
         this.onQuit(socket);
       }.bind(this));
@@ -112,10 +116,21 @@ module.exports = function (io, Game) {
 
       setTimeout(function () {
         var emitter = new EventEmitter();
-        _startGame(Game).with(emitter, [socket, otherSocket]);
-        emitter.on('game over', this.onGameOver);
+        _startGame(gameService).with(emitter, [socket, otherSocket]);
+        emitter.on(gameEvents.server.gameOver, this.onGameOver);
       }.bind(this), 1000);
     }
+  };
+
+  this.onPlaySingle = function (socket) {
+    _leaveLobby(socket, true);
+
+    io.to('lobby').emit(gameEvents.server.lobbyUpdate, _lobby.getLobbyState());
+    setTimeout(function () {
+      var emitter = new EventEmitter();
+      _startGame(gameService).with(emitter, [socket]);
+      emitter.on(gameEvents.server.gameOver, this.onGameOver);
+    }.bind(this), 1000);
   };
 
   this.onQuit = function (socket) {
@@ -154,7 +169,8 @@ module.exports = function (io, Game) {
 
     if (!disconnect) {
       socket.emit(gameEvents.server.signOutStatus, messageHelper.OK());
-    };
+    }
+    ;
     io.to('lobby').emit(gameEvents.server.lobbyUpdate, _lobby.getLobbyState());
   }
 
@@ -165,13 +181,16 @@ module.exports = function (io, Game) {
     items.forEach(function (item) {
 
       var socket = _findUserSocket(item.userId);
-      var payload = item.payload;
+      if(socket) {
+        var payload = item.payload;
 
-      socket.emit(gameEvents.server.gameOver, messageHelper.toResult(payload));
+        socket.emit(gameEvents.server.gameOver, messageHelper.toResult(payload));
 
-      _lobby.enterLobby(socket.username, true);
-      socket.join('lobby');
+        _lobby.enterLobby(socket.username, true);
+        socket.join('lobby');
+      }
     });
     io.to('lobby').emit(gameEvents.server.lobbyUpdate, _lobby.getLobbyState());
   }
-};
+}
+;

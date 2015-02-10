@@ -1,8 +1,8 @@
 var _ = require('lodash')
-  , messageHelper = require('./messageHelper')
-  , gameEvents = require('./gameEvents')
-  , Ship = require('./models/ship')
-  , Position = require('./models/position');
+  , messageHelper = require('./../messageHelper')
+  , gameEvents = require('./../gameEvents')
+  , Ship = require('./../models/ship')
+  , Position = require('./../models/position');
 
 var GameUser = function (userId) {
   this.id = userId;
@@ -45,10 +45,11 @@ var BattleshipsGame = function (emitter, userAId, userBId) {
     return {
       boardSize: 10,
       ships: [
-        {name: 'Battleship', size: 4, count: 1},
-        {name: 'Submarine', size: 3, count: 2},
-        {name: 'Cruiser', size: 2, count: 2},
-        {name: 'Destroyer', size: 1, count: 2}
+        {name: 'Battleship', size: 5, count: 1},
+        {name: 'Submarine', size: 4, count: 1},
+        {name: 'Cruiser', size: 3, count: 2},
+        {name: 'Destroyer', size: 2, count: 2},
+        {name: 'Patrol boat', size: 1, count: 2}
       ]};
   };
 
@@ -68,8 +69,8 @@ var BattleshipsGame = function (emitter, userAId, userBId) {
     // transform ships
     ships.forEach(function (ship) {
       var positions = [];
-      ship.cells.forEach(function (ship) {
-        positions.push(new Position(ship.x, ship.y));
+      ship.cells.forEach(function (cell) {
+        positions.push(new Position(cell.x, cell.y));
       });
 
       this.sender.ships.push(new Ship(ship.id, positions));
@@ -139,7 +140,7 @@ var BattleshipsGame = function (emitter, userAId, userBId) {
     this.sender.shoots.push(position);
 
     var result = this._checkForHit(this.opponent, position);
-    this._sendToSender(gameEvents.server.shotUpdate, _.merge(result, {me: true}));
+    this._sendToSender(gameEvents.server.shotUpdate, _.chain(result).merge({me: true}).omit(!result.shipWasDestroyed ? 'ship': '').value());
     this._sendToOpponent(gameEvents.server.shotUpdate, _.merge(result, {me: false}));
 
     var iLost = (this.sender.intactShipsCount <= 0);
@@ -147,7 +148,7 @@ var BattleshipsGame = function (emitter, userAId, userBId) {
     var gameOver = iLost || opponentLost;
     if (gameOver) {
       setTimeout(function () {
-        emitter.emit('game over',[
+        emitter.emit(gameEvents.server.gameOver,[
           {userId: this.sender.id, payload: {hasWon: !iLost}},
           {userId: this.opponent.id, payload: {hasWon: !opponentLost}}
           ]);

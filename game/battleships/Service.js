@@ -1,13 +1,19 @@
-var messageHelper = require('./messageHelper')
+var messageHelper = require('./../messageHelper')
   , _ = require('lodash')
-  , gameEvents = require('./gameEvents')
-  , BattleshipsGame = require('./BattleshipsGame')
+  , gameEvents = require('./../gameEvents')
+  , Game = require('./Game')
   , EventEmitter = require('events').EventEmitter;
 
 function BattleshipsService(emitter, sockets) {
-  if (sockets.length != 2) {
-    throw new Error('Expected an array containing two sockets!');
+  if (sockets.length > 2) {
+    throw new Error('Too many socket joined the game!');
   }
+
+  if (sockets.length <= 0) {
+    throw new Error('At least one socket must join the game!');
+  }
+
+  var singleMode = (sockets.length == 1);
 
   var clientEvents = [
     gameEvents.client.placeShips,
@@ -16,10 +22,7 @@ function BattleshipsService(emitter, sockets) {
 
   sockets.forEach(function (socket) {
     emitter.on(socket.username, function (event, data) {
-      if(event == 'game over') {
-
-      }
-      else {
+      if(event != gameEvents.server.gameOver) {
         socket.emit(event, data);
       }
     });
@@ -31,7 +34,16 @@ function BattleshipsService(emitter, sockets) {
     });
   });
 
-  var game = new BattleshipsGame(emitter, sockets[0].username, sockets[1].username);
+  var game;
+  if(singleMode) {
+    var opponentName = 'Computer';
+    var opponent = new (require('../../game/battleships/Opponent'))();
+    opponent.bindEvents(opponentName, emitter);
+    game = new Game(emitter, sockets[0].username, opponentName);
+  }
+  else {
+    game = new Game(emitter, sockets[0].username, sockets[1].username);
+  }
 
   this.start = function () {
     game.start();

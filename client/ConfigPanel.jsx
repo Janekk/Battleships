@@ -31,7 +31,7 @@ var ConfigPanel = React.createClass({
       components.push(<ConfigurationShip config={cfg} index={index} key={cfg.size} selected={cfg.size == selectedSize} count={cfg.count} onClick={handleClick}/>);
     });
 
-    var svgViewbox = [0, 0,100, (config.length * 10) +  10];
+    var svgViewbox = [0, 0, 120, (config.length * 10) +  10];
     return (
       <div className="ships-panel">
         <svg width="100%" height="100%" viewBox={svgViewbox.join(' ')}>
@@ -46,7 +46,7 @@ var ConfigurationShip = React.createClass({
 
   render() {
     var props = {
-      x: (4 - this.props.config.size) * 10,
+      x: (5 - this.props.config.size) * 10,
       y: this.props.index * 12,
       width: this.props.config.size * 10,
       height: 10

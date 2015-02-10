@@ -3,6 +3,7 @@ var gameEvents = {
     enterLobby: 'enter lobby',
     invitationRequest: 'invitation request',
     invitationResponse: 'invitation response',
+    playSingle: 'play single',
     placeShips: 'place ships',
     shoot: 'shoot',
     quitGame: 'quit game',

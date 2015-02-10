@@ -19,7 +19,7 @@ var React = require('react')
   , phase = require('./GameStates')
   , Actions = require('./actions')
   , AppStore = require('./stores/UserStore')
-  , utils = require('./utils')
+  , utils = require('./utils');
 
 var ReactToastr = require('react-toastr');
 var {ToastContainer} = ReactToastr;
@@ -73,8 +73,8 @@ var Body = React.createClass({
           <div className="user-id">
             <span>User: {state.app.userId}
             {state.app.opponentId ?
-              <span> |
-                <span className="versus">vs.</span> {state.app.opponentId} </span> : null}
+              <span>
+                <span className="versus"> vs.</span> {state.app.opponentId} </span> : null}
             </span>
           </div> : null
           }

@@ -7,6 +7,7 @@ var actions = {
   init: {
     showSignIn: Reflux.createAction(),
     signIn: Reflux.createAction(),
+    playSingle: Reflux.createAction(),
     inviteUser: Reflux.createAction(),
     acceptInvitation: Reflux.createAction(),
     signOut: Reflux.createAction()
