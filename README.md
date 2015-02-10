@@ -3,7 +3,6 @@
 Battleships
 ===========
 
-## Description ##
 Battleships is a remake of the classic pen and pencil game brought to your browser. Game is round-based and can be played in single- or two-player mode. It was originally created to learn and explore a few libraries and technologies, some of which are: [ReactJS](https://github.com/facebook/react), Flux architecture (with [RefluxJS](https://github.com/spoike/refluxjs)), SVG, RWD, [sockets.io](https://github.com/Automattic/socket.io), Node.js.
 
 ### Features ###
