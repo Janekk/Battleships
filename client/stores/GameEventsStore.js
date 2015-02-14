@@ -2,16 +2,16 @@ var Reflux = require('Reflux')
   , socket = require('../socket')
   , _ = require('lodash')
   , gameEvents = require('../../game/gameEvents')
-  , phase = require('../gameStates')
+  , phase = require('../gamePhase')
   , Actions = require('../actions')
-  , GameplayStore = require('./GameplayStore')
+  , GamePhaseStore = require('./GamePhaseStore')
   , InvitationStore = require('./InvitationStore')
   , AppStore = require('./UserStore');
 
 var GameEventsStore = Reflux.createStore({
   init() {
 
-    this.listenTo(GameplayStore, this.setGamePhase);
+    this.listenTo(GamePhaseStore, this.setGamePhase);
     this.listenTo(InvitationStore, this.handleInvitationEvent);
     this.listenTo(AppStore, this.setUser)
 

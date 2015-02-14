@@ -1,9 +1,9 @@
 var Reflux = require('Reflux')
   , socket = require('../socket')
   , _ = require('lodash')
-  , phase = require('../GameStates')
+  , phase = require('../gamePhase')
   , Actions = require('../actions')
-  , GameplayStore = require('./GameplayStore')
+  , GamePhaseStore = require('./GamePhaseStore')
   , gameEvents = require('../../game/gameEvents');
 
 var UserStore = Reflux.createStore({
@@ -16,7 +16,7 @@ var UserStore = Reflux.createStore({
       opponentId: null
     };
 
-    this.listenTo(GameplayStore, this.setState);
+    this.listenTo(GamePhaseStore, this.setState);
   },
 
   setState(game) {

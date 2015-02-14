@@ -1,4 +1,4 @@
-var gameStates = {
+var gamePhase = {
   signIn: 0,
   inLobby: 10,
   setup: 20,
@@ -8,4 +8,4 @@ var gameStates = {
   gameOver: 80
 };
 
-module.exports = gameStates;
+module.exports = gamePhase;

@@ -1,6 +1,6 @@
 var React = require('react/addons')
   , _ = require('lodash')
-  , utils = require('../utils');
+  , utils = require('../../utils/domUtils');
 
 var Ship = React.createClass({
 

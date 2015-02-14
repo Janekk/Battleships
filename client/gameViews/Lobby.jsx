@@ -1,8 +1,8 @@
 var React = require('react/addons')
   , Reflux = require('Reflux')
   , _ = require('lodash')
-  , Actions = require('./actions')
-  , LobbyStore = require('./stores/LobbyStore');
+  , Actions = require('./../actions')
+  , LobbyStore = require('./../stores/LobbyStore');
 
 var Lobby = React.createClass({
   mixins: [Reflux.ListenerMixin],

@@ -3,9 +3,9 @@
   var socket = require('./socket'); //init and cache socket instance
   socket.io.close();
 
-  var GameplayStore = require('./stores/GameplayStore');
+  var GamePhaseStore = require('./stores/GamePhaseStore');
 
-  GameplayStore.listen(function(game) {
+  GamePhaseStore.listen(function(game) {
     if(game.phase == phase.signIn) {
       //close socket when not signed-in
       socket.io.close();
@@ -16,10 +16,10 @@
 var React = require('react')
   , Reflux = require('reflux')
   , Game = require('./Game')
-  , phase = require('./GameStates')
+  , phase = require('./gamePhase')
   , Actions = require('./actions')
   , AppStore = require('./stores/UserStore')
-  , utils = require('./utils');
+  , utils = require('./utils/domUtils');
 
 var ReactToastr = require('react-toastr');
 var {ToastContainer} = ReactToastr;

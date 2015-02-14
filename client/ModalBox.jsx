@@ -1,5 +1,5 @@
 var React = require('react')
-  , utils = require('./utils');
+  , utils = require('./utils/domUtils');
 
 var ModalBox = React.createClass({
 

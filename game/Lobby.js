@@ -29,6 +29,7 @@ var Lobby = function () {
     }
 
     var validationError = validator.validateUserId(username);
+    username = username.trim();
     if(validationError) {
       return messageHelper.toResult(new Error(validationError));
     }

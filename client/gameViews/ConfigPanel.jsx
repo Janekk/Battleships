@@ -1,6 +1,6 @@
 var React = require('react')
   , _ = require('lodash')
-  , Actions = require('./actions');
+  , Actions = require('./../actions');
 
 var ConfigPanel = React.createClass({
 

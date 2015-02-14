@@ -1,12 +1,12 @@
 var React = require('react/addons')
   , Reflux = require('reflux')
   , _ = require('lodash')
-  , Actions = require('./actions')
-  , {Cell, Hit} = require('./Board/Cell')
-  , Ship = require('./Board/Ship')
-  , GameShip = require('./Board/GameShip')
-  , GameplayStore = require('./stores/GameplayStore')
-  , phase = require('./GameStates');
+  , Actions = require('./../actions')
+  , {Cell, Hit} = require('./board/Cell')
+  , Ship = require('./board/Ship')
+  , GameShip = require('./board/GameShip')
+  , GamePhaseStore = require('./../stores/GamePhaseStore')
+  , phase = require('./../gamePhase');
 
 var PlayBoard = React.createClass({
   mixins: [Reflux.ListenerMixin],
@@ -16,7 +16,7 @@ var PlayBoard = React.createClass({
   },
 
   componentDidMount() {
-    this.listenTo(GameplayStore, this.handleGameEvents);
+    this.listenTo(GamePhaseStore, this.handleGameEvents);
   },
 
   handleGameEvents(game) {

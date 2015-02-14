@@ -5,8 +5,8 @@ var Reflux = require('Reflux')
   , BoardUtils = require('../../game/BoardUtils')
   , gameEvents = require('../../game/gameEvents')
   , ConfigStore = require('./ConfigStore')
-  , phase = require('../GameStates')
-  , GameplayStore = require('./GameplayStore');
+  , phase = require('../gamePhase')
+  , GamePhaseStore = require('./GamePhaseStore');
 
 function getNamedShip(ship) {
   return {id: ship.id ? ship.id : _.uniqueId(), cells: ship.cells};
@@ -31,7 +31,7 @@ var SetupStore = Reflux.createStore({
     this.reset();
 
     this.utils = BoardUtils;
-    this.listenTo(GameplayStore, this.checkGamePhase);
+    this.listenTo(GamePhaseStore, this.checkGamePhase);
     this.listenTo(ConfigStore, this.setConfig);
     this.listenTo(Actions.setup.placeShips, this.emitShips);
     this.listenTo(Actions.setup.selectConfigItem, this.selectConfigItem);
@@ -101,10 +101,6 @@ var SetupStore = Reflux.createStore({
       }
 
       if (pivoted && this.utils.canBeDropped(pivoted, ship.id, state.ships)) {
-        //state.selected = {
-        //  type: 'board',
-        //  item: {ship: {id: state.selected.item.id, cells: pivoted}, old: state.selected.item}
-        //};
         this.dropShip(pivoted, ship.id);
         state.selected = null;
         this.trigger(state);

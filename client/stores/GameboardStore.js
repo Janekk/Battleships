@@ -2,10 +2,10 @@ var Reflux = require('Reflux')
   , socket = require('../socket')
   , Actions = require('../actions')
   , _ = require('lodash')
-  , GameplayStore = require('./GameplayStore')
+  , GamePhaseStore = require('./GamePhaseStore')
   , SetupStore = require('./SetupStore')
   , BoardUtils = require('../../game/BoardUtils')
-  , phase = require('../GameStates')
+  , phase = require('../gamePhase')
   , gameEvents = require('../../game/gameEvents');
 
 var model = {
@@ -54,8 +54,8 @@ var GameboardStore = Reflux.createStore({
   init() {
 
     this.listenTo(Actions.game.initGameboard, this.triggerStateChange);
-    this.listenTo(GameplayStore, this.initAfterSetup);
-    this.listenTo(GameplayStore, this.setGamePhase);
+    this.listenTo(GamePhaseStore, this.initAfterSetup);
+    this.listenTo(GamePhaseStore, this.setGamePhase);
     socket.on(gameEvents.server.shotUpdate, this.onShotReceived);
   },
 

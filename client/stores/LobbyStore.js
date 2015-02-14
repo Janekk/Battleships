@@ -3,8 +3,8 @@ var Reflux = require('Reflux')
   , Actions = require('../actions')
   , _ = require('lodash')
   , gameEvents = require('../../game/gameEvents')
-  , phase = require('../GameStates')
-  , GameplayStore = require('./GameplayStore')
+  , phase = require('../gamePhase')
+  , GamePhaseStore = require('./GamePhaseStore')
   , AppStore = require('./UserStore');
 
 var LobbyStore = Reflux.createStore({
@@ -28,7 +28,7 @@ var LobbyStore = Reflux.createStore({
 
   init() {
     this.setInitialState();
-    this.listenTo(GameplayStore, this.resetOnSignIn);
+    this.listenTo(GamePhaseStore, this.resetOnSignIn);
     this.listenTo(AppStore, this.setUser);
 
     socket.on(gameEvents.server.lobbyUpdate, (update) => {

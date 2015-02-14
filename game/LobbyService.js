@@ -170,7 +170,7 @@ module.exports = function (io, gameService) {
     if (!disconnect) {
       socket.emit(gameEvents.server.signOutStatus, messageHelper.OK());
     }
-    ;
+
     io.to('lobby').emit(gameEvents.server.lobbyUpdate, _lobby.getLobbyState());
   }
 

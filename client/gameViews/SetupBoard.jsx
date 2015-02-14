@@ -1,9 +1,9 @@
 var React = require('react/addons')
   , _ = require('lodash')
-  , Actions = require('./actions')
-  , {Cell} = require('./Board/Cell')
-  , Coordinate = require('./Board/Coordinate')
-  , Ship = require('./Board/Ship');
+  , Actions = require('./../actions')
+  , {Cell} = require('./board/Cell')
+  , Coordinate = require('./board/Coordinate')
+  , Ship = require('./board/Ship');
 
 var SetupBoard = React.createClass({
 

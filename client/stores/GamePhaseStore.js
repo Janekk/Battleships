@@ -2,11 +2,11 @@ var Reflux = require('Reflux')
   , socket = require('../socket')
   , Actions = require('../actions')
   , _ = require('lodash')
-  , phase = require('../GameStates')
+  , phase = require('../gamePhase')
   , gameEvents = require('../../game/gameEvents')
   , validator = require('../../game/Validator');
 
-var GameplayStore = Reflux.createStore({
+var GamePhaseStore = Reflux.createStore({
   init() {
 
     this.game = {};
@@ -143,4 +143,4 @@ var GameplayStore = Reflux.createStore({
   }
 });
 
-module.exports = GameplayStore;
+module.exports = GamePhaseStore;
