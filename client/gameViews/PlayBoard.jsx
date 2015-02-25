@@ -17,13 +17,14 @@ var PlayBoard = React.createClass({
 
   componentDidMount() {
     this.listenTo(GamePhaseStore, this.handleGameEvents);
+    this.listenTo(GamePhaseStore, this.handleGameEvents);
   },
 
   handleGameEvents(game) {
     if (game.phase == phase.gameMyTurn) {
       this.setState({active: true});
     }
-    if (game.phase == phase.gameOpponentsTurn || game.phase == phase.readyToShoot) {
+    if (game.phase == phase.gameOpponentsTurn || game.phase == phase.shipsPlaced) {
       this.setState({active: false});
     }
   },

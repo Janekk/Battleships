@@ -4,8 +4,9 @@ var _ = require('lodash')
   , Ship = require('./../models/ship')
   , Position = require('./../models/position');
 
-var GameUser = function (userId) {
-  this.id = userId;
+var GameUser = function (user) {
+  this.id = user.id;
+  this.name = user.name;
   this.ships = [];                    // contains the ships for the player
   this.intactShipsCount = undefined;  // number of intact ships; on "0" current player lose
   this.shoots = [];                   // contains positions to which the player has shot
@@ -16,14 +17,14 @@ var GameUser = function (userId) {
   };
 }
 
-var BattleshipsGame = function (emitter, userAId, userBId) {
+var BattleshipsGame = function (emitter, userA, userB) {
 
-  if (!userAId || !userBId) {
+  if (!userA || !userB) {
     throw new Error("One of user IDs is missing");
   }
 
-  this.userA = new GameUser(userAId);
-  this.userB = new GameUser(userBId);
+  this.userA = new GameUser(userA);
+  this.userB = new GameUser(userB);
 
   emitter.on(gameEvents.client.placeShips, function (userId, shipsData) {
     this.placeShips(userId, shipsData);
@@ -90,7 +91,7 @@ var BattleshipsGame = function (emitter, userAId, userBId) {
       }.bind(this), 1000);
     }
     else { // opponent isn't ready
-      this._sendToSender(gameEvents.server.shipsPlaced, 'ships are placed. Waiting for ' + this.opponent.id + '...');
+      this._sendToSender(gameEvents.server.shipsPlaced, 'ships are placed. Waiting for ' + this.opponent.name + '...');
     }
 
     this._sendToOpponent(gameEvents.server.infoMessage, this.sender.id + ' has placed his ships!');

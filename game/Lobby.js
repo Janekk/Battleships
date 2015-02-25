@@ -6,11 +6,6 @@ var Lobby = function () {
   var users = [];
   var invitations = [];
 
-  function LobbyUser(id) {
-    this.id = id;
-    this.isPlaying = false;
-  }
-
   function getLobbyState() {
     return {users: users, invitations: invitations};
   };
@@ -23,50 +18,46 @@ var Lobby = function () {
     return getLobbyState();
   };
 
-  this.enterLobby = function (username, wasPlaying) {
-    if (!username) {
+  this.reenterLobby = function (userId) {
+    if (!userId) {
       return messageHelper.toResult(new Error('User name is empty.'));
     }
 
-    var validationError = validator.validateUserId(username);
-    username = username.trim();
-    if(validationError) {
-      return messageHelper.toResult(new Error(validationError));
+    var storedUser = _.find(users, {id: userId});
+    storedUser.isPlaying = false;
+    return messageHelper.toResult({user: storedUser});
+  };
+  //TODO JK: temporary change
+  this.enterLobby = function (user) {
+    if (!user.id) {
+      return messageHelper.toResult(new Error('User ID is empty.'));
     }
 
-    var storedUser = _.find(users, {id: username});
-    if (!wasPlaying) {
-      if (storedUser) { // username already exists
-        return messageHelper.toResult(new Error('The username already exists.'));
-      }
-
-      // join lobby
-      var user = new LobbyUser(username);
-      users.push(user);
-      return messageHelper.toResult({user: user});
+    var storedUser = _.find(users, {id: user.id});
+    if (storedUser) { // username already exists
+      return messageHelper.toResult(new Error('The username already exists.'));
     }
-    else {
-      storedUser.isPlaying = false;
-      return messageHelper.toResult({user: storedUser});
-    }
+    // join lobby
+    users.push(user);
+    return messageHelper.toResult({user: user});
   };
 
-  this.leaveLobby = function (username, startsPlay) {
-    if (!username) {
+  this.leaveLobby = function (userId, startsPlay) {
+    if (!userId) {
       return messageHelper.toResult(new Error('User name is empty.'));
     }
 
-    var storedUser = findUser(username);
+    var storedUser = findUser(userId);
     if (!storedUser) {
       return messageHelper.toResult(new Error('User with the given ID doesn\'t exist.'));
     }
 
     // join lobby
-    var user = {id: username};
+    var user = {id: userId};
     if (!startsPlay) {
       _.remove(users, user);
-      _.remove(invitations, {from: username});
-      _.remove(invitations, {to: username});
+      _.remove(invitations, {from: userId});
+      _.remove(invitations, {to: userId});
     }
     else {
       storedUser.isPlaying = true;
@@ -95,20 +86,27 @@ var Lobby = function () {
     }
 
     invitations.push(invitation);
-    return messageHelper.toResult({invitation: invitation});
-  }
+    return messageHelper.toResult({invitation: {from: invitingUser, to: user}});
+  };
 
   this.acceptInvitation = function (accepted, invitation) {
     if (accepted) {
       if (!_.find(invitations, invitation)) {
         return messageHelper.toResult(new Error('You\'re not invited by this user!'));
       }
+      var from = _.find(users, {id: invitation.from});
+      var to = _.find(users, {id: invitation.to});
 
-      _.find(users, {id: invitation.from}).isPlaying = true;
-      _.find(users, {id: invitation.to}).isPlaying = true;
+      from.isPlaying = true;
+      to.isPlaying = true;
+
       _.remove(invitations, invitation);
     }
-    return messageHelper.toResult({accepted: accepted, invitation: invitation});
+    return messageHelper.toResult({invitation: {
+      accepted: accepted,
+      from: from,
+      to: to
+    }});
   }
 };
 

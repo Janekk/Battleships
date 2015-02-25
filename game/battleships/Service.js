@@ -1,12 +1,11 @@
 var messageHelper = require('./../messageHelper')
   , _ = require('lodash')
   , gameEvents = require('./../gameEvents')
-  , Game = require('./Game')
-  , EventEmitter = require('events').EventEmitter;
+  , Game = require('./Game');
 
 function BattleshipsService(emitter, sockets) {
   if (sockets.length > 2) {
-    throw new Error('Too many socket joined the game!');
+    throw new Error('Too many sockets have joined the game!');
   }
 
   if (sockets.length <= 0) {
@@ -21,7 +20,7 @@ function BattleshipsService(emitter, sockets) {
   ];
 
   sockets.forEach(function (socket) {
-    emitter.on(socket.username, function (event, data) {
+    emitter.on(socket.getUserId(), function (event, data) {
       if(event != gameEvents.server.gameOver) {
         socket.emit(event, data);
       }
@@ -29,20 +28,20 @@ function BattleshipsService(emitter, sockets) {
 
     clientEvents.forEach(function (event) {
       socket.on(event, function (data) {
-        emitter.emit(event, socket.username, data);
+        emitter.emit(event, socket.getUserId(), data);
       });
     });
   });
 
   var game;
   if(singleMode) {
-    var opponentName = 'Computer';
+    var dummyUser = {id: 'Computer', name: 'Computer'};
     var opponent = new (require('../../game/battleships/Opponent'))();
-    opponent.bindEvents(opponentName, emitter);
-    game = new Game(emitter, sockets[0].username, opponentName);
+    opponent.bindEvents(dummyUser.id, emitter);
+    game = new Game(emitter, sockets[0].getUser(), dummyUser);
   }
   else {
-    game = new Game(emitter, sockets[0].username, sockets[1].username);
+    game = new Game(emitter, sockets[0].getUser(), sockets[1].getUser());
   }
 
   this.start = function () {

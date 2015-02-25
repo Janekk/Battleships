@@ -1,17 +1,6 @@
 extends layout
 block content
-  //div.g-plus(data-action="share" data-annotation="bubble" data-height="24")
-  div#app
+    div#app
 block footer
-  script(src="/scripts/bundle.js")
-  script(src="//apis.google.com/js/platform.js" async defer)
-  script(src="//platform.twitter.com/widgets.js" async defer)
-  script.
-      window.fbAsyncInit = function () {
-          FB.init({
-              appId: '633605170101399',
-              xfbml: true,
-              version: 'v2.2'
-          });
-      };
-  script(src="//connect.facebook.net/en_US/sdk.js" async="" defer="")
+    script(src="/scripts/bundle.js")
+    script(src="//connect.facebook.net/en_US/sdk.js")

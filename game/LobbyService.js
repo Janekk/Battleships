@@ -13,11 +13,13 @@ module.exports = function (io, gameService) {
     if (!userId) return;
 
     var sockets = io.sockets.sockets;
-    return _.find(sockets, {username: userId});
+    return _.find(sockets, function (socket) {
+      return socket.user && (socket.user.id == userId);
+    });
   };
 
   var _leaveLobby = function (socket, startsPlay) {
-    _lobby.leaveLobby(socket.username, startsPlay);
+    _lobby.leaveLobby(socket.getUserId(), startsPlay);
     socket.leave('lobby');
   };
 
@@ -27,7 +29,7 @@ module.exports = function (io, gameService) {
         var game = new Game(emitter, sockets);
 
         sockets.forEach(function (socket) {
-          _games.push({userId: socket.username, game: game});
+          _games.push({userId: socket.getUserId(), game: game});
         });
         game.start();
         return game;
@@ -51,12 +53,13 @@ module.exports = function (io, gameService) {
     io.on('connection', function (socket) {
       socket.emit("ping");
 
-      socket.on(gameEvents.client.enterLobby, function (username) {
-        var result = _lobby.enterLobby(username);
+      socket.on(gameEvents.client.enterLobby, function (user) {
+        var result = _lobby.enterLobby(user);
         socket.emit(gameEvents.server.enterLobbyStatus, result);
 
         if (result.isSuccessful) {
-          socket.username = username;
+          _.mixin(socket, new (require('./SocketMixin'))());
+          socket.setUser(user);
           socket.join('lobby');
 
           var update = _.merge({newUser: result.user}, _lobby.getLobbyState());
@@ -65,7 +68,7 @@ module.exports = function (io, gameService) {
       });
 
       socket.on(gameEvents.client.invitationRequest, function (userID) {
-        var result = _lobby.inviteUser(userID, socket.username);
+        var result = _lobby.inviteUser(userID, socket.getUserId());
         socket.emit(gameEvents.server.invitationRequestStatus, result);
 
         if (result.isSuccessful) {
@@ -91,13 +94,13 @@ module.exports = function (io, gameService) {
       }.bind(this));
 
       socket.on('disconnect', function () {
-        this.onSignOut(socket, true);
+        this.onDisconnect(socket);
       }.bind(this));
     }.bind(this));
   };
 
   this.onInvitationResponse = function (socket, response) {
-    if (socket.username != response.invitation.to) {
+    if (socket.getUserId() != response.invitation.to) {
       return socket.emit(gameEvents.server.invitationResponse,
         messageHelper.toResult(new Error('User ID mismatch in invitation response')));
     }
@@ -134,14 +137,14 @@ module.exports = function (io, gameService) {
   };
 
   this.onQuit = function (socket) {
-    var game = _endGameWith(socket.username);
+    var game = _endGameWith(socket.getUserId());
     if (game) {
       game.getSockets().forEach(function (gameSocket) {
         if (gameSocket != socket) {
-          gameSocket.emit(gameEvents.server.playerLeft, messageHelper.toResult('Player ' + socket.username + ' has left the game!'));
+          gameSocket.emit(gameEvents.server.playerLeft, messageHelper.toResult(socket.user.name + ' has left the game!'));
         }
 
-        _lobby.enterLobby(gameSocket.username, true);
+        _lobby.reenterLobby(gameSocket.user.id);
         gameSocket.join('lobby');
       });
     }
@@ -149,9 +152,15 @@ module.exports = function (io, gameService) {
     io.to('lobby').emit(gameEvents.server.lobbyUpdate, _lobby.getLobbyState());
   }
 
-  this.onSignOut = function (socket, disconnect) {
+  this.onDisconnect = function (socket) {
+    if (socket.user) {
+      this.onSignOut(socket)
+    }
+  };
+
+  this.onSignOut = function (socket) {
     _leaveLobby(socket);
-    var game = _endGameWith(socket.username);
+    var game = _endGameWith(socket.getUserId());
     if (game) {
       var gameSockets = _.filter(game.getSockets(), function (gSocket) {
         return (gSocket != socket);
@@ -159,18 +168,14 @@ module.exports = function (io, gameService) {
 
       if (gameSockets) {
         gameSockets.forEach(function (gameSocket) {
-          gameSocket.emit(gameEvents.server.playerLeft, messageHelper.toResult('Player ' + socket.username + ' has left the game!'));
+          gameSocket.emit(gameEvents.server.playerLeft, messageHelper.toResult('Player ' + socket.user.name + ' has left the game!'));
 
-          _lobby.enterLobby(gameSocket.username, true);
+          _lobby.reenterLobby(gameSocket.user.id);
           gameSocket.join('lobby');
         });
       }
     }
-
-    if (!disconnect) {
-      socket.emit(gameEvents.server.signOutStatus, messageHelper.OK());
-    }
-
+    socket.emit(gameEvents.server.signOutStatus, messageHelper.OK());
     io.to('lobby').emit(gameEvents.server.lobbyUpdate, _lobby.getLobbyState());
   }
 
@@ -181,12 +186,12 @@ module.exports = function (io, gameService) {
     items.forEach(function (item) {
 
       var socket = _findUserSocket(item.userId);
-      if(socket) {
+      if (socket) {
         var payload = item.payload;
 
         socket.emit(gameEvents.server.gameOver, messageHelper.toResult(payload));
 
-        _lobby.enterLobby(socket.username, true);
+        _lobby.reenterLobby(socket.getUserId());
         socket.join('lobby');
       }
     });

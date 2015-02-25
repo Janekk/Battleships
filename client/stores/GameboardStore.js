@@ -60,7 +60,7 @@ var GameboardStore = Reflux.createStore({
   },
 
   initAfterSetup(game) {
-    if(game.phase == phase.readyToShoot) {
+    if(game.phase == phase.shipsPlaced) {
       this.state = new model.StoreData({
         isGameStarted: false,
         isMyTurn: false,
@@ -145,7 +145,7 @@ var GameboardStore = Reflux.createStore({
   },
 
   setGamePhase(game) {
-    if(game.phase == phase.gameOpponentsTurn || game.phase == phase.gameMyTurn || game.phase == phase.readyToShoot) {
+    if(game.phase == phase.gameOpponentsTurn || game.phase == phase.gameMyTurn || game.phase == phase.shipsPlaced) {
       this.state.isGameStarted = true;
 
       if(game.phase == phase.gameMyTurn) {

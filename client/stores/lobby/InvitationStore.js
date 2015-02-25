@@ -1,8 +1,8 @@
  var Reflux = require('Reflux')
-  , socket = require('../socket')
-  , Actions = require('../actions')
+  , socket = require('../../socket')
+  , Actions = require('../../actions')
   , _ = require('lodash')
-  , gameEvents = require('../../game/gameEvents');
+  , gameEvents = require('../../../game/gameEvents');
 
 var InvitationStore = Reflux.createStore({
 

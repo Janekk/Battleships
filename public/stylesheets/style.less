@@ -3,7 +3,7 @@
 @import "bootstrap-import";
 @import "font-awesome.css";
 @import "toast.min.css";
-@import url(http://fonts.googleapis.com/css?family=Raleway:200,400,700,800);
+@import url(//fonts.googleapis.com/css?family=Raleway:200,400,700,800);
 
 @font-face {
   font-family: army-rust;
@@ -63,6 +63,10 @@ html, body {
 
   .clearfix {
     .clearfix();
+  }
+
+  button.btn {
+    border-radius: 0;
   }
 }
 
@@ -147,18 +151,10 @@ html, body {
   animation: opacity-blink @opacity-blink-duration linear @opacity-blink-iterations;
 }
 
-.tool-font {
+.tool-font(@font-size: 18px) {
   font-family: "Raleway", Arial, sans-serif;
   letter-spacing: initial;
-
-  @media (max-width: @screen-xs-max) {
-    font-size: 14px;
-  }
-
-  @media (min-width: @screen-sm-min) {
-    font-size: 16px;
-  }
-
+  font-size: @font-size;
 }
 
 #app {
@@ -220,7 +216,7 @@ html, body {
     }
 
     .user-id {
-      padding: 14px 20px 5px 10px;
+      padding: 10px 20px 5px 10px;
       display: inline-block;
       float: right;
       text-align: right;
@@ -423,61 +419,123 @@ html, body {
     }
 
     .sign-in {
-      font-size: 16px;
-      div {
-        margin-top: 10px;
-      }
+      .tool-font(28px);
+      margin-top: 40px;
 
-      input {
-        font-family: "Raleway", Arial, sans-serif;
-      }
-
-      button.btn {
-        line-height: 1;
-      }
-
-      @media (min-width: @screen-sm-min) {
-        font-size: 2em;
-        button.btn {
-          font-size: 2em;
-        }
-      }
-      @media (max-width: @screen-xs-max) {
-        font-size: 1.5em;
-        button.btn {
-          font-size: 1.5em;
-        }
+      button {
+        .tool-font(28px);
       }
     }
 
     #game {
       font: 24px army-rust, "Lucida Grande", Helvetica, Arial, sans-serif;
 
+      .checking-fb {
+        .tool-font();
+      }
+
       .lobby {
-        @bg-lobby: #debdbd;
+        @bg-lobby: #EFEDED;
 
         .tool-font();
 
         .header {
           padding: 10px 0;
+          overflow: auto;
+        }
+
+        .no-user {
+          font-weight: 700;
+          line-height: 1.5em;
+        }
+
+        .name-filter {
+          width: 60%;
+        }
+
+        .friends-filter {
+          float: right;
+          .checkbox + label {
+            padding-left: 8px;
+          }
+
+          .checkbox {
+            background: #808080;
+            width: 30px;
+            height: 30px;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+          }
+
+          .checkbox input {
+            visibility: hidden;
+          }
+
+          .checkbox label {
+            vertical-align: middle;
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            width: 24px;
+            height: 24px;
+            background: whitesmoke;
+          }
+
+          .checkbox label::after {
+            opacity: 0;
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 11px;
+            background: transparent;
+            top: 4px;
+            left: 2px;
+            border: 3px solid @bg-hf;
+            border-top: none;
+            border-right: none;
+            transform: rotate(-45deg);
+          }
+
+          .checkbox input[type='checkbox']:checked + label::after {
+            opacity: 1;
+          }
+        }
+
+        .user-filter {
+          font-size: 2em;
+        }
+
+        .welcome {
+          .tool-font(26px);
+
+          p {
+            padding: 10px 0 0 0;
+            line-height: 1.2em;
+            &.welcome {
+              font-weight: 700;
+            }
+
+            button {
+              margin-left: 10px;
+            }
+          }
+
+          padding: 10px 0;
         }
 
         .single-player {
+          font-weight: 500;
           margin: 1em 0;
-          button {
-            margin-left: 0.5em;
+          > span {
+            padding-right: 0.5em;
           }
         }
 
         .content {
-          -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+          background: @fill-ship;
+          padding: 10px;
           box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-
-          .no-user {
-            font-weight: 700;
-            line-height: 2em;
-            background: @bg-lobby;
-          }
 
           @media (min-width: @screen-sm-min) {
             width: 80%;
@@ -492,16 +550,40 @@ html, body {
           overflow: auto;
 
           .header {
-            padding: 10px 5px 10px 5px;
-            background: #B7C4EA;
+            padding: 0 0 10px 0;
+            color: #747474;
+
+            .question {
+              overflow: auto;
+              i {
+                float: right;
+                color: @color-alt;
+                font-size: 24px;
+              }
+            }
           }
 
           .user-list {
+            overflow-y: auto;
+
+            .sub-header {
+              font-weight: 700;
+              color: #888888;
+              padding: 5px;
+            }
+
+            .active.sub-header {
+              background: #BAE2AE;
+            }
+
+            .inactive.sub-header {
+              background: #ececec;
+            }
 
             .user-item {
               padding: 5px;
               overflow: hidden;
-              border: solid #B7C4EA;
+              border: solid #d3d3d3;
               background: @bg-lobby;
               border-width: 1px 0 0 0;
               vertical-align: middle;
@@ -509,13 +591,51 @@ html, body {
               .user-name, .user-invitation {
                 display: inline-block;
               }
+
+              .non-friend {
+                display: inline-block;
+                height: 50px;
+                width: 50px;
+                text-align: center;
+                font-size: 2.5em;
+                font-weight: 700;
+                border: solid 1px gray;
+                vertical-align: middle;
+                color: dodgerblue;
+                background: #f5f5f5;
+              }
+
+              .fb-image {
+                width: 50px;
+                height: 50px;
+                box-sizing: content-box;
+              }
+
               .user-name {
-                float: left;
                 max-width: 65%;
                 font-weight: 700;
+                padding-left: 0.5em;
               }
               .user-invitation {
                 float: right;
+              }
+
+              &.active {
+                background: #BAE2AE;
+
+                button {
+                  @bg-btn-active-user: #21B421;
+                  color: #fff;
+                  background-color: @bg-btn-active-user;
+                  border-color: darken(#21B421, 5%);
+                  &:hover, &:active, &:focus {
+                    background-color: darken(@bg-btn-active-user, 10%);
+                  }
+                }
+              }
+
+              &.inactive {
+                background: #ececec;
               }
             }
           }
@@ -526,6 +646,7 @@ html, body {
         .clearfix();
         .command, button {
           .tool-font();
+          font-weight: 700;
         }
 
         .command {
@@ -546,17 +667,20 @@ html, body {
         @media (min-aspect-ratio: 1/1) {
           width: 100%;
           .side {
-            width: 30%;
+            width: 40%;
             float: right;
 
             .ships-panel {
-              padding: 15px 0 0 15px;
               width: 100%;
+
+              svg {
+                min-height: 25vh;
+              }
             }
           }
 
           .board.setup {
-            width: 70%;
+            width: 60%;
             float: left;
 
             svg {
@@ -636,19 +760,19 @@ html, body {
             @media (min-aspect-ratio: 1/1) {
               display: inline-block;
               &.opponent {
-                width: 43%;
+                width: 46%;
               }
 
               &.me {
-                width: 43%;
+                width: 46%;
                 float: right;
               }
 
               svg {
-                height: 36vw;
+                height: 38vw;
               }
 
-              @media(max-width: @screen-md-min) {
+              @media (max-width: @screen-md-min) {
 
                 &.opponent {
                   width: 49%;
@@ -721,7 +845,7 @@ html, body {
         justify-content: center;
 
         .turn-overlay-text {
-          font-size: 12vw;
+          font-size: 10vw;
           color: rgb(107, 12, 12);
 
           -webkit-animation: turn-blink 0.8s linear infinite;
@@ -963,9 +1087,10 @@ html, body {
   .box {
     .tool-font();
     font-weight: 700;
-    width: 40%;
+    display: inline-block;
     min-width: 250px;
     min-height: 100px;
+    padding: 10px;
     margin: 100px auto;
     background-color: #fff;
     border: 1px solid #000;
@@ -976,6 +1101,10 @@ html, body {
 
     .question {
       padding: 15px;
+    }
+
+    img {
+      max-width: 100%;
     }
 
     .buttons {

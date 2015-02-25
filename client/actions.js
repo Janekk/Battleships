@@ -5,10 +5,11 @@ var actions = {
     error: Reflux.createAction()
   },
   init: {
-    showSignIn: Reflux.createAction(),
-    signIn: Reflux.createAction(),
+    signInToFb: Reflux.createAction(),
+    signInToGame: Reflux.createAction(),
     playSingle: Reflux.createAction(),
     inviteUser: Reflux.createAction(),
+    inviteFriend: Reflux.createAction(),
     acceptInvitation: Reflux.createAction(),
     signOut: Reflux.createAction()
 

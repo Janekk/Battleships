@@ -6,4 +6,8 @@ router.get('/', function(req, res) {
   res.render('index', {title: 'Battleships - online game'});
 });
 
+router.post('/', function(req, res) {
+  res.render('index', {title: 'Battleships - online game'});
+});
+
 module.exports = router;

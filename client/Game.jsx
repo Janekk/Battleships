@@ -5,11 +5,12 @@ var React = require('react')
   , phase = require('./gamePhase')
   , GamePhaseStore = require('./stores/GamePhaseStore')
   , GameEventsStore = require('./stores/GameEventsStore')
-  , LobbyView = require('./gameViews/Lobby')
-  , SignInView = require('./gameViews/SignInView')
+  , FbSignInView = require('./gameViews/FbSignInView')
+  , GameSignInView = require('./gameViews/GameSignInView')
   , SetupView = require('./gameViews/SetupView')
   , ShootingView = require('./gameViews/ShootingView')
-  , GameOverView = require('./gameViews/GameOverView');
+  , GameOverView = require('./gameViews/GameOverView')
+  , Lobby = require('./gameViews/Lobby');
 
 var Game = React.createClass({
   mixins: [Reflux.ListenerMixin],
@@ -39,16 +40,26 @@ var Game = React.createClass({
     var panel, {state} = this;
     if (state) {
       switch (state.phase) {
-        case phase.signIn:
-          panel = (<SignInView />);
+        case phase.checkingFbStatus:
+          panel = (<p className="checking-fb">Please wait..</p>);
+          break;
+        case phase.signedOutOfGame:
+          panel = (<GameSignInView />);
+          break;
+        case phase.signedOutOfFb:
+          panel = (<FbSignInView />);
           break;
         case phase.inLobby:
-          panel = (<LobbyView />);
+          panel = (
+            <div>
+              <Lobby />
+            </div>
+          );
           break;
         case phase.setup:
           panel = (<SetupView />);
           break;
-        case phase.readyToShoot:
+        case phase.shipsPlaced:
           panel = (<ShootingView />);
           break;
         case phase.gameOver:
@@ -60,6 +71,7 @@ var Game = React.createClass({
     return (
       <div id="game">
         {panel}
+        <audio id="audio-player"></audio>
       </div>
     );
   }

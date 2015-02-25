@@ -105,7 +105,7 @@ describe('Lobby', function () {
   //  expect(client).toBeTruthy();
   //
   //  client.on(gameEvents.server.enterLobbyStatus, function (user) {
-  //    expect(user.username).toBe('test user');
+  //    expect(user.userId).toBe('test user');
   //    done();
   //  });
   //  client.emit(gameEvents.client.enterLobby, 'test user');

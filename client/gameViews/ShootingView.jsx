@@ -22,8 +22,9 @@ var ShootingView = React.createClass({
   getInitialState() {
     return {
       boardSize: 0,
+      waitingForOpponentReady: true,
       isOpponentsBoardVisible: true,
-      active: false,
+      myTurn: false,
       previewBoard: null,
       opponentsBoard: null,
       switched: false
@@ -39,10 +40,11 @@ var ShootingView = React.createClass({
   },
 
   onGamePhaseChange(game) {
-    var active = (game.phase == phase.gameMyTurn);
+    var myTurn = (game.phase == phase.gameMyTurn);
     this.setStateIfMounted({
-      active: active,
-      isOpponentsBoardVisible: active
+      myTurn: myTurn,
+      isOpponentsBoardVisible: myTurn,
+      waitingForOpponentReady: (game.phase == phase.shipsPlaced)
     });
   },
 
@@ -95,10 +97,12 @@ var ShootingView = React.createClass({
       'switched': state.switched
     });
 
-    var overlay = !state.active ?
+    var overlay = !state.myTurn ?
       (
         <div className="overlay">
-          <span className="turn-overlay-text">Opponent's turn</span>
+          <span className="turn-overlay-text">
+            {state.waitingForOpponentReady ? "Waiting for opponent" : "Opponent's turn"}
+          </span>
         </div>
       ) : null;
 

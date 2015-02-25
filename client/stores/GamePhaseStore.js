@@ -4,40 +4,46 @@ var Reflux = require('Reflux')
   , _ = require('lodash')
   , phase = require('../gamePhase')
   , gameEvents = require('../../game/gameEvents')
-  , validator = require('../../game/Validator');
+  , FacebookStore = require('./FacebookStore');
 
 var GamePhaseStore = Reflux.createStore({
   init() {
 
-    this.game = {};
+    this.game = {
+    };
 
-    this.listenTo(Actions.init.showSignIn, this.initSignIn);
-    this.listenTo(Actions.init.signIn, this.initStoresOnSignIn);
-    this.listenTo(Actions.init.signIn, this.enterLobby);
+    this.listenTo(FacebookStore, this.updateFbStatus);
+    this.listenTo(Actions.init.signInToFb, this.initSignIn);
     this.listenTo(Actions.init.playSingle, this.playSingle);
     this.listenTo(Actions.game.shoot, this.takeShot);
     this.listenTo(Actions.game.quit, this.quitGame);
     this.listenTo(Actions.init.signOut, this.signOut);
 
     socket.on('disconnect', () => {
-      this.game = {phase: phase.signIn};
+      this.game = {phase: phase.signedOutOfGame};
       this.trigger(this.game);
     });
 
     socket.on('connect_error', this.updateConnectionStatus);
     socket.on('connect_timeout', this.updateConnectionStatus);
 
+    socket.on(gameEvents.server.enterLobbyStatus, (result) => {
+      if(result.isSuccessful) {
+        this.game.phase = phase.inLobby;
+        this.trigger(this.game);
+      }
+    });
+
     socket.on(gameEvents.server.gameStarted, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.setup;
-        this.game.opponent = result.opponent;
         this.trigger(this.game);
       }
     });
 
     socket.on(gameEvents.server.shipsPlaced, (result) => {
       if (result.isSuccessful) {
-        this.game.phase = phase.readyToShoot;
+        this.game.phase = phase.shipsPlaced;
         this.trigger(this.game);
       }
     });
@@ -71,19 +77,6 @@ var GamePhaseStore = Reflux.createStore({
       }
     });
 
-    socket.on(gameEvents.server.signOutStatus, (result) => {
-      if (result.isSuccessful) {
-        this.game = {phase: phase.signIn};
-
-
-        if(socket) {
-          socket.io.close();
-        }
-
-        this.trigger(this.game);
-      }
-    });
-
     socket.on(gameEvents.server.quitGameStatus, (result) => {
       if (result.isSuccessful) {
         this.game.phase = phase.inLobby;
@@ -92,9 +85,14 @@ var GamePhaseStore = Reflux.createStore({
     });
   },
 
+  updateFbStatus(fbState) {
+    if(!fbState.user) {
+      this.game = {phase: phase.signedOutOfFb};
+      this.trigger(this.game);
+    }
+  },
 
-  initStoresOnSignIn() {
-    require('./LobbyStore');
+  initStores() {
     require('./ConfigStore');
   },
 
@@ -111,7 +109,7 @@ var GamePhaseStore = Reflux.createStore({
   },
 
   updateConnectionStatus() {
-    this.game = {phase: phase.signIn};
+    this.game = {phase: phase.signedOutOfGame};
     this.trigger(this.game);
   },
 
@@ -120,26 +118,18 @@ var GamePhaseStore = Reflux.createStore({
   },
 
   initSignIn() {
-    this.game = {phase: phase.signIn};
+    //var social = require('../social');
+    //social.signIn({
+    //  success: function (me) {
+    //    Actions.init.signInToGame(me.id, me.first_name);
+    //  },
+    //  error: function () {
+    //    this.game = {phase: phase.signedOutOfFb};
+    //    this.trigger(this.game);
+    //  }
+    //});
+    this.game = {phase: phase.checkingFbStatus};
     this.trigger(this.game);
-  },
-
-  enterLobby(userName) {
-    var validationError = validator.validateUserId(userName);
-    if(validationError) {
-      return Actions.common.error(validationError);
-    }
-
-    socket.connect();
-
-    socket.on(gameEvents.server.enterLobbyStatus, (result) => {
-      if(result.isSuccessful) {
-        this.game.phase = phase.inLobby;
-        this.game.user = result.user;
-        this.trigger(this.game);
-      }
-    });
-    socket.emit(gameEvents.client.enterLobby, userName);
   }
 });
 

@@ -4,10 +4,8 @@
   socket.io.close();
 
   var GamePhaseStore = require('./stores/GamePhaseStore');
-
   GamePhaseStore.listen(function(game) {
-    if(game.phase == phase.signIn) {
-      //close socket when not signed-in
+    if(game.phase < phase.inLobby) {
       socket.io.close();
     };
   });
@@ -18,41 +16,41 @@ var React = require('react')
   , Game = require('./Game')
   , phase = require('./gamePhase')
   , Actions = require('./actions')
-  , AppStore = require('./stores/UserStore')
+  , UserStore = require('./stores/UserSessionStore')
   , utils = require('./utils/domUtils');
 
 var ReactToastr = require('react-toastr');
 var {ToastContainer} = ReactToastr;
 var NavPanel = require('./NavPanel');
 var ToastMessageFactory = React.createFactory(ReactToastr.ToastMessage.animation);
-var ModalBox = require('./ModalBox');
+var {ModalBox, ModalBoxWrapper} = require('./ModalBox');
 
 var Body = React.createClass({
-  mixins: [Reflux.listenTo(AppStore, 'onAppStateChange')],
+  mixins: [Reflux.listenTo(UserStore, 'onAppStateChange')],
 
   getInitialState() {
     return {
       showNav: false,
-      app: {userId: null}
+      app: {user: null}
     };
   },
 
   onAppStateChange(appState) {
     this.setState({
-      showNav: this.state.showNav && !!appState.userId,
+      showNav: this.state.showNav && !!appState.user,
       app: appState
     });
   },
 
   setNavPanelVisibility(e) {
     var {state, refs} = this;
-    if (state.app.signedIn && e.target == refs.navBtn.getDOMNode()) {
+    if (state.app.isPlaying && e.target == refs.navBtn.getDOMNode()) {
       this.setState({showNav: !state.showNav});
     }
     else {
       var isOutsideNav = !(e.target == refs.nav.getDOMNode()) && !utils.isElementChildOf(e.target, refs.nav.getDOMNode());
 
-      if (isOutsideNav) {
+      if (isOutsideNav && this.state.showNav) {
         this.setState({showNav: false});
       }
     }
@@ -64,17 +62,17 @@ var Body = React.createClass({
       <div id="react-root" onClick={this.setNavPanelVisibility}>
 
         <div id="header" className="hf">
-        {state.app.signedIn ?
+        {state.app.isPlaying ?
           <div id="nav-btn">
             <i className="fa fa-bars fa-2x" ref="navBtn" />
           </div> : null
           }
-        {state.app.signedIn ?
+        {state.app.isPlaying ?
           <div className="user-id">
-            <span>User: {state.app.userId}
-            {state.app.opponentId ?
+            <span>User: {state.app.user.name}
+            {state.app.opponent ?
               <span>
-                <span className="versus"> vs.</span> {state.app.opponentId} </span> : null}
+                <span className="versus"> vs.</span> {state.app.opponent.name} </span> : null}
             </span>
           </div> : null
           }
@@ -100,31 +98,25 @@ var Body = React.createClass({
           </div>
         </div>
         <div id="footer" className="hf">
-          <div className="social">
-            <div className="g-plus" data-action="share" data-annotation="none"></div>
-            <a href="https://twitter.com/share" className="twitter-share-button" data-count="none">Tweet</a>
-            <div className="fb-share-button" data-layout="button"></div>
-          </div>
-          <div className="content"> ©
+          <div className="content"> Copyright ©
             <a target="_blank" href="//janekk.github.io">&nbsp;Janekk&nbsp;</a>
             2015
           </div>
         </div>
-        <ModalBox ref="modal"/>
+        <div id="modal"/>
       </div>);
   },
 
   componentDidMount: function () {
     window.toastr = this.refs.container;
-    window.modalBox = this.refs.modal;
+    window.modalBox = new ModalBoxWrapper(ModalBox, document.getElementById('modal'));
   }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-
   React.render(<Body />, document.getElementById('app'));
 
-  Actions.init.showSignIn();
+  Actions.init.signInToFb();
 });
 
 

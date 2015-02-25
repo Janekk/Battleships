@@ -5,21 +5,24 @@ var Reflux = require('Reflux')
   , phase = require('../gamePhase')
   , Actions = require('../actions')
   , GamePhaseStore = require('./GamePhaseStore')
-  , InvitationStore = require('./InvitationStore')
-  , AppStore = require('./UserStore');
+  , InvitationStore = require('./lobby/InvitationStore')
+  , UserStore = require('./UserSessionStore');
 
 var GameEventsStore = Reflux.createStore({
   init() {
 
     this.listenTo(GamePhaseStore, this.setGamePhase);
     this.listenTo(InvitationStore, this.handleInvitationEvent);
-    this.listenTo(AppStore, this.setUser)
+    this.listenTo(UserStore, this.setUser);
 
     socket.on('disconnect', (status) => {
       if(status != 'forced close') {
-        this.handleErrorResult({error: 'You\'ve been disconnected from the server!'});
+        this.handleErrorResult({error: 'You\'ve been disconnected from the game server!'});
       }
     });
+
+    socket.on('connect_error', this.showConnectionStatus);
+    socket.on('connect_timeout', this.showConnectionStatus);
 
     socket.on(gameEvents.server.enterLobbyStatus, (result) => {
       if(!result.isSuccessful) {
@@ -42,13 +45,25 @@ var GameEventsStore = Reflux.createStore({
 
     socket.on(gameEvents.server.shotUpdate, (result) => {
       if(result.shipWasHit || result.shipWasDestroyed) {
-        var message = result.me ? this.opponentId +  "'s" : "Your ";
+        var message = result.me ? this.getOpponentName() +  "'s" : "Your ";
         message += result.shipWasDestroyed ? " ship was destroyed!" : " ship was hit!";
 
         this.trigger({
           type: result.me ? 'success' : 'info' ,
           message
         });
+
+        var audio = document.getElementById('audio-player');
+        audio.src="/sounds/Blast.mp3";
+        audio.play();
+
+        if(result.shipWasDestroyed) {
+          audio.addEventListener("ended", function playSunk() {
+            audio.src = "/sounds/Bubbling.mp3";
+            audio.play();
+            audio.removeEventListener("ended", playSunk);
+          });
+        }
       }
     });
 
@@ -92,8 +107,20 @@ var GameEventsStore = Reflux.createStore({
   },
 
   setUser(appState) {
-    this.userId = appState.userId;
-    this.opponentId = appState.opponentId;
+    this.user = appState.user;
+    this.opponent = appState.opponent;
+  },
+
+  getUserId() {
+    return (this.user) ? this.user.id : null;
+  },
+
+  getOpponentName() {
+    return (this.opponent) ? this.opponent.name : null;
+  },
+
+  showConnectionStatus() {
+    this.handleErrorResult({error: 'Could not connect to the game server!'});
   },
 
   handleInvitationEvent(event) {
@@ -116,25 +143,35 @@ var GameEventsStore = Reflux.createStore({
     }
   },
 
-  getInvitationForward(response) {
-    var {invitation} = response;
-    if (this.userId == invitation.to) {
+  getInvitationForward(forward) {
+    var {invitation} = forward;
+    if (this.getUserId()  == invitation.to.id) {
+
+      var audio = document.getElementById('audio-player');
+      audio.src="/sounds/Notification.mp3";
+      audio.play();
+
       return {
         type: 'info',
         header: 'New invitation',
-        message: `An invitation from user ${invitation.from}.`
+        message: `An invitation from user ${invitation.from.name}.`
       }
     }
     return null;
   },
 
   getInvitationResponse(invitation) {
-    var {state} = this;
-    if (this.userId == invitation.from) {
+    var {response} = invitation;
+    if (this.getUserId()  == response.from.id) {
+
+      var audio = document.getElementById('audio-player');
+      audio.src="/sounds/Notification.mp3";
+      audio.play();
+
       return {
         type: 'info',
         header: '',
-        message: `User ${invitation.to} has ${invitation.accepted ? 'accepted' : 'rejected'} your invitation.`
+        message: `User ${response.to.name} has ${response.accepted ? 'accepted' : 'rejected'} your invitation.`
       }
     }
     return null;

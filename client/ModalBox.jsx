@@ -3,14 +3,23 @@ var React = require('react')
 
 var ModalBox = React.createClass({
 
-  getInitialState() {
+  getDefaultProps() {
     return {
-      show: false,
       question: null,
       confirmText: 'Yes',
       declineText: 'No',
       action: null
     }
+  },
+
+  getInitialState() {
+    return {
+      show: true
+    }
+  },
+
+  componentWillReceiveProps() {
+    this.setState({show: true});
   },
 
   componentDidMount: function() {
@@ -21,20 +30,16 @@ var ModalBox = React.createClass({
   },
 
   confirm() {
-    this.setState(this.getInitialState());
-    this.state.action();
+    this.setState({show: false});
+    if(this.props.action) {
+      this.props.action();
+    }
   },
 
   decline() {
-    this.setState(this.getInitialState());
-  },
-
-  show(question, action, opts) {
-    var {state} = this;
-    if (question) {
-      var confirmText = (opts && opts.confirmText) ? opts.confirmText: state.confirmText;
-      var declineText = (opts && opts.declineText) ? opts.declineText: state.declineText;
-      this.setState({show: true, question, action, confirmText, declineText});
+    this.setState({show: false});
+    if(this.props.decline) {
+      this.props.decline();
     }
   },
 
@@ -51,16 +56,23 @@ var ModalBox = React.createClass({
   },
 
   render() {
-    var {state} = this;
+    var {state, props} = this;
     return (
       <div id="overlay" className={state.show ? "visible" : null } onClick={this.onOverlayClick}>
       {state.show ?
         <div className="box" ref="box" onKeyDown={this.closeOnEscape}>
-          <div className="question">{state.question}</div>
-          <div className="buttons">
-            <button className="btn btn-default" onClick={this.confirm}>{state.confirmText}</button>
-            <button className="btn btn-primary" onClick={this.decline}>{state.declineText}</button>
-          </div>
+          <div className="question">{props.question}</div>
+          <div>{props.children}</div>
+          {props.mode == 'ok' ?
+            (<div className="buttons">
+              <button className="btn btn-default" onClick={this.decline}>OK</button>
+            </div>)
+            :
+            (<div className="buttons">
+              <button className="btn btn-default" onClick={this.confirm}>{props.confirmText}</button>
+              <button className="btn btn-primary" onClick={this.decline}>{props.declineText}</button>
+            </div>)
+          }
         </div> : null
         }
       </div>
@@ -68,4 +80,20 @@ var ModalBox = React.createClass({
   }
 });
 
-module.exports = ModalBox;
+var ModalBoxWrapper = function(ModalBox, element) {
+  this.show = function(question, action, opts) {
+    var {props} = this;
+    if (question) {
+      var props = {question, action};
+      if(opts && opts.confirmText) {
+        props.confirmText = opts.confirmText;
+      }
+      if(opts && opts.declineText) {
+        props.declineText = opts.declineText;
+      }
+      React.render(<ModalBox {...props} />, element);
+    }
+  };
+};
+
+module.exports = {ModalBox, ModalBoxWrapper};
