@@ -109,8 +109,10 @@ var GamePhaseStore = Reflux.createStore({
   },
 
   updateConnectionStatus() {
-    this.game = {phase: phase.signedOutOfGame};
-    this.trigger(this.game);
+    if(this.game.phase != phase.signedOutOfFb) {
+      this.game = {phase: phase.signedOutOfGame};
+      this.trigger(this.game);
+    }
   },
 
   takeShot(cell) {

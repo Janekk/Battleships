@@ -18,6 +18,11 @@ var social = function() {
 
     //FB.Event.subscribe('auth.authResponseChange', onAuthResponseChange);
     FB.Event.subscribe('auth.statusChange', onStatusChange);
+    FB.getLoginStatus(function(response) {
+      if(response.status != 'connected') {
+        signInCallback.error();
+      };
+    });
   };
 
   function login(callback) {

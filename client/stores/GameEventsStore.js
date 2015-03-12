@@ -108,6 +108,7 @@ var GameEventsStore = Reflux.createStore({
 
   setUser(appState) {
     this.user = appState.user;
+    this.fbUser = appState.fbUser;
     this.opponent = appState.opponent;
   },
 
@@ -120,7 +121,11 @@ var GameEventsStore = Reflux.createStore({
   },
 
   showConnectionStatus() {
-    this.handleErrorResult({error: 'Could not connect to the game server!'});
+    if(this.fbUser) {
+      // socket.io triggers connect error also if socket is closed (in this case before user is authenticated with FB),
+      // therefore prevent the error from showing if the user is not logged in to FB
+      this.handleErrorResult({error: 'Could not connect to the game server!'});
+    }
   },
 
   handleInvitationEvent(event) {
