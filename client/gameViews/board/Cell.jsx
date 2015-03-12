@@ -19,14 +19,13 @@ var Cell = React.createClass({
       var classes = cx({
         'cell': true,
         'shot': !!shot,
-        'update': this.props.update,
-        //'hit': (shot && shot.isHit),
+        'update': props.update,
         'adjacent': (shot && shot.isAdjacentToShip)
       });
 
       return (
         <g className={classes}>
-          <rect onClick={props.onCellClick} {...rectProps} />
+          <rect {...rectProps} />//
           <g>
             <line x1={rectProps.x} y1={rectProps.y} x2={rectProps.x + rectProps.width} y2={rectProps.y + rectProps.height} />
             <line x1={rectProps.x} y1={rectProps.y + rectProps.height} x2={rectProps.x + rectProps.width} y2={rectProps.y} />

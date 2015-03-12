@@ -151,10 +151,7 @@ var SetupStore = Reflux.createStore({
     };
 
     if (allPlaced()) {
-      var toSend = state.ships.map((ship) => {
-        return ship;
-      });
-      socket.emit(gameEvents.client.placeShips, toSend);
+      socket.emit(gameEvents.client.placeShips, state.ships);
     }
   },
 

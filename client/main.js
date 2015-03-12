@@ -67,7 +67,7 @@ var Body = React.createClass({
             <i className="fa fa-bars fa-2x" ref="navBtn" />
           </div> : null
           }
-        {state.app.isPlaying ?
+        {state.app.signedIn ?
           <div className="user-id">
             <span>User: {state.app.user.name}
             {state.app.opponent ?
@@ -99,7 +99,7 @@ var Body = React.createClass({
         </div>
         <div id="footer" className="hf">
           <div className="content"> Copyright ©
-            <a target="_blank" href="//janekk.github.io">&nbsp;Janekk&nbsp;</a>
+            <a target="_blank" href="http://janekk.github.io">&nbsp;Janekk&nbsp;</a>
             2015
           </div>
         </div>

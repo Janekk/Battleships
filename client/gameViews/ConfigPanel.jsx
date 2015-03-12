@@ -25,17 +25,23 @@ var ConfigPanel = React.createClass({
     var config = setup.config ? _.sortBy(setup.config.ships, (cfg) => {return -cfg.size;}) : [];
     var selectedSize = selected ? selected.size : null;
 
-    var components = [];
+    var configShips = [];
     config.forEach((cfg, index) => {
-      var handleClick = this.handleItemClick.bind(this, cfg);
-      components.push(<ConfigurationShip config={cfg} index={index} key={cfg.size} selected={cfg.size == selectedSize} count={cfg.count} onClick={handleClick}/>);
+      var shipProps = {
+        config: cfg,
+        index: index,
+        key: cfg.size,
+        selected: (cfg.size == selectedSize),
+        onShipClick: this.handleItemClick.bind(this, cfg)
+      };
+      configShips.push(<ConfigurationShip {...shipProps}/>);
     });
 
     var svgViewbox = [0, 0, 120, (config.length * 10) +  12];
     return (
       <div className="ships-panel">
         <svg width="100%" height="100%" viewBox={svgViewbox.join(' ')}>
-            {components}
+            {configShips}
         </svg>
       </div>
     );
@@ -45,30 +51,31 @@ var ConfigPanel = React.createClass({
 var ConfigurationShip = React.createClass({
 
   render() {
-    var props = {
-      x: (5 - this.props.config.size) * 10,
-      y: 2 + (this.props.index * 12),
-      width: this.props.config.size * 10,
+    var {props} = this, config;
+    var svgProps = {
+      x: (5 - props.config.size) * 10,
+      y: 2 + (props.index * 12),
+      width: props.config.size * 10,
       height: 10
     };
 
     var cx = React.addons.classSet;
     var classes = cx({
       'config': true,
-      'selected': this.props.selected && (this.props.count > 0),
-      'inactive': (this.props.count == 0),
+      'selected': props.selected && (props.config.count > 0),
+      'inactive': (props.config.count == 0),
       'ship': true,
       'configuration-ship': true
     });
 
     return (
       <g>
-        <g className={classes} onClick={this.props.onClick}>
-          <rect {...props} />
-          <text x={props.x + props.width - 10} y={props.y + 8}>{"x" + this.props.count}</text>
+        <g className={classes} onClick={props.onShipClick}>
+          <rect {...svgProps} />
+          <text x={svgProps.x + svgProps.width - 10} y={svgProps.y + 8}>{"x" + props.config.count}</text>
         </g>
         <g className={classes}>
-          <text x={props.x + props.width + 2} y={props.y + 8}>{this.props.config.name}</text>
+          <text x={svgProps.x + svgProps.width + 2} y={svgProps.y + 8}>{props.config.name}</text>
         </g>
       </g>
     );
