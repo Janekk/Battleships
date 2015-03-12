@@ -82,7 +82,6 @@ var ModalBox = React.createClass({
 
 var ModalBoxWrapper = function(ModalBox, element) {
   this.show = function(question, action, opts) {
-    var {props} = this;
     if (question) {
       var props = {question, action};
       if(opts && opts.confirmText) {

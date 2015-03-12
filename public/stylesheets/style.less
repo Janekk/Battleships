@@ -436,6 +436,7 @@ html, body {
 
       .lobby {
         @bg-lobby: #EFEDED;
+        overflow: auto;
 
         .tool-font();
 
@@ -455,6 +456,8 @@ html, body {
 
         .friends-filter {
           float: right;
+          width: 40%;
+          text-align: right;
           .checkbox + label {
             padding-left: 8px;
           }
@@ -503,16 +506,16 @@ html, body {
         }
 
         .user-filter {
-          font-size: 2em;
+          font-size: 1.5em;
         }
 
         .welcome {
-          .tool-font(26px);
-
           p {
             padding: 10px 0 0 0;
             line-height: 1.2em;
+            font-size: 18px;
             &.welcome {
+              font-size: 26px;
               font-weight: 700;
             }
 
@@ -532,21 +535,43 @@ html, body {
           }
         }
 
+        .ad {
+          float: left;
+          display: inline-block;
+          padding: 0 0 0 5%;
+
+          @media (min-width: @screen-md-min) {
+            width: 40%;
+          }
+          @media (max-width: @screen-sm-max) {
+            display: none;
+          }
+
+          img {
+            width: 100%;
+          }
+
+          a {
+            font-weight: 700;
+          }
+        }
+
         .content {
+          float: left;
+          display: inline-block;
           background: @fill-ship;
           padding: 10px;
           box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-
-          @media (min-width: @screen-sm-min) {
-            width: 80%;
-            min-width: @screen-sm-min;
-          }
-          @media (min-width: @screen-md-min) {
-            width: @screen-sm-min;
-          }
           @media (max-width: @screen-xs-max) {
             width: 100%;
           }
+          @media (min-width: @screen-sm-min) {
+            width: 70%;
+          }
+          @media (min-width: @screen-md-min) {
+            width: 50%;
+          }
+
           overflow: auto;
 
           .header {
@@ -577,7 +602,7 @@ html, body {
             }
 
             .inactive.sub-header {
-              background: #ececec;
+              background: @bg-lobby;
             }
 
             .user-item {
@@ -588,8 +613,22 @@ html, body {
               border-width: 1px 0 0 0;
               vertical-align: middle;
 
-              .user-name, .user-invitation {
+              .user-name {
                 display: inline-block;
+              }
+              .user-invitation {
+                display: inline-block;
+                float: right;
+                button {
+                  float: right;
+                }
+                .fb-confirmation {
+                  float: right;
+                  font-size: 14px;
+                  font-weight: 700;
+                  padding-top: 3px;
+                  color: green;
+                }
               }
 
               .non-friend {
@@ -621,8 +660,6 @@ html, body {
               }
 
               &.active {
-                background: #BAE2AE;
-
                 button {
                   @bg-btn-active-user: #21B421;
                   color: #fff;
@@ -640,6 +677,7 @@ html, body {
             }
           }
         }
+
       }
 
       div.setup {

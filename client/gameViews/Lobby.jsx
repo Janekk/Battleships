@@ -42,7 +42,8 @@ var Lobby = React.createClass({
     this.setState({onlyFriends: !this.state.onlyFriends});
   },
 
-  toggleHint() {
+  toggleHint(e) {
+    e.preventDefault();
     this.setState({showHints: !this.state.showHints});
   },
 
@@ -56,12 +57,15 @@ var Lobby = React.createClass({
             <p className="welcome">Welcome to the Battleships Lobby!</p>
             <p>Invite other users to the game or try the
               <button className="btn btn-primary" onClick={this.onSinglePlay}>
-              Single Player Mode
-            </button></p>
+                Single Player Mode
+              </button>
+            </p>
           </div>
           <div className="content">
             <div className="header">
-              <div className="question"><i onClick={this.toggleHint} className="fa fa-question-circle"></i></div>
+              <div className="question">
+                <a href="" onClick={this.toggleHint}><i className="fa fa-question-circle"></i></a>
+              </div>
               <div className="user-filter">
                 <input type="text" ref="userNameFilter" placeholder="Search.." className="name-filter" onKeyUp={this.onFilterSubmit}></input>
                 <FancyCheckbox id="friends-filter" label="Only friends" onChange={this.onFriendsFilterChange}/>
@@ -69,11 +73,23 @@ var Lobby = React.createClass({
             </div>
             <UserList {...state}>
             {state.showHints ?
-              <ModalBox mode="ok" question="How to use the Lobby" decline={this.toggleHint.bind(this)}><img src="/images/explanation.png" /></ModalBox>
+              <ModalBox mode="ok" question="How to use the Lobby" decline={this.toggleHint.bind(this)}>
+                <img src="/images/explanation.png" />
+              </ModalBox>
               : null
-            }
+              }
             </UserList>
           </div>
+          <div className="ad">
+            <p>Check out the standalone version for mobile browsers at &nbsp;
+              <a href="http://battleships.mobi" target="_blank">Battleships.mobi</a>
+              !</p>
+
+            <a href="http://battleships.mobi" target="_blank">
+              <img src="/images/preview.png" />
+            </a>
+          </div>
+
         </div>
         :
         <div className="no-user">
@@ -153,9 +169,14 @@ var InactiveUserItem = React.createClass({
           <img className="fb-image" src={props.user.picture.data.url} /> : null }
         <div className="user-name">{props.user.name}</div>
         <div className="user-invitation">
-          <button className="btn btn-primary" onClick={props.onInvitationClick}>
-            Invite to Lobby
-          </button>
+          <div>
+            <button className="btn btn-primary" onClick={props.onInvitationClick}>
+              Invite to Lobby
+            </button>
+          </div>
+          {props.user.gotFbInvitation ?
+            <div className="fb-confirmation">Invitation has been sent!</div> : null
+          }
         </div>
       </li>
     );
