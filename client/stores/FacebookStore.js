@@ -1,4 +1,5 @@
 var Reflux = require('reflux')
+  , _ = require('lodash')
   , Actions = require('../actions');
 
 var FacebookStore = Reflux.createStore({
@@ -36,8 +37,17 @@ var FacebookStore = Reflux.createStore({
         message: 'Come play Battleships with me!',
         to: friendId
       },
-      function(result){
-        console.log(result);
+      (result) => {
+        if(result.error) {
+          console.error(result);
+        }
+        else {
+          var friend = _.find(this.state.friends, {id: friendId});
+          if(friend) {
+            friend.gotFbInvitation = true;
+          }
+          this.trigger(this.state);
+        }
       }
     );
   },

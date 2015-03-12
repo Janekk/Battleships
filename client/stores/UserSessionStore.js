@@ -13,6 +13,7 @@ var UserStore = Reflux.createStore({
     this.state = {
       signedIn: false,
       isPlaying: false,
+      fbUser: null,
       user: null,
       opponent: null
     };
@@ -48,20 +49,17 @@ var UserStore = Reflux.createStore({
   },
 
   signInToFb(fbState) {
-    this.fbUser = fbState.user;
+    this.state.fbUser = fbState.user;
   },
 
   signInToGame() {
     this.initStores();
 
+    socket.once('connect', function() {
+      socket.emit(gameEvents.client.enterLobby, {id: this.state.fbUser.id, name: this.state.fbUser.name});
+    }.bind(this));
+
     socket.connect();
-
-    this.enterLobbyCallback = this.enterLobbyCallback || function() {
-      socket.emit(gameEvents.client.enterLobby, {id: this.fbUser.id, name: this.fbUser.name});
-    }.bind(this);
-
-    socket.removeListener('connect', this.enterLobbyCallback);
-    socket.on('connect', this.enterLobbyCallback);
   },
 
   initStores() {
