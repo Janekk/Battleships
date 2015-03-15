@@ -21,10 +21,10 @@ module.exports = function (io, gameService) {
     socket.leave('lobby');
   };
 
-  var _startGame = function (Game) {
+  var _startGame = function (GameService) {
     return {
       with: function (emitter, sockets) {
-        var game = new Game(emitter, sockets);
+        var game = new GameService(emitter, sockets);
 
         sockets.forEach(function (socket) {
           _games.push({userId: socket.username, game: game});

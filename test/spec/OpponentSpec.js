@@ -1,5 +1,4 @@
 var opponent = new (require('../../game/battleships/Opponent'))();
-var customMatchers = require('../customMatchers');
 var _ = require('lodash');
 
 describe('BoardUtils', function () {

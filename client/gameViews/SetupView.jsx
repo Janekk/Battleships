@@ -7,14 +7,14 @@ var React = require('react')
   , SetupBoard = require('./SetupBoard');
 
 var SetupView = React.createClass({
-  mixins: [Reflux.listenTo(SetupStore, 'onSetupStateChange')],
+  mixins: [Reflux.listenTo(SetupStore, 'onSetupChange')],
 
-  onSetupStateChange(setup) {
+  onSetupChange(setup) {
     this.setState({setup});
   },
 
   componentWillMount() {
-    this.onSetupStateChange(SetupStore.getState());
+    this.onSetupChange(SetupStore.getState());
   },
 
   placeShips() {
@@ -22,23 +22,24 @@ var SetupView = React.createClass({
   },
 
   render() {
+    var {state} = this;
     return (
       <div className="setup">
-        {this.state.setup.config ?
+        {state.setup.config ?
           <div>
             <div className="command">
               Place ships on the gameboard by selecting a ship and clicking on a target field. Double-click to pivot the ship. Ships can't be adjacent to each other!
             </div>
             <div className="side">
               <div className="confirm">
-                <button type='button' className="btn btn-default" disabled={!this.state.setup.allPlaced} onClick={this.placeShips}>
+                <button type='button' className="btn btn-default" disabled={!state.setup.allPlaced} onClick={this.placeShips}>
                   <span className="fa fa-check"></span>
                   Ready!
                 </button>
               </div>
-              <ConfigPanel setup={this.state.setup} />
+              <ConfigPanel setup={state.setup} />
             </div>
-            <SetupBoard setup={this.state.setup} />
+            <SetupBoard setup={state.setup} />
           </div> : null}
       </div>);
   }
