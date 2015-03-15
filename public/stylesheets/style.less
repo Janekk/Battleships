@@ -530,6 +530,7 @@ html, body {
 
         .command {
           margin-bottom: 10px;
+          font-weight: 700;
         }
 
         .confirm {
@@ -546,18 +547,20 @@ html, body {
         @media (min-aspect-ratio: 1/1) {
           width: 100%;
           .side {
-            width: 30%;
+            width: 40%;
             float: right;
 
             .ships-panel {
-              padding: 15px 0 0 15px;
               width: 100%;
+
+              svg {
+                min-height: 25vh;
+              }
             }
           }
 
           .board.setup {
-            width: 70%;
-            float: left;
+            width: 60%;
 
             svg {
               height: 65vh;
