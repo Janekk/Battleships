@@ -65,7 +65,7 @@ gulp.task('less', function () {
     .pipe(gulp.dest('./public/stylesheets'));
 });
 
-gulp.task('watch-browserify', function () {
+gulp.task('watch-client', function () {
   gulp.watch([paths.src.client.scripts], ['browserify'])
 });
 

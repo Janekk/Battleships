@@ -1,7 +1,17 @@
 {
-  "name": "Battleship",
-  "version": "0.0.0",
+  "name": "Battleships",
+  "description": "Battleships browser game",
+  "version": "0.9.1",
   "private": true,
+  "engines": {
+    "node": "0.10.x",
+    "npm": "2.5.x"
+  },
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "jest"
+  },
   "dependencies": {
     "body-parser": "~1.8.4",
     "browserify": "~6.0.3",
