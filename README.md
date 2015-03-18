@@ -19,4 +19,4 @@ Battleships is a remake of the classic pen and pencil game brought to your brows
 
 [You can play Battleships here!](http://battleships.mobi/)
 
-[And the Facebook version here!](apps.facebook.com/battleshipsboardgame/)
+[And the Facebook version here!](https://apps.facebook.com/battleshipsboardgame/)
