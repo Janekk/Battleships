@@ -13,7 +13,10 @@ Battleships is a remake of the classic pen and pencil game brought to your brows
 - game offers a lobby where users can invite each other to play together 
 
 ## Roadmap ##
+- [x] Facebook integration (see branch: [fb-integration](../../tree/fb-integration))
 - [ ] Firefox OS / Phone Gap App
 - [ ] Add more games on top of it
 
 [You can play Battleships here!](http://battleships.mobi/)
+
+[And the Facebook version here!](apps.facebook.com/battleshipsboardgame/)
