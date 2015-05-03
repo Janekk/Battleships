@@ -1,7 +1,7 @@
 var messageHelper = require('./../messageHelper')
   , _ = require('lodash')
   , gameEvents = require('./../gameEvents')
-  , Game = require('./Game')
+  , Game = require('./game')
   , EventEmitter = require('events').EventEmitter;
 
 function BattleshipsService(emitter, sockets) {

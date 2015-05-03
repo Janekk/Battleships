@@ -1,4 +1,4 @@
-var Reflux = require('Reflux')
+var Reflux = require('reflux')
   , socket = require('../socket')
   , _ = require('lodash')
   , phase = require('../gamePhase')

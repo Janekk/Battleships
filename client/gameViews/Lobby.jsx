@@ -1,5 +1,5 @@
 var React = require('react/addons')
-  , Reflux = require('Reflux')
+  , Reflux = require('reflux')
   , _ = require('lodash')
   , Actions = require('./../actions')
   , LobbyStore = require('./../stores/LobbyStore');
